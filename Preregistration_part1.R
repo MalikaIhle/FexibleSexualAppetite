@@ -150,14 +150,44 @@ summary(mod4)
 
 
 
-# to calculate odds ratio
-## p is the probability of attacking the red prey
-## Aversion is the treatment group trained to be red averse
-## Preference, the treatment group trained to prefer red preys
+# to calculate risk ratios or odd ratios
+## http://www.biostat.umn.edu/~susant/Fall10ph6414/Lesson14_complete.pdf
 
-pAversion <-  plogis(coef(mod)[1])
-pPreference <- plogis(coef(mod)[1]+coef(mod)[2])
-odds <- pP/(1-pA) / pA/(1-pP) # how much more the red preference group will attack the red bugs compared to the red averse group.
+# step 1
+table(MY_TABLE_FID$Trt, MY_TABLE_FID$AttackBugYN)
 
+a <- table(MY_TABLE_FID$Trt, MY_TABLE_FID$AttackBugYN)[1,2]
+b <- table(MY_TABLE_FID$Trt, MY_TABLE_FID$AttackBugYN)[1,1]
+c <- table(MY_TABLE_FID$Trt, MY_TABLE_FID$AttackBugYN)[2,2]
+d <- table(MY_TABLE_FID$Trt, MY_TABLE_FID$AttackBugYN)[2,1]
+
+riskratio_step1 <- (a/(a+b)) / (c/(c+d))
+lower_RR1 <- exp(log(riskratio_step1)-1.96*sqrt(b/(a*(a+b))+d/(c*(c+d))))
+upper_RR1 <- exp(log(riskratio_step1)+1.96*sqrt(b/(a*(a+b))+d/(c*(c+d))))
+
+
+# step 2
+table(MY_TABLE_FID$Trt, MY_TABLE_FID$AttackNewRedYN)
+
+a <- table(MY_TABLE_FID$Trt, MY_TABLE_FID$AttackNewRedYN)[1,2]
+b <- table(MY_TABLE_FID$Trt, MY_TABLE_FID$AttackNewRedYN)[1,1]
+c <- table(MY_TABLE_FID$Trt, MY_TABLE_FID$AttackNewRedYN)[2,2]
+d <- table(MY_TABLE_FID$Trt, MY_TABLE_FID$AttackNewRedYN)[2,1]
+
+
+odds1 <- (a/b) / (c/d)
+lower_odds1 <- exp(log(odds1)-1.96*sqrt(1/a + 1/b + 1/c + 1/d))
+upper_odds1 <- exp(log(odds1)+1.96*sqrt(1/a + 1/b + 1/c + 1/d))
+
+exp(cbind(coef(mod1), confint(mod1)))  
+
+pAversion2 <-  plogis(coef(mod2)[1])
+pPreference2 <- plogis(coef(mod2)[1]+coef(mod2)[2])
+odds2 <- pPreference2/(1-pAversion2) / pAversion2/(1-pPreference2)
+
+
+pAversion3 <-  plogis(coef(mod3)[1])
+pPreference3 <- plogis(coef(mod3)[1]+coef(mod3)[2])
+odds3 <- pPreference3/(1-pAversion3) / pAversion3/(1-pPreference3) # how much more the red preference group will attack the red bugs compared to the red averse group.
 
 
