@@ -144,7 +144,7 @@ summary(mod3)
   
 # exploratory analyses: repeatability of female bias, and step "strenght of effect"
 
-mod4 <- glmer (attackRedYN ~ Step+Trt + (1|FID), family = "binomial", data=MY_TABLE_Step)
+mod4 <- glmer (attackRedYN ~ Trt + (1|FID), family = "binomial", data=MY_TABLE_Step)
 summary(mod4)
 
 
