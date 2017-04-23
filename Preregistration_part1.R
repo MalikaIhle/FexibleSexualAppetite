@@ -10,6 +10,7 @@ rm(list = ls(all = TRUE))
 
 {# packages
 library(lme4)
+library(rptR)
 }
 
 {# simulation data
@@ -142,11 +143,18 @@ summary(mod3)
 
 
   
-# exploratory analyses: repeatability of female bias, and step "strenght of effect"
+# exploratory analyses: repeatability of female bias
 
 mod4 <- glmer (attackRedYN ~ Trt + (1|FID), family = "binomial", data=MY_TABLE_Step)
 summary(mod4)
 
+print(rpt(formula = attackRedYN ~ Trt + (1|FID),
+          grname = c("Fixed","Overdispersion","FID"), 
+          data= MY_TABLE_Step, 
+          datatype = "Binary", 
+          nboot = 1000, 
+          npermut = 0, 
+          adjusted = FALSE))
 
 
 
