@@ -2,8 +2,8 @@
 #	 Malika IHLE      malika_ihle@hotmail.fr
 #	 Preregistration FlexibleSexualAppetite part 1
 #	 Start : 21/04/2017
-#	 last modif : 23/04/2017
-#	 commit: simulation of data to see whether planned analyses code works
+#	 last modif : 25/04/2017
+#	 commit: simulation of data to see whether planned analyses code works - remove Fcondition taken before and after
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
@@ -23,21 +23,10 @@ Trt <- rep(c("RedPref","RedAverse"),nF/2)
 AttackBugYN <- sample(c(0,1),nF, replace=TRUE) # step 1
 AttackNewRedYN <- sample(c(0,1),nF, replace=TRUE) # step 2
 Time_to_attack <- rnorm(nF, mean = 15, sd = 7) # step 2 find value previous experiment!!
-
-MY_TABLE_FID <- data.frame(FID, Trt, AttackBugYN,AttackNewRedYN,Time_to_attack)
-
-
-Females_and_Trt <- data.frame(FID,Trt)
-Double_Females_and_Trt <- data.frame(rbind(Females_and_Trt,Females_and_Trt))
-sortedDouble_Females_and_Trt <- Double_Females_and_Trt[order(Double_Females_and_Trt$FID),]
-
-Fsize <- sort(rnorm(nF*2,mean = 4, sd=1))# find real values!!
-Fweight <- rnorm(nF*2,mean = 4, sd=1)# find real values!!
+Fsize <- sort(rnorm(nF,mean = 4, sd=1))# find real values!!
+Fweight <- rnorm(nF,mean = 4, sd=1)# find real values!!
 Fcondition <- resid(lm(Fweight~Fsize))
-before_after <- rep(c("before","z_after"),nF)
-
-MY_TABLE_FCondition <- data.frame(Fcondition,before_after,sortedDouble_Females_and_Trt)
-MY_TABLE_FCondition$interaction <- paste(MY_TABLE_FCondition$before_after,MY_TABLE_FCondition$Trt, sep="")
+MY_TABLE_FID <- data.frame(FID, Trt, AttackBugYN,AttackNewRedYN,Time_to_attack,Fcondition)
 
 
 MID <- 1:(nF*2)
@@ -79,17 +68,17 @@ colnames(Males2) <- c("MID","Mcolor")
 MY_TABLE_MID <- merge(MY_TABLE_MID, rbind(Males1,Males2),all.x=TRUE)
 MY_TABLE_MID$latency_to_court <- rnorm(nF*2, mean = 15, sd = 7)
 
-
+Females_and_Trt <- data.frame(FID,Trt)
 Triple_Females_and_Trt <- data.frame(rbind(Females_and_Trt,Females_and_Trt,Females_and_Trt))
 Step <- sort(rep (c("step1", "step2", "step3"),nF))
 attackRedYN <- c(AttackBugYN, AttackNewRedYN, CannibalizedRedYN)
 
 MY_TABLE_Step <- data.frame(Step,Triple_Females_and_Trt,attackRedYN)
 MY_TABLE_Step <- MY_TABLE_Step[order(MY_TABLE_Step$FID),]
+MY_TABLE_Step$rowID <- 1:nrow(MY_TABLE_Step)
 }
 
 head(MY_TABLE_FID)
-head(MY_TABLE_FCondition)
 head(MY_TABLE_MID)
 head(MY_TABLE_Step)
 
@@ -100,25 +89,24 @@ head(MY_TABLE_Step)
 # step 1
 
 mod1 <- glm (AttackBugYN ~ Trt + Fcondition, "binomial", data = MY_TABLE_FID)
+
+par(mfrow=c(2,2))
+plot(mod1)
+
 summary(mod1)
-
-  ## to get one sided test p value
-  coef(summary(mod1))[2, 4]/2
-
-  ## to check slope of change of condition over the diet training isn't different between treatment
-  #summary(lmer (Fcondition ~ before_after*Trt + (1|FID), data = MY_TABLE_FCondition))
-  ## if they do differ: check which treatment declined in body condition
-  #summary(lmer (Fcondition ~ -1+interaction + (1|FID), data = MY_TABLE_FCondition))
 
 
 
 # step 2
 
 mod2 <- glm (AttackNewRedYN ~ Trt, family = "binomial",  data = MY_TABLE_FID)
+
+par(mfrow=c(2,2))
+plot(mod2)
+
 summary(mod2)
 
-  ## to get one sided test p value
-  coef(summary(mod2))[2, 4]/2
+
 
   ## to check equality of motivation to feed
   shapiro.test(MY_TABLE_FID$Time_to_attack)
@@ -132,10 +120,13 @@ summary(mod2)
 # step 3
 
 mod3 <- glm (CannibalizedRedYN ~ Trt+ DeltaMsize + DeltaMcondition, family = "binomial", data = MY_TABLE_FID)
+
+par(mfrow=c(2,2))
+plot(mod3)
+
 summary(mod3)
 
-  ## to get one sided test p value
-  coef(summary(mod3))[2, 4]/2
+
 
   ## to check equality of male motivation to court
   shapiro.test(MY_TABLE_MID$latency_to_court)
@@ -147,6 +138,22 @@ summary(mod3)
 # exploratory analyses: repeatability of female bias
 
 mod4 <- glmer (attackRedYN ~ Trt + (1|FID), family = "binomial", data=MY_TABLE_Step)
+
+par(mfrow=c(2,2))
+qqnorm(resid(mod4))
+qqline(resid(mod4))
+qqnorm(unlist(ranef(mod4)$FID))
+qqline(unlist(ranef(mod4)$FID))
+plot(fitted(mod4), resid(mod4))
+abline(h=0)
+plot(fitted(mod4),jitter(MY_TABLE_Step$attackRedYN, 0.5))
+abline(0,1)
+
+
+mod4withrowID <- glm (attackRedYN ~ Trt + (1|FID) + (1|rowID), family = "binomial", data=MY_TABLE_Step)
+anova(mod4,mod4withoutFID)
+
+
 summary(mod4)
 
 print(rpt(formula = attackRedYN ~ Trt + (1|FID),
@@ -175,6 +182,7 @@ riskratio_step1 <- (a/(a+b)) / (c/(c+d)) # how much more the red preference grou
 lower_RR1 <- exp(log(riskratio_step1)-1.96*sqrt(b/(a*(a+b))+d/(c*(c+d))))
 upper_RR1 <- exp(log(riskratio_step1)+1.96*sqrt(b/(a*(a+b))+d/(c*(c+d))))
 
+exp(cbind(OR=coef(mod1), confint(mod1)))[2,] # odds1
 
 # step 2: odds ratio ?
 table(MY_TABLE_FID$Trt, MY_TABLE_FID$AttackNewRedYN)
