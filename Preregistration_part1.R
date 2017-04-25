@@ -98,16 +98,16 @@ head(MY_TABLE_Step)
 
 # step 1
 
-mod1 <- glm (AttackBugYN ~ Trt, "binomial", data = MY_TABLE_FID)
+mod1 <- glm (AttackBugYN ~ Trt + Fcondition, "binomial", data = MY_TABLE_FID)
 summary(mod1)
 
   ## to get one sided test p value
   coef(summary(mod1))[2, 4]/2
 
   ## to check slope of change of condition over the diet training isn't different between treatment
-  summary(lmer (Fcondition ~ before_after*Trt + (1|FID), data = MY_TABLE_FCondition))
+  #summary(lmer (Fcondition ~ before_after*Trt + (1|FID), data = MY_TABLE_FCondition))
   ## if they do differ: check which treatment declined in body condition
-  summary(lmer (Fcondition ~ -1+interaction + (1|FID), data = MY_TABLE_FCondition))
+  #summary(lmer (Fcondition ~ -1+interaction + (1|FID), data = MY_TABLE_FCondition))
 
 
 
