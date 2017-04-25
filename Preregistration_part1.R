@@ -3,7 +3,7 @@
 #	 Preregistration FlexibleSexualAppetite part 1
 #	 Start : 21/04/2017
 #	 last modif : 25/04/2017
-#	 commit: simulation of data to see whether planned analyses code works - remove Fcondition taken before and after
+#	 commit: simulation of data to see whether planned analyses code works
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
@@ -66,7 +66,7 @@ Males2 <- MY_TABLE_Mpair[,c("MID2","Mcolor2")]
 colnames(Males2) <- c("MID","Mcolor")
   
 MY_TABLE_MID <- merge(MY_TABLE_MID, rbind(Males1,Males2),all.x=TRUE)
-MY_TABLE_MID$latency_to_court <- rnorm(nF*2, mean = 15, sd = 7)
+MY_TABLE_MID$Latency_to_court <- rnorm(nF*2, mean = 15, sd = 7)
 
 Females_and_Trt <- data.frame(FID,Trt)
 Triple_Females_and_Trt <- data.frame(rbind(Females_and_Trt,Females_and_Trt,Females_and_Trt))
@@ -130,10 +130,10 @@ summary(mod3)
 
   ## to check equality of male motivation to court
   shapiro.test(MY_TABLE_MID$latency_to_court)
-  t.test (MY_TABLE_MID$latency_to_court[MY_TABLE_MID$Mcolor == "Red"], 
-          MY_TABLE_MID$latency_to_court[MY_TABLE_MID$Mcolor == "Black"])
+  t.test (MY_TABLE_MID$Latency_to_court[MY_TABLE_MID$Mcolor == "Red"], 
+          MY_TABLE_MID$Latency_to_court[MY_TABLE_MID$Mcolor == "Black"])
 
-
+  
   
 # exploratory analyses: repeatability of female bias
 
@@ -149,10 +149,8 @@ abline(h=0)
 plot(fitted(mod4),jitter(MY_TABLE_Step$attackRedYN, 0.5))
 abline(0,1)
 
-
 mod4withrowID <- glm (attackRedYN ~ Trt + (1|FID) + (1|rowID), family = "binomial", data=MY_TABLE_Step)
 anova(mod4,mod4withoutFID)
-
 
 summary(mod4)
 
@@ -166,55 +164,19 @@ print(rpt(formula = attackRedYN ~ Trt + (1|FID),
 
 
 
-# to calculate odds ratios for the Red Preference group relative to the red averse group
-## http://www.biostat.umn.edu/~susant/Fall10ph6414/Lesson14_complete.pdf
-## https://stats.stackexchange.com/questions/136193/from-exp-coefficients-to-odds-ratio-and-their-interpretation-in-logistic-regre
+# to calculate odds ratios of eating the red prey for the Red Preference group relative to the red averse group
 
-# step 1 : risk ratio ?
+# step 1 
 table(MY_TABLE_FID$Trt, MY_TABLE_FID$AttackBugYN)
+exp(cbind(OR=coef(mod1), confint(mod1)))[2,] 
 
-a <- table(MY_TABLE_FID$Trt, MY_TABLE_FID$AttackBugYN)[2,2]
-b <- table(MY_TABLE_FID$Trt, MY_TABLE_FID$AttackBugYN)[2,1]
-c <- table(MY_TABLE_FID$Trt, MY_TABLE_FID$AttackBugYN)[1,2]
-d <- table(MY_TABLE_FID$Trt, MY_TABLE_FID$AttackBugYN)[1,1]
-
-riskratio_step1 <- (a/(a+b)) / (c/(c+d)) # how much more the red preference group will attack the red bugs compared to the red averse group.
-lower_RR1 <- exp(log(riskratio_step1)-1.96*sqrt(b/(a*(a+b))+d/(c*(c+d))))
-upper_RR1 <- exp(log(riskratio_step1)+1.96*sqrt(b/(a*(a+b))+d/(c*(c+d))))
-
-exp(cbind(OR=coef(mod1), confint(mod1)))[2,] # odds1
-
-# step 2: odds ratio ?
+# step 2
 table(MY_TABLE_FID$Trt, MY_TABLE_FID$AttackNewRedYN)
-
-a <- table(MY_TABLE_FID$Trt, MY_TABLE_FID$AttackNewRedYN)[2,2]
-b <- table(MY_TABLE_FID$Trt, MY_TABLE_FID$AttackNewRedYN)[2,1]
-c <- table(MY_TABLE_FID$Trt, MY_TABLE_FID$AttackNewRedYN)[1,2]
-d <- table(MY_TABLE_FID$Trt, MY_TABLE_FID$AttackNewRedYN)[1,1]
-
-odds2 <- (a/b) / (c/d)
-lower_odds2 <- exp(log(odds2)-1.96*sqrt(1/a + 1/b + 1/c + 1/d))
-upper_odds2 <- exp(log(odds2)+1.96*sqrt(1/a + 1/b + 1/c + 1/d))
-
-c(odds2,lower_odds2,upper_odds2)
-
-exp(cbind(OR=coef(mod2), confint(mod2)))[2,]   # odds ratio of eating the red prey when in the red preference group relate to the red averse group
-
+exp(cbind(OR=coef(mod2), confint(mod2)))[2,]
 
 # step 3: odds ratio ?
-table(MY_TABLE_FID$Trt, MY_TABLE_FID$CannibalizedRedYN)
+exp(cbind(OR=coef(mod3), confint(mod3)))[2,]  
 
-a <- table(MY_TABLE_FID$Trt, MY_TABLE_FID$CannibalizedRedYN)[2,2]
-b <- table(MY_TABLE_FID$Trt, MY_TABLE_FID$CannibalizedRedYN)[2,1]
-c <- table(MY_TABLE_FID$Trt, MY_TABLE_FID$CannibalizedRedYN)[1,2]
-d <- table(MY_TABLE_FID$Trt, MY_TABLE_FID$CannibalizedRedYN)[1,1]
 
-odds3 <- (a/b) / (c/d)
-lower_odds3 <- exp(log(odds3)-1.96*sqrt(1/a + 1/b + 1/c + 1/d))
-upper_odds3 <- exp(log(odds3)+1.96*sqrt(1/a + 1/b + 1/c + 1/d))
-
-c(odds3,lower_odds3,upper_odds3)
-
-exp(cbind(OR=coef(mod3), confint(mod3)))[2,]   # odds ratio of eating the red male when in the red preference group relative to the red averse group
 
 
