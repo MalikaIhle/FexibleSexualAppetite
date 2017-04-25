@@ -95,6 +95,8 @@ plot(mod1)
 
 summary(mod1)
 
+  ## to get one sided test p value
+  coef(summary(mod1))[2, 4]/2
 
 
 # step 2
@@ -106,6 +108,8 @@ plot(mod2)
 
 summary(mod2)
 
+  ## to get one sided test p value
+  coef(summary(mod2))[2, 4]/2
 
 
   ## to check equality of motivation to feed
@@ -125,6 +129,10 @@ par(mfrow=c(2,2))
 plot(mod3)
 
 summary(mod3)
+
+  ## to get one sided test p value
+  coef(summary(mod3))[2, 4]/2
+
 
 
 
