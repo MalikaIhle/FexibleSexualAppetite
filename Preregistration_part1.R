@@ -2,7 +2,7 @@
 #	 Malika IHLE      malika_ihle@hotmail.fr
 #	 Preregistration FlexibleSexualAppetite part 1
 #	 Start : 21/04/2017
-#	 last modif : 21/04/2017
+#	 last modif : 23/04/2017
 #	 commit: simulation of data to see whether planned analyses code works
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
