@@ -166,7 +166,7 @@ print(rpt(formula = attackRedYN ~ Trt + (1|FID),
 
 
 
-# to calculate risk ratios or odd ratios for the Red Preference group relative to the red averse group
+# to calculate odds ratios for the Red Preference group relative to the red averse group
 ## http://www.biostat.umn.edu/~susant/Fall10ph6414/Lesson14_complete.pdf
 ## https://stats.stackexchange.com/questions/136193/from-exp-coefficients-to-odds-ratio-and-their-interpretation-in-logistic-regre
 
