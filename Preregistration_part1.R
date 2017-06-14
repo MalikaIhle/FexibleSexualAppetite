@@ -12,7 +12,11 @@ rm(list = ls(all = TRUE))
 {# packages
 library(lme4)
 library(rptR)
+library(pbapply)
 }
+
+
+Simulate_and_analyse <-function(){
 
 {# simulation data
 
@@ -90,26 +94,26 @@ head(MY_TABLE_Step)
 
 mod1 <- glm (AttackBugYN ~ Trt + Fcondition, "binomial", data = MY_TABLE_FID)
 
-par(mfrow=c(2,2))
-plot(mod1)
+#par(mfrow=c(2,2))
+#plot(mod1)
 
 summary(mod1)
 
   ## to get one sided test p value
-  coef(summary(mod1))[2, 4]/2
+  mod1p <- coef(summary(mod1))[2, 4]
 
 
 # step 2
 
 mod2 <- glm (AttackNewRedYN ~ Trt, family = "binomial",  data = MY_TABLE_FID)
 
-par(mfrow=c(2,2))
-plot(mod2)
+#par(mfrow=c(2,2))
+#plot(mod2)
 
 summary(mod2)
 
   ## to get one sided test p value
-  coef(summary(mod2))[2, 4]/2
+ mod2p <- coef(summary(mod2))[2, 4]
 
 
   ## to check equality of motivation to feed
@@ -125,37 +129,48 @@ summary(mod2)
 
 mod3 <- glm (CannibalizedRedYN ~ Trt+ DeltaMsize + DeltaMcondition, family = "binomial", data = MY_TABLE_FID)
 
-par(mfrow=c(2,2))
-plot(mod3)
+#par(mfrow=c(2,2))
+#plot(mod3)
 
 summary(mod3)
 
   ## to get one sided test p value
-  coef(summary(mod3))[2, 4]/2
+ mod3p <-  coef(summary(mod3))[2, 4]
 
 
 
 
   ## to check equality of male motivation to court
-  shapiro.test(MY_TABLE_MID$latency_to_court)
+  shapiro.test(MY_TABLE_MID$Latency_to_court)
   t.test (MY_TABLE_MID$Latency_to_court[MY_TABLE_MID$Mcolor == "Red"], 
           MY_TABLE_MID$Latency_to_court[MY_TABLE_MID$Mcolor == "Black"])
 
+
   
+return(list(mod1p, mod2p,mod3p))  
+  
+}  
+
+
+  
+OutputSimulation <- pbreplicate(1000,Simulate_and_analyse())
+OutputSimulation <- OutputSimulation<0.05
+rowSums(OutputSimulation)/1000
+ 
   
 # exploratory analyses: repeatability of female bias
 
 mod4 <- glmer (attackRedYN ~ Trt + (1|FID), family = "binomial", data=MY_TABLE_Step)
-
-par(mfrow=c(2,2))
-qqnorm(resid(mod4))
-qqline(resid(mod4))
-qqnorm(unlist(ranef(mod4)$FID))
-qqline(unlist(ranef(mod4)$FID))
-plot(fitted(mod4), resid(mod4))
-abline(h=0)
-plot(fitted(mod4),jitter(MY_TABLE_Step$attackRedYN, 0.5))
-abline(0,1)
+# 
+# par(mfrow=c(2,2))
+# qqnorm(resid(mod4))
+# qqline(resid(mod4))
+# qqnorm(unlist(ranef(mod4)$FID))
+# qqline(unlist(ranef(mod4)$FID))
+# plot(fitted(mod4), resid(mod4))
+# abline(h=0)
+# plot(fitted(mod4),jitter(MY_TABLE_Step$attackRedYN, 0.5))
+# abline(0,1)
 
 mod4withrowID <- glm (attackRedYN ~ Trt + (1|FID) + (1|rowID), family = "binomial", data=MY_TABLE_Step)
 anova(mod4,mod4withoutFID)
