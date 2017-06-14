@@ -100,7 +100,7 @@ mod1 <- glm (AttackBugYN ~ Trt + Fcondition, "binomial", data = MY_TABLE_FID)
 summary(mod1)
 
   ## to get one sided test p value
-  mod1p <- coef(summary(mod1))[2, 4]
+  mod1p <- coef(summary(mod1))[2, 4]/2
 
 
 # step 2
@@ -113,7 +113,7 @@ mod2 <- glm (AttackNewRedYN ~ Trt, family = "binomial",  data = MY_TABLE_FID)
 summary(mod2)
 
   ## to get one sided test p value
- mod2p <- coef(summary(mod2))[2, 4]
+ mod2p <- coef(summary(mod2))[2, 4]/2
 
 
   ## to check equality of motivation to feed
@@ -135,7 +135,7 @@ mod3 <- glm (CannibalizedRedYN ~ Trt+ DeltaMsize + DeltaMcondition, family = "bi
 summary(mod3)
 
   ## to get one sided test p value
- mod3p <-  coef(summary(mod3))[2, 4]
+ mod3p <-  coef(summary(mod3))[2, 4]/2
 
 
 
