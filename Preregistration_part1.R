@@ -200,7 +200,7 @@ exp(cbind(OR=coef(mod3), confint(mod3)))[2,]
 
 
 
-# Testing each group to 50/50
+# Comparing each group to 50/50
 
 ##step 2
 chisq.test(table(MY_TABLE_FID$AttackNewRedYN[MY_TABLE_FID$Trt == 'RedPref']), p=c(0.5,0.5))
