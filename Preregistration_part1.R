@@ -1,9 +1,10 @@
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #	 Malika IHLE      malika_ihle@hotmail.fr
 #	 Preregistration FlexibleSexualAppetite part 1
+#  simulation of data to see whether planned analyses code works
 #	 Start : 21/04/2017
-#	 last modif : 25/04/2017
-#	 commit: simulation of data to see whether planned analyses code works
+#	 last modif : 7/4/2017
+#	 commit: add exploratory analyses
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
@@ -15,8 +16,8 @@ library(rptR)
 library(pbapply)
 }
 
-
-Simulate_and_analyse <-function(){
+                  #Function to check number of significant result by chance
+                  #Simulate_and_analyse <-function(){
 
 {# simulation data
 
@@ -147,33 +148,30 @@ summary(mod3)
 
 
   
-return(list(mod1p, mod2p,mod3p))  
-  
-}  
-
-
-  
-OutputSimulation <- pbreplicate(1000,Simulate_and_analyse())
-OutputSimulation <- OutputSimulation<0.05
-rowSums(OutputSimulation)/1000
+                # return(list(mod1p, mod2p,mod3p))  
+                #}  
+                
+                #OutputSimulation <- pbreplicate(1000,Simulate_and_analyse())
+                #OutputSimulation <- OutputSimulation<0.05
+                #rowSums(OutputSimulation)/1000
  
   
 # exploratory analyses: repeatability of female bias
 
 mod4 <- glmer (attackRedYN ~ Trt + (1|FID), family = "binomial", data=MY_TABLE_Step)
-# 
-# par(mfrow=c(2,2))
-# qqnorm(resid(mod4))
-# qqline(resid(mod4))
-# qqnorm(unlist(ranef(mod4)$FID))
-# qqline(unlist(ranef(mod4)$FID))
-# plot(fitted(mod4), resid(mod4))
-# abline(h=0)
-# plot(fitted(mod4),jitter(MY_TABLE_Step$attackRedYN, 0.5))
-# abline(0,1)
+ 
+par(mfrow=c(2,2))
+qqnorm(resid(mod4))
+qqline(resid(mod4))
+qqnorm(unlist(ranef(mod4)$FID))
+qqline(unlist(ranef(mod4)$FID))
+plot(fitted(mod4), resid(mod4))
+abline(h=0)
+plot(fitted(mod4),jitter(MY_TABLE_Step$attackRedYN, 0.5))
+abline(0,1)
 
 mod4withrowID <- glm (attackRedYN ~ Trt + (1|FID) + (1|rowID), family = "binomial", data=MY_TABLE_Step)
-anova(mod4,mod4withoutFID)
+anova(mod4,mod4withrowID)
 
 summary(mod4)
 
@@ -189,16 +187,28 @@ print(rpt(formula = attackRedYN ~ Trt + (1|FID),
 
 # to calculate odds ratios of eating the red prey for the Red Preference group relative to the red averse group
 
-# step 1 
+## step 1 
 table(MY_TABLE_FID$Trt, MY_TABLE_FID$AttackBugYN)
 exp(cbind(OR=coef(mod1), confint(mod1)))[2,] 
 
-# step 2
+## step 2
 table(MY_TABLE_FID$Trt, MY_TABLE_FID$AttackNewRedYN)
 exp(cbind(OR=coef(mod2), confint(mod2)))[2,]
 
-# step 3: odds ratio ?
+## step 3: odds ratio ?
 exp(cbind(OR=coef(mod3), confint(mod3)))[2,]  
+
+
+
+# Testing each group to 50/50
+
+##step 2
+chisq.test(table(MY_TABLE_FID$AttackNewRedYN[MY_TABLE_FID$Trt == 'RedPref']), p=c(0.5,0.5))
+chisq.test(table(MY_TABLE_FID$AttackNewRedYN[MY_TABLE_FID$Trt == 'RedAverse']), p=c(0.5,0.5))
+
+##step 3
+chisq.test(table(MY_TABLE_FID$CannibalizedRedYN[MY_TABLE_FID$Trt == 'RedPref']), p=c(0.5,0.5))
+chisq.test(table(MY_TABLE_FID$CannibalizedRedYN[MY_TABLE_FID$Trt == 'RedAverse']), p=c(0.5,0.5))
 
 
 
