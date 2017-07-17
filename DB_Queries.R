@@ -47,7 +47,6 @@ ON Basic_Trials.Ind_ID = Basic_Individuals.Ind_ID
 ")
 
 DailySchedule <- gather(ScheduleDiet, "Event", "EventDate", 3:24 )
-DailySchedule <- arrange(DailySchedule,as.POSIXct(EventDate),GroupName, Ind_ID)
 
 for (i in 1:nrow(DailySchedule)){
   if (DailySchedule$Event[i] == "Start" | 
@@ -59,6 +58,7 @@ for (i in 1:nrow(DailySchedule)){
   {DailySchedule$GrossEvent[i]<-DailySchedule$Event[i]}
 }
 
+DailySchedule <- arrange(DailySchedule,as.POSIXct(EventDate),GrossEvent, GroupName, Ind_ID)
 DailySchedule$EventDate <- as.character(DailySchedule$EventDate)
 
 
