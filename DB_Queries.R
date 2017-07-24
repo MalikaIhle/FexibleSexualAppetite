@@ -41,9 +41,9 @@ DateAdd('d',32,[Basic_Trials].[PeriodBeginDate]) AS Feed17,
 DateAdd('d',34,[Basic_Trials].[PeriodBeginDate]) AS Feed18, 
 DateAdd('d',35,[Basic_Trials].[PeriodBeginDate]) AS rmvPreyPaintMales, 
 DateAdd('d',36,[Basic_Trials].[PeriodBeginDate]) AS MaleTest
-FROM Basic_Trials 
-INNER JOIN Basic_Individuals 
-ON Basic_Trials.Ind_ID = Basic_Individuals.Ind_ID
+FROM Basic_Individuals 
+INNER JOIN Basic_Trials ON Basic_Individuals.Ind_ID = Basic_Trials.Ind_ID
+WHERE (((Basic_Trials.PeriodEndDate) Is Null));
 ")
 
 DailySchedule <- gather(ScheduleDiet, "Event", "EventDate", 3:24 )
