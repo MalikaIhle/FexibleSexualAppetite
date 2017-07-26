@@ -32,8 +32,8 @@ DateAdd('d',16,[Basic_Trials].[PeriodBeginDate]) AS Feed9,
 DateAdd('d',18,[Basic_Trials].[PeriodBeginDate]) AS Feed10, 
 DateAdd('d',20,[Basic_Trials].[PeriodBeginDate]) AS Feed11, 
 DateAdd('d',22,[Basic_Trials].[PeriodBeginDate]) AS Feed12, 
-DateAdd('d',24,[Basic_Trials].[PeriodBeginDate]) AS rmvPreyPaintTermite, 
-DateAdd('d',25,[Basic_Trials].[PeriodBeginDate]) AS TermiteTest, 
+DateAdd('d',23,[Basic_Trials].[PeriodBeginDate]) AS rmvPreyPaintTermite, 
+DateAdd('d',24,[Basic_Trials].[PeriodBeginDate]) AS TermiteTest, 
 DateAdd('d',26,[Basic_Trials].[PeriodBeginDate]) AS Feed14, 
 DateAdd('d',28,[Basic_Trials].[PeriodBeginDate]) AS Feed15, 
 DateAdd('d',30,[Basic_Trials].[PeriodBeginDate]) AS Feed16, 
@@ -43,7 +43,8 @@ DateAdd('d',35,[Basic_Trials].[PeriodBeginDate]) AS rmvPreyPaintMales,
 DateAdd('d',36,[Basic_Trials].[PeriodBeginDate]) AS MaleTest
 FROM Basic_Individuals 
 INNER JOIN Basic_Trials ON Basic_Individuals.Ind_ID = Basic_Trials.Ind_ID
-WHERE (((Basic_Trials.PeriodEndDate) Is Null));
+WHERE (((Basic_Individuals.DeathDate) Is Null) AND ((Basic_Trials.Sex)=0))
+ORDER BY Basic_Trials.PeriodBeginDate;
 ")
 
 DailySchedule <- gather(ScheduleDiet, "Event", "EventDate", 3:24 )
