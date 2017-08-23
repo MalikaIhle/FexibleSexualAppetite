@@ -43,7 +43,7 @@ DateAdd('d',35,[Basic_Trials].[PeriodBeginDate]) AS rmvPreyPaintMales,
 DateAdd('d',36,[Basic_Trials].[PeriodBeginDate]) AS MaleTest
 FROM Basic_Individuals 
 INNER JOIN Basic_Trials ON Basic_Individuals.Ind_ID = Basic_Trials.Ind_ID
-WHERE (((Basic_Individuals.DeathDate) Is Null) AND ((Basic_Trials.Sex)=0))
+WHERE (((Basic_Individuals.DeathDate) Is Null) AND ((Basic_Trials.Sex)=0) AND ((Basic_Trials.Experiment)='MatedFemaleCannibalism'))
 ORDER BY Basic_Trials.PeriodBeginDate;
 ")
 
@@ -61,9 +61,9 @@ for (i in 1:nrow(DailySchedule)){
 
 DailySchedule <- arrange(DailySchedule,as.POSIXct(EventDate),GrossEvent, GroupName, Ind_ID)
 DailySchedule$EventDate <- as.character(DailySchedule$EventDate)
+SubDailySchedule <- DailySchedule[as.POSIXct(DailySchedule$EventDate)>=format(Sys.time(),"%Y-%m-%d"),]
 
-
-write.xlsx(DailySchedule,"C:\\Users\\malika.ihle\\Dropbox\\HabronatusPyrrithrix\\R_DailySchedule.xlsx", row.names = FALSE) 
+write.xlsx(SubDailySchedule,"C:\\Users\\malika.ihle\\Dropbox\\HabronatusPyrrithrix\\R_DailySchedule.xlsx", row.names = FALSE) 
 
 
 bb <- DailySchedule[,c("EventDate","GrossEvent")]
@@ -76,4 +76,6 @@ DailyScheduleSummary <- as.data.frame(summarise(group_by(bb, EventDate= as.chara
                                         MaleTest = sum(GrossEvent == "MaleTest")))
 
 write.xlsx(DailyScheduleSummary,"C:\\Users\\malika.ihle\\Dropbox\\HabronatusPyrrithrix\\R_DailyScheduleSummary.xlsx", row.names = FALSE) 
+
+
 
