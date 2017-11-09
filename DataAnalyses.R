@@ -232,9 +232,10 @@ summary(mod2)
   hist(MY_TABLE_TermiteTest$LatencyAttack)
   hist(log(MY_TABLE_TermiteTest$LatencyAttack))
   shapiro.test(log(MY_TABLE_TermiteTest$LatencyAttack))
-  
-  t.test (log(MY_TABLE_TermiteTest$LatencyAttack[MY_TABLE_TermiteTest$Trt == "RedPreference"]), 
-          log(MY_TABLE_TermiteTest$LatencyAttack[MY_TABLE_TermiteTest$Trt == "RedAverse"]))
+  LogLatencyAttackTermiteRedPreference <- log(MY_TABLE_TermiteTest$LatencyAttack[MY_TABLE_TermiteTest$Trt == "RedPreference"] )
+  LogLatencyAttackTermiteRedAverse <- log(MY_TABLE_TermiteTest$LatencyAttack[MY_TABLE_TermiteTest$Trt == "RedAverse"] ) 
+                                                                                          
+  t.test (LogLatencyAttackTermiteRedPreference, LogLatencyAttackTermiteRedAverse)
 
 
 }

@@ -19,7 +19,7 @@ chisq.test(rbind(DeadFemales,AliveFemales))
 ```
 ## dead males during tests
 
-### Males tests excluded out of ```{r, echo=FALSE} nrow(MY_TABLE_MaleTest)```
+### Males tests excluded out of `r nrow(MY_TABLE_MaleTest)`
 ```{r, echo=FALSE}
 table(MY_TABLE_MaleTest$ReasonExclusion[MY_TABLE_MaleTest$ExcludeYN == TRUE]) 
 ```
@@ -50,8 +50,7 @@ summary(mod2)
 
 ## equality of motivation to feed
 ```{r, echo=FALSE}
-t.test (log(MY_TABLE_TermiteTest$LatencyAttack[MY_TABLE_TermiteTest$Trt == "RedPreference"]), 
-          log(MY_TABLE_TermiteTest$LatencyAttack[MY_TABLE_TermiteTest$Trt == "RedAverse"]))
+  t.test (LogLatencyAttackTermiteRedPreference, LogLatencyAttackTermiteRedAverse)
 ```
 
 # Male test
