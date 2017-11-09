@@ -19,12 +19,24 @@ chisq.test(rbind(DeadFemales,AliveFemales))
 ```
 ## dead males during tests
 
+### Males tests excluded out of ```{r, echo=FALSE} nrow(MY_TABLE_MaleTest)```
 ```{r, echo=FALSE}
 table(MY_TABLE_MaleTest$ReasonExclusion[MY_TABLE_MaleTest$ExcludeYN == TRUE]) 
 ```
 ```{r, echo=TRUE}
 chisq.test(rbind(c(10,3),c(97,104)))
 ```
+
+## duration to male consumption
+
+### number valid tests: `r nrow(MY_TABLE_MaleTestValid) `
+### number test male consumed during video:`r nrow(MY_TABLE_MaleTestValid[MY_TABLE_MaleTestValid$DuringVideo == 1,]) `
+### percentage of test where consumption within first day: `r PercentageWithinFirstDay`
+### Delay to consumption all valid tests: 
+```{r, echo=FALSE}
+summary(as.numeric(as.character(TimeDiffInDaysGlobal)))
+```
+
 
 # Bug test
 ```{r, echo=FALSE}
@@ -52,6 +64,13 @@ videos not watched yet
 # FID repeatability 
 ```{r, echo=FALSE}
 summary(mod4)
+print(rpt(formula = AttackRedYN ~ Trt + (1|FID),
+          grname = c("Fixed","FID"),
+          data= MY_TABLE_Step,
+          datatype = "Binary",
+          nboot = 1000,
+          npermut = 0,
+          adjusted = FALSE))
 ```
 
 # Odds ratio

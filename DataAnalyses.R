@@ -48,9 +48,9 @@ ORDER BY Behav_Female.FID, Behav_Female.TrialDate
 
 
 MY_TABLE_MaleTest <- sqlQuery(conDB,"
-SELECT Behav_Female.TrialFID, Behav_Female.FID, Behav_Female.TrialDate, Behav_Female.TrialTime, Basic_Trials.GroupName AS Trt, Behav_Female.AttackRedYN AS CannibalizedRedYN, Behav_Female.AttackGreyBlackYN, Behav_Female.LatencyAttack, Behav_Female.TrialDateEnd, Behav_Female.TrialTimeEnd, Behav_Female.ExcludeYN, Behav_Female.ReasonExclusion, Behav_Female.Remarks
+SELECT Behav_Female.TrialFID, Behav_Female.FID, Behav_Female.TrialDate, Behav_Female.TrialTime, Basic_Trials.GroupName AS Trt, Behav_Female.AttackRedYN AS CannibalizedRedYN, Behav_Female.AttackGreyBlackYN, Behav_Female.LatencyAttack,Behav_Female.DuringVideo, Behav_Female.TrialDateEnd, Behav_Female.TrialTimeEnd, Behav_Female.ExcludeYN, Behav_Female.ReasonExclusion, Behav_Female.Remarks
 FROM Morph_Measurements RIGHT JOIN (Basic_Trials INNER JOIN Behav_Female ON Basic_Trials.Ind_ID = Behav_Female.FID) ON Morph_Measurements.Ind_ID = Behav_Female.FID
-GROUP BY Behav_Female.TrialFID, Behav_Female.FID, Behav_Female.TrialDate, Behav_Female.TrialTime, Basic_Trials.GroupName, Basic_Trials.Sex, Basic_Trials.Experiment, Behav_Female.TestName, Behav_Female.AttackRedYN, Behav_Female.AttackGreyBlackYN, Behav_Female.LatencyAttack, Behav_Female.TrialDateEnd, Behav_Female.TrialTimeEnd, Behav_Female.ExcludeYN, Behav_Female.ReasonExclusion, Behav_Female.Remarks
+GROUP BY Behav_Female.TrialFID, Behav_Female.FID, Behav_Female.TrialDate, Behav_Female.TrialTime, Basic_Trials.GroupName, Basic_Trials.Sex, Basic_Trials.Experiment, Behav_Female.TestName, Behav_Female.AttackRedYN, Behav_Female.AttackGreyBlackYN, Behav_Female.LatencyAttack, Behav_Female.DuringVideo,Behav_Female.TrialDateEnd, Behav_Female.TrialTimeEnd, Behav_Female.ExcludeYN, Behav_Female.ReasonExclusion, Behav_Female.Remarks
 HAVING (((Basic_Trials.Sex)=0) AND ((Basic_Trials.Experiment)='MatedFemaleCannibalism') AND ((Behav_Female.TestName)='Male'))
 ORDER BY Behav_Female.FID, Behav_Female.TrialDate
 ")
@@ -168,7 +168,33 @@ chisq.test(rbind(c(10,3),c(97,104)))
 
 }
 
-  }
+# duration to male consumption
+  
+head(MY_TABLE_MaleTestValid)
+  
+nrow(MY_TABLE_MaleTestValid) # 80
+nrow(MY_TABLE_MaleTestValid[MY_TABLE_MaleTestValid$DuringVideo == 1,]) # 15
+
+MY_TABLE_MaleTestValid$TrialDateEnd[MY_TABLE_MaleTestValid$DuringVideo == 1] <-  MY_TABLE_MaleTestValid$TrialDate[MY_TABLE_MaleTestValid$DuringVideo == 1]
+
+Within1stDay <- nrow(MY_TABLE_MaleTestValid[!(is.na(MY_TABLE_MaleTestValid$TrialDateEnd)) & MY_TABLE_MaleTestValid$TrialDate == MY_TABLE_MaleTestValid$TrialDateEnd,]) # 22
+
+PercentageWithinFirstDay <- Within1stDay*  100/nrow(MY_TABLE_MaleTestValid) # 27.5
+
+
+TimeDiffInDays <- MY_TABLE_MaleTestValid$TrialDateEnd[!(is.na(MY_TABLE_MaleTestValid$TrialDateEnd)) 
+                                    & MY_TABLE_MaleTestValid$TrialDate != MY_TABLE_MaleTestValid$TrialDateEnd] -
+      MY_TABLE_MaleTestValid$TrialDate[!(is.na(MY_TABLE_MaleTestValid$TrialDateEnd)) 
+                                       & MY_TABLE_MaleTestValid$TrialDate != MY_TABLE_MaleTestValid$TrialDateEnd]
+
+summary(as.numeric(as.character(TimeDiffInDays)))
+
+ 
+
+TimeDiffInDaysGlobal <- difftime(MY_TABLE_MaleTestValid$TrialDateEnd, MY_TABLE_MaleTestValid$TrialDate, unit ='days')
+summary(as.numeric(as.character(TimeDiffInDaysGlobal)))
+
+}
 
 
 ## Trt Red Averse is the reference (intercept)
@@ -257,13 +283,13 @@ anova(mod4,mod4withrowID)
 
 summary(mod4)
 
-# print(rpt(formula = AttackRedYN ~ Trt + (1|FID),
-#           grname = c("Fixed","FID"), 
-#           data= MY_TABLE_Step, 
-#           datatype = "Binary", 
-#           nboot = 1000, 
-#           npermut = 0, 
-#           adjusted = FALSE))
+print(rpt(formula = AttackRedYN ~ Trt + (1|FID),
+          grname = c("Fixed","FID"),
+          data= MY_TABLE_Step,
+          datatype = "Binary",
+          nboot = 1000,
+          npermut = 0,
+          adjusted = FALSE))
 }
 
 
