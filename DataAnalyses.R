@@ -2,8 +2,8 @@
 #	 Malika IHLE      malika_ihle@hotmail.fr
 #	 Data analyses FlexibleSexualAppetite part 1
 #	 Start : 11/8/2017
-#	 last modif : 11/8/2017
-#	 commit: modify prereg code to call database 
+#	 last modif : 11/9/2017
+#	 commit: modify prereg code to call database  - update rptR package
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 {# Remarks
@@ -63,7 +63,7 @@ GROUP BY Basic_Trials.Ind_ID, Basic_Trials.Sex, Basic_Trials.Experiment, Basic_T
 HAVING (((Basic_Trials.Sex)=1) AND ((Basic_Trials.Experiment)='MatedFemaleCannibalism') AND ((Basic_Trials.GroupNumber) Is Not Null))
 ")
 
-
+close(conDB)
 
 # missing one value of mass for a female from the red averse group
 MY_TABLE_BugTest$Mass[is.na(MY_TABLE_BugTest$Mass)] <- mean(MY_TABLE_BugTest$Mass[MY_TABLE_BugTest$Trt == 'RedAverse'], na.rm=TRUE)
@@ -104,17 +104,33 @@ MY_TABLE_MIDValid$DeltaMcondition <- MY_TABLE_MIDValid$Mcondition.x - MY_TABLE_M
 MY_TABLE_MaleTestValid <- merge(MY_TABLE_MaleTestValid, MY_TABLE_MIDValid[,c('FID','DeltaMsize','DeltaMcondition')], by = 'FID')
   
 
+
+# combine into MY_TABLE_Step
+
+MY_TABLE_Step <-data.frame(mapply(c,MY_TABLE_BugTest[,c('FID','Trt','AttackBugYN')],
+                       MY_TABLE_TermiteTest[,c('FID','Trt','AttackNewRedYN')],
+                       MY_TABLE_MaleTestValid[,c('FID','Trt','CannibalizedRedYN')]))
+colnames(MY_TABLE_Step) <- c('FID','Trt','AttackRedYN')
+MY_TABLE_Step$Trt[MY_TABLE_Step$Trt == 1] <- 'RedAverse'
+MY_TABLE_Step$Trt[MY_TABLE_Step$Trt == 2] <- 'RedPreference'
+MY_TABLE_Step <- MY_TABLE_Step[ order(MY_TABLE_Step$FID), ]
+MY_TABLE_Step$rowID <- 1:nrow(MY_TABLE_Step)
+
+
 head(MY_TABLE_BugTest)
 head(MY_TABLE_TermiteTest)
 head(MY_TABLE_MaleTest)
 head(MY_TABLE_MaleTestValid)
 head(MY_TABLE_MID)
 head(MY_TABLE_MIDValid)
+head(MY_TABLE_Step)
 }
 
 {# Descriptive statistics
 
 {# female death during training:
+
+conDB= odbcConnectAccess2007("C:\\Users\\malika.ihle\\Dropbox\\HabronatusPyrrithrix\\HabronatusPyrrithrix_DB.accdb")
   
 FemaleDeadDuringTraining <- sqlQuery(conDB,"
 SELECT Basic_Individuals.Ind_ID AS FID, Basic_Trials.GroupName AS Trt, [Basic_Individuals]![DeathDate]-[Basic_Trials]![PeriodBeginDate] AS DaysInTrialWhenDied
@@ -129,22 +145,30 @@ SELECT Basic_Individuals.Ind_ID, Basic_Trials.GroupName AS Trt, [Basic_Individua
 FROM Basic_Individuals LEFT JOIN Basic_Trials ON Basic_Individuals.Ind_ID = Basic_Trials.Ind_ID
 WHERE (((Basic_Individuals.Sex)=0) AND ((Basic_Individuals.DeathDate) Is Null Or (Basic_Individuals.DeathDate)>[Basic_Trials]![PeriodEndDate]) AND ((Basic_Trials.Experiment)='MatedFemaleCannibalism'))
 ")
-  
+
+close(conDB)
   
 DeadFemales <- table(FemaleDeadDuringTraining$Trt)  
 AliveFemales <- table(FemaleAliveUntilEndTraining$Trt)  
 
-chisq.test(c(12,45),c(23,48))
-}
-  
-# male death after painting
-  
-  
-
-# Female starvation
+chisq.test(rbind(DeadFemales,AliveFemales))
 
 }
+  
+{# excluded male tests
+  
+nrow(MY_TABLE_MaleTest)
+nrow(MY_TABLE_MaleTest[MY_TABLE_MaleTest$ExcludeYN == TRUE,]) # 24 out of 107
+table(MY_TABLE_MaleTest$ReasonExclusion[MY_TABLE_MaleTest$ExcludeYN == TRUE]) 
+# BlackMaleDied    FemaleDied FemaleStarved   RedMaleDied 
+# 10             3             8             3   
+# total tests where male didn't died during trial: 107-10=97 black; 107-3: 104 red
 
+chisq.test(rbind(c(10,3),c(97,104)))
+
+}
+
+  }
 
 
 ## Trt Red Averse is the reference (intercept)
@@ -206,9 +230,9 @@ summary(mod3)
 
 
   ## to check equality of male motivation to court
-  shapiro.test(MY_TABLE_MID$Latency_to_court)
-  t.test (MY_TABLE_MID$Latency_to_court[MY_TABLE_MID$Mcolor == "Red"], 
-          MY_TABLE_MID$Latency_to_court[MY_TABLE_MID$Mcolor == "Black"])
+  # shapiro.test(MY_TABLE_MID$Latency_to_court)
+  # t.test (MY_TABLE_MID$Latency_to_court[MY_TABLE_MID$Mcolor == "Red"], 
+  #         MY_TABLE_MID$Latency_to_court[MY_TABLE_MID$Mcolor == "Black"])
 
 
 }  
@@ -216,7 +240,7 @@ summary(mod3)
   
 {# exploratory analyses: repeatability of female bias
 
-mod4 <- glmer (attackRedYN ~ Trt + (1|FID), family = "binomial", data=MY_TABLE_Step)
+mod4 <- glmer (AttackRedYN ~ Trt + (1|FID), family = "binomial", data=MY_TABLE_Step)
  
 par(mfrow=c(2,2))
 qqnorm(resid(mod4))
@@ -225,21 +249,21 @@ qqnorm(unlist(ranef(mod4)$FID))
 qqline(unlist(ranef(mod4)$FID))
 plot(fitted(mod4), resid(mod4))
 abline(h=0)
-plot(fitted(mod4),jitter(MY_TABLE_Step$attackRedYN, 0.5))
+plot(fitted(mod4),jitter(MY_TABLE_Step$AttackRedYN, 0.5))
 abline(0,1)
 
-mod4withrowID <- glm (attackRedYN ~ Trt + (1|FID) + (1|rowID), family = "binomial", data=MY_TABLE_Step)
+mod4withrowID <- glm (AttackRedYN ~ Trt + (1|FID) + (1|rowID), family = "binomial", data=MY_TABLE_Step)
 anova(mod4,mod4withrowID)
 
 summary(mod4)
 
-print(rpt(formula = attackRedYN ~ Trt + (1|FID),
-          grname = c("Fixed","Overdispersion","FID"), 
-          data= MY_TABLE_Step, 
-          datatype = "Binary", 
-          nboot = 1000, 
-          npermut = 0, 
-          adjusted = FALSE))
+# print(rpt(formula = AttackRedYN ~ Trt + (1|FID),
+#           grname = c("Fixed","FID"), 
+#           data= MY_TABLE_Step, 
+#           datatype = "Binary", 
+#           nboot = 1000, 
+#           npermut = 0, 
+#           adjusted = FALSE))
 }
 
 
@@ -256,7 +280,6 @@ exp(cbind(OR=coef(mod2), confint(mod2)))[2,]
 ## step 3: odds ratio ?
 exp(cbind(OR=coef(mod3), confint(mod3)))[2,]  
 }
-
 
 {# Comparing each group to 50/50
 
