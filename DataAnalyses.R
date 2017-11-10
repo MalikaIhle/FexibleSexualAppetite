@@ -65,6 +65,7 @@ HAVING (((Basic_Trials.Sex)=1) AND ((Basic_Trials.Experiment)='MatedFemaleCannib
 
 close(conDB)
 
+
 # missing one value of mass for a female from the red averse group
 MY_TABLE_BugTest$Mass[is.na(MY_TABLE_BugTest$Mass)] <- mean(MY_TABLE_BugTest$Mass[MY_TABLE_BugTest$Trt == 'RedAverse'], na.rm=TRUE)
 
@@ -75,6 +76,9 @@ MY_TABLE_MID$Mass[is.na(MY_TABLE_MID$Mass)] <- mean(MY_TABLE_MID$Mass, na.rm=TRU
 # calculate body condition
 MY_TABLE_BugTest$Fcondition <- residuals(lm(MY_TABLE_BugTest$Mass~ MY_TABLE_BugTest$CarapaceWidth))
 MY_TABLE_MID$Mcondition <- residuals(lm(MY_TABLE_MID$Mass~ MY_TABLE_MID$CarapaceWidth))
+
+# remove termite test where no prey was attacked
+MY_TABLE_TermiteTestValid <- MY_TABLE_TermiteTest[MY_TABLE_TermiteTest$DidNotAttackAnyYN == 0,]
 
 # exclude initialTrials IDs where replacement males were given
 MY_TABLE_MaleTestValid <- MY_TABLE_MaleTest[MY_TABLE_MaleTest$TrialFID != 405 
@@ -216,7 +220,7 @@ summary(mod1)
 
 {# step 2
 
-mod2 <- glm (AttackNewRedYN ~ Trt, family = "binomial",  data = MY_TABLE_TermiteTest)
+mod2 <- glm (AttackNewRedYN ~ Trt, family = "binomial",  data = MY_TABLE_TermiteTestValid)
 
 par(mfrow=c(2,2))
 plot(mod2)
@@ -325,10 +329,10 @@ exp(cbind(OR=coef(mod3_firstDay), confint(mod3_firstDay)))[2,]
 {# Comparing each group to 50/50
 
 ##step 2
-chisq.test(table(MY_TABLE_TermiteTest$AttackNewRedYN[MY_TABLE_TermiteTest$Trt == 'RedPreference']), p=c(0.5,0.5))
-chisq.test(table(MY_TABLE_TermiteTest$AttackNewRedYN[MY_TABLE_TermiteTest$Trt == 'RedAverse']), p=c(0.5,0.5))
+chisq.test(table(MY_TABLE_TermiteTestValid$AttackNewRedYN[MY_TABLE_TermiteTestValid$Trt == 'RedPreference']), p=c(0.5,0.5))
+chisq.test(table(MY_TABLE_TermiteTestValid$AttackNewRedYN[MY_TABLE_TermiteTestValid$Trt == 'RedAverse']), p=c(0.5,0.5))
 
-ggplot(MY_TABLE_TermiteTest,aes(x=AttackNewRedYN,group=Trt,fill=Trt))+
+ggplot(MY_TABLE_TermiteTestValid,aes(x=AttackNewRedYN,group=Trt,fill=Trt))+
   geom_histogram(position="dodge",binwidth=0.25)+theme_bw()
 
 
