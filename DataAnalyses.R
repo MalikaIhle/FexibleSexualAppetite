@@ -262,6 +262,19 @@ summary(mod3)
   #         MY_TABLE_MID$Latency_to_court[MY_TABLE_MID$Mcolor == "Black"])
 
 
+ # exploration: male test for test where male consumption happened within the first day
+ 
+ mod3_firstDay <- glm (CannibalizedRedYN ~ Trt+ DeltaMsize + DeltaMcondition
+                    , family = "binomial" 
+                    , data = MY_TABLE_MaleTestValid[MY_TABLE_MaleTestValid$TrialDateEnd == MY_TABLE_MaleTestValid$TrialDate 
+                                                    & !is.na(MY_TABLE_MaleTestValid$TrialDateEnd),])
+ 
+ par(mfrow=c(2,2))
+ plot(mod3_firstDay)
+ 
+ summary(mod3_firstDay)
+ 
+ 
 }  
  
   
@@ -306,6 +319,7 @@ exp(cbind(OR=coef(mod2), confint(mod2)))[2,]
 
 ## step 3: odds ratio ?
 exp(cbind(OR=coef(mod3), confint(mod3)))[2,]  
+exp(cbind(OR=coef(mod3_firstDay), confint(mod3_firstDay)))[2,]
 }
 
 {# Comparing each group to 50/50
