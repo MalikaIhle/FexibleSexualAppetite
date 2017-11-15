@@ -81,10 +81,10 @@ MY_TABLE_MID$Mcondition <- residuals(lm(MY_TABLE_MID$Mass~ MY_TABLE_MID$Carapace
 MY_TABLE_TermiteTestValid <- MY_TABLE_TermiteTest[MY_TABLE_TermiteTest$DidNotAttackAnyYN == 0,]
 
 # exclude initialTrials IDs where replacement males were given
-MY_TABLE_MaleTestValid <- MY_TABLE_MaleTest[MY_TABLE_MaleTest$TrialFID != 405 
-                                            & MY_TABLE_MaleTest$TrialFID != 297 
-                                            & MY_TABLE_MaleTest$TrialFID != 406 
-                                            & MY_TABLE_MaleTest$Exclude == FALSE,]  
+MY_TABLE_MaleTestValid <- MY_TABLE_MaleTest[#MY_TABLE_MaleTest$TrialFID != 405 
+                                            #& MY_TABLE_MaleTest$TrialFID != 297 
+                                            #& MY_TABLE_MaleTest$TrialFID != 406 &
+                                             MY_TABLE_MaleTest$Exclude == FALSE,]  
 
 # calculate Delta Male traits for males in valid female male tests
 
@@ -92,8 +92,8 @@ MY_TABLE_MIDValid <- MY_TABLE_MID[MY_TABLE_MID$MID != 24
                                   & MY_TABLE_MID$MID != 53
                                   & MY_TABLE_MID$MID != 349 
                                   & MY_TABLE_MID$MID != 60 
-                                  & MY_TABLE_MID$MID != 221
-                                  & !MY_TABLE_MID$FID%in% MY_TABLE_MaleTest$FID[MY_TABLE_MaleTest$Exclude == TRUE]  , ]
+                                  & MY_TABLE_MID$MID != 221 &
+                                   MY_TABLE_MID$FID%in% MY_TABLE_MaleTestValid$FID, ]
 
 MY_TABLE_MIDValid <- merge(
       MY_TABLE_MIDValid[MY_TABLE_MIDValid$Color == 'Red',c('FID','CarapaceWidth','Mcondition')],
@@ -137,25 +137,50 @@ head(MY_TABLE_Step)
 conDB= odbcConnectAccess2007("C:\\Users\\malika.ihle\\Dropbox\\HabronatusPyrrithrix\\HabronatusPyrrithrix_DB.accdb")
   
 FemaleDeadDuringTraining <- sqlQuery(conDB,"
-SELECT Basic_Individuals.Ind_ID AS FID, Basic_Trials.GroupName AS Trt, [Basic_Individuals]![DeathDate]-[Basic_Trials]![PeriodBeginDate] AS DaysInTrialWhenDied
+SELECT Basic_Individuals.Ind_ID AS FID, Basic_Trials.GroupName AS Trt, [Basic_Individuals]![DeathDate]-[Basic_Trials]![PeriodBeginDate] AS DaysInTrialWhenDied, Basic_Individuals.UnnaturalDeath, Basic_Individuals.Disappear
+FROM (Basic_Individuals LEFT JOIN (SELECT Behav_Female.FID
+FROM Behav_Female
+WHERE (((Behav_Female.ReasonExclusion)='FemaleStarved')))  AS FemaleStarved ON Basic_Individuals.Ind_ID = FemaleStarved.FID) LEFT JOIN Basic_Trials ON Basic_Individuals.Ind_ID = Basic_Trials.Ind_ID
+WHERE (((Basic_Individuals.Sex)=0) AND ((Basic_Individuals.DeathDate) Is Not Null And (Basic_Individuals.DeathDate)<=[Basic_Trials]![PeriodEndDate]) AND ((Basic_Trials.Experiment)='MatedFemaleCannibalism') AND ((FemaleStarved.FID) Is Null) AND ((Basic_Individuals.UnnaturalDeath)=False) AND ((Basic_Individuals.Disappear)=False))
+ORDER BY Basic_Trials.GroupName;
+") # remove dead from accident, escapees, starved during male tests
+
+
+AllFemales <- sqlQuery(conDB,"
+SELECT Basic_Individuals.Ind_ID AS FID, Basic_Trials.GroupName AS Trt
 FROM Basic_Individuals LEFT JOIN Basic_Trials ON Basic_Individuals.Ind_ID = Basic_Trials.Ind_ID
-WHERE (((Basic_Individuals.Sex)=0) AND ((Basic_Individuals.DeathDate) Is Not Null And (Basic_Individuals.DeathDate)<=[Basic_Trials]![PeriodEndDate]) AND ((Basic_Trials.Experiment)='MatedFemaleCannibalism'))
+WHERE (((Basic_Individuals.Sex)=0) AND ((Basic_Trials.Experiment)='MatedFemaleCannibalism'))
+ORDER BY Basic_Trials.GroupName
+")
+
+FemaleStarve <- sqlQuery(conDB,"
+SELECT Basic_Trials.Ind_ID, Basic_Trials.GroupName AS Trt, Behav_Female.ReasonExclusion, Behav_Female.TrialDate, Behav_Female.TrialDateEnd, [Behav_Female]![TrialDateEnd]-[Behav_Female]![TrialDate] AS DelayStarve
+FROM Basic_Trials INNER JOIN Behav_Female ON Basic_Trials.Ind_ID = Behav_Female.FID
+WHERE (((Basic_Trials.Experiment)='MatedFemaleCannibalism') AND ((Behav_Female.ReasonExclusion)='FemaleStarved'))
 ORDER BY Basic_Trials.GroupName
 ")
 
 
-FemaleAliveUntilEndTraining <- sqlQuery(conDB,"
-SELECT Basic_Individuals.Ind_ID, Basic_Trials.GroupName AS Trt, [Basic_Individuals]![DeathDate]-[Basic_Trials]![PeriodBeginDate] AS DaysInTrialWhenDied
-FROM Basic_Individuals LEFT JOIN Basic_Trials ON Basic_Individuals.Ind_ID = Basic_Trials.Ind_ID
-WHERE (((Basic_Individuals.Sex)=0) AND ((Basic_Individuals.DeathDate) Is Null Or (Basic_Individuals.DeathDate)>[Basic_Trials]![PeriodEndDate]) AND ((Basic_Trials.Experiment)='MatedFemaleCannibalism'))
-")
-
 close(conDB)
+
+table(AllFemales$Trt)
+
+AllFemalesMinusAccident <- AllFemales[AllFemales$FID != 138 # escaped
+                                       & AllFemales$FID != 188 # disappeared
+                                       & AllFemales$FID != 170 # killed by accident
+                                       & AllFemales$FID != 294,] # killed by accident
   
 DeadFemales <- table(FemaleDeadDuringTraining$Trt)  
-AliveFemales <- table(FemaleAliveUntilEndTraining$Trt)  
+AliveFemales <- table(AllFemalesMinusAccident$Trt) - DeadFemales
 
 chisq.test(rbind(DeadFemales,AliveFemales))
+
+
+# female starvation
+
+summary(FemaleStarve$DelayStarve)
+
+
 
 }
   
@@ -176,14 +201,14 @@ chisq.test(rbind(c(10,3),c(97,104)))
   
 head(MY_TABLE_MaleTestValid)
   
-nrow(MY_TABLE_MaleTestValid) # 80
+nrow(MY_TABLE_MaleTestValid) # 83
 nrow(MY_TABLE_MaleTestValid[MY_TABLE_MaleTestValid$DuringVideo == 1,]) # 15
 
 MY_TABLE_MaleTestValid$TrialDateEnd[MY_TABLE_MaleTestValid$DuringVideo == 1] <-  MY_TABLE_MaleTestValid$TrialDate[MY_TABLE_MaleTestValid$DuringVideo == 1]
 
 Within1stDay <- nrow(MY_TABLE_MaleTestValid[!(is.na(MY_TABLE_MaleTestValid$TrialDateEnd)) & MY_TABLE_MaleTestValid$TrialDate == MY_TABLE_MaleTestValid$TrialDateEnd,]) # 22
 
-PercentageWithinFirstDay <- Within1stDay*  100/nrow(MY_TABLE_MaleTestValid) # 27.5
+PercentageWithinFirstDay <- Within1stDay*  100/nrow(MY_TABLE_MaleTestValid) # 26.5
 
 
 TimeDiffInDays <- MY_TABLE_MaleTestValid$TrialDateEnd[!(is.na(MY_TABLE_MaleTestValid$TrialDateEnd)) 
@@ -215,6 +240,12 @@ summary(mod1)
 
   ## to get one sided test p value
   mod1p <- coef(summary(mod1))[2, 4]/2
+  
+  
+  shapiro.test(MY_TABLE_BugTest$Fcondition)
+  hist(MY_TABLE_BugTest$Fcondition)
+  t.test(MY_TABLE_BugTest$Fcondition[MY_TABLE_BugTest$Trt == "RedPreference"],
+        MY_TABLE_BugTest$Fcondition[MY_TABLE_BugTest$Trt == "RedAverse"])
   
 }
 
@@ -315,26 +346,65 @@ print(rpt(formula = AttackRedYN ~ Trt + (1|FID),
 
 ## step 1 
 table(MY_TABLE_BugTest$Trt, MY_TABLE_BugTest$AttackBugYN)
-exp(cbind(OR=coef(mod1), confint(mod1)))[2,] 
+oddsBug <- exp(cbind(OR=coef(mod1), confint(mod1)))[2,] 
 
 ## step 2
 table(MY_TABLE_TermiteTest$Trt, MY_TABLE_TermiteTest$AttackNewRedYN)
-exp(cbind(OR=coef(mod2), confint(mod2)))[2,]
+oddsTermite <- exp(cbind(OR=coef(mod2), confint(mod2)))[2,]
 
 ## step 3: odds ratio ?
-exp(cbind(OR=coef(mod3), confint(mod3)))[2,]  
-exp(cbind(OR=coef(mod3_firstDay), confint(mod3_firstDay)))[2,]
+oddsMales <- exp(cbind(OR=coef(mod3), confint(mod3)))[2,]  
+oddsMales1stDay <- exp(cbind(OR=coef(mod3_firstDay), confint(mod3_firstDay)))[2,]
+
+
+odds <- data.frame(rbind(oddsBug,oddsTermite,oddsMales))
+colnames(odds) <- c('OR','lower','upper')
+odds$testname <- c('3_Bug','2_Termite', '1_Males')
+
+ggplot(odds, aes(y= OR, x = testname)) +
+    geom_point() +
+    geom_errorbar(aes(ymin=lower, ymax=upper), width=.2) +
+    scale_y_log10(breaks=c(0.3,0.5,1,2,3,4), labels = c(0.3,0.5,1,2,3,4)) +
+    scale_x_discrete(labels= c("Males", "Termites", "Bug")) +
+    geom_hline(yintercept = 1, linetype=2) +
+    coord_flip() +
+    labs(x = NULL, y = 'Odds Ratio') +
+    theme_bw() +  theme(text = element_text(size=20))
+
 }
 
 {# Comparing each group to 50/50
+
+## step 1
+chisq.test(table(MY_TABLE_BugTest$AttackBugYN[MY_TABLE_BugTest$Trt == 'RedPreference']), p=c(0.5,0.5))
+chisq.test(table(MY_TABLE_BugTest$AttackBugYN[MY_TABLE_BugTest$Trt == 'RedAverse']), p=c(0.5,0.5))
+
+ggplot(MY_TABLE_BugTest,aes(x=AttackBugYN,group=Trt,fill=Trt))+
+  geom_bar(position="dodge", aes(y = (..count..)/sum(..count..)))+
+  scale_x_discrete(NULL, c(0,1), c("Did not attack bug", "Attacked bug"), c(0,1)) +
+  scale_y_continuous(title = NULL,labels = percent_format())+
+  theme_bw()+
+  scale_fill_discrete(name = "Treatment")+
+  theme(text = element_text(size=20))
+
+
+ <- ggplot(mydataf, aes(x = foo)) +  
+  geom_bar(aes(y = (..count..)/sum(..count..))) + 
+  ## version 3.0.9
+  # scale_y_continuous(labels = percent_format())
+  ## version 3.1.0
+  scale_y_continuous(labels=percent)
 
 ##step 2
 chisq.test(table(MY_TABLE_TermiteTestValid$AttackNewRedYN[MY_TABLE_TermiteTestValid$Trt == 'RedPreference']), p=c(0.5,0.5))
 chisq.test(table(MY_TABLE_TermiteTestValid$AttackNewRedYN[MY_TABLE_TermiteTestValid$Trt == 'RedAverse']), p=c(0.5,0.5))
 
 ggplot(MY_TABLE_TermiteTestValid,aes(x=AttackNewRedYN,group=Trt,fill=Trt))+
-  geom_histogram(position="dodge",binwidth=0.25)+theme_bw()
-
+  geom_bar(position="dodge")+
+  scale_x_discrete(NULL, c(0,1), c("Attacked grey termite", "Attacked red termite"), c(0,1)) +
+  theme_bw()+
+  scale_fill_discrete(name = "Treatment")+
+  theme(text = element_text(size=20))
 
 ##step 3
 chisq.test(table(MY_TABLE_MaleTestValid$CannibalizedRedYN[MY_TABLE_MaleTestValid$Trt == 'RedPreference']), p=c(0.5,0.5))
@@ -342,6 +412,11 @@ chisq.test(table(MY_TABLE_MaleTestValid$CannibalizedRedYN[MY_TABLE_MaleTestValid
 
 
 ggplot(MY_TABLE_MaleTestValid,aes(x=CannibalizedRedYN,group=Trt,fill=Trt))+
-  geom_histogram(position="dodge",binwidth=0.25)+theme_bw()
+  geom_bar(position="dodge")+
+  scale_x_discrete(NULL, c(0,1), c("Attacked black male", "Attacked red male"), c(0,1)) +
+  theme_bw()+
+  scale_fill_discrete(name = "Treatment")+
+  theme(text = element_text(size=20))
+
 
 }
