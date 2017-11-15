@@ -357,15 +357,15 @@ oddsMales <- exp(cbind(OR=coef(mod3), confint(mod3)))[2,]
 oddsMales1stDay <- exp(cbind(OR=coef(mod3_firstDay), confint(mod3_firstDay)))[2,]
 
 
-odds <- data.frame(rbind(oddsBug,oddsTermite,oddsMales))
+odds <- data.frame(rbind(oddsBug,oddsTermite,oddsMales1stDay,oddsMales))
 colnames(odds) <- c('OR','lower','upper')
-odds$testname <- c('3_Bug','2_Termite', '1_Males')
+odds$testname <- c('3_Bug','2_Termite', '1_Male1stday', '0_Males')
 
 ggplot(odds, aes(y= OR, x = testname)) +
     geom_point() +
     geom_errorbar(aes(ymin=lower, ymax=upper), width=.2) +
-    scale_y_log10(breaks=c(0.3,0.5,1,2,3,4), labels = c(0.3,0.5,1,2,3,4)) +
-    scale_x_discrete(labels= c("Males", "Termites", "Bug")) +
+    scale_y_log10(breaks=c(0.1,0.5,1,2,3,4), labels = c(0.1,0.5,1,2,3,4)) +
+    scale_x_discrete(labels= c("Males","Males 1st day", "Termites", "Bug")) +
     geom_hline(yintercept = 1, linetype=2) +
     coord_flip() +
     labs(x = NULL, y = 'Odds Ratio') +
@@ -380,29 +380,22 @@ chisq.test(table(MY_TABLE_BugTest$AttackBugYN[MY_TABLE_BugTest$Trt == 'RedPrefer
 chisq.test(table(MY_TABLE_BugTest$AttackBugYN[MY_TABLE_BugTest$Trt == 'RedAverse']), p=c(0.5,0.5))
 
 ggplot(MY_TABLE_BugTest,aes(x=AttackBugYN,group=Trt,fill=Trt))+
-  geom_bar(position="dodge", aes(y = (..count..)/sum(..count..)))+
+  geom_bar(position="dodge",aes(y = ..prop.., fill = Trt)) +
   scale_x_discrete(NULL, c(0,1), c("Did not attack bug", "Attacked bug"), c(0,1)) +
-  scale_y_continuous(title = NULL,labels = percent_format())+
+ scale_y_continuous(NULL,labels=scales::percent) +
   theme_bw()+
   scale_fill_discrete(name = "Treatment")+
   theme(text = element_text(size=20))
 
-
- <- ggplot(mydataf, aes(x = foo)) +  
-  geom_bar(aes(y = (..count..)/sum(..count..))) + 
-  ## version 3.0.9
-  # scale_y_continuous(labels = percent_format())
-  ## version 3.1.0
-  scale_y_continuous(labels=percent)
 
 ##step 2
 chisq.test(table(MY_TABLE_TermiteTestValid$AttackNewRedYN[MY_TABLE_TermiteTestValid$Trt == 'RedPreference']), p=c(0.5,0.5))
 chisq.test(table(MY_TABLE_TermiteTestValid$AttackNewRedYN[MY_TABLE_TermiteTestValid$Trt == 'RedAverse']), p=c(0.5,0.5))
 
 ggplot(MY_TABLE_TermiteTestValid,aes(x=AttackNewRedYN,group=Trt,fill=Trt))+
-  geom_bar(position="dodge")+
+  geom_bar(position="dodge",aes(y = ..prop.., fill = Trt)) +
   scale_x_discrete(NULL, c(0,1), c("Attacked grey termite", "Attacked red termite"), c(0,1)) +
-  theme_bw()+
+  scale_y_continuous(NULL,labels=scales::percent) + theme_bw()+
   scale_fill_discrete(name = "Treatment")+
   theme(text = element_text(size=20))
 
@@ -412,9 +405,9 @@ chisq.test(table(MY_TABLE_MaleTestValid$CannibalizedRedYN[MY_TABLE_MaleTestValid
 
 
 ggplot(MY_TABLE_MaleTestValid,aes(x=CannibalizedRedYN,group=Trt,fill=Trt))+
-  geom_bar(position="dodge")+
+  geom_bar(position="dodge",aes(y = ..prop.., fill = Trt)) +
   scale_x_discrete(NULL, c(0,1), c("Attacked black male", "Attacked red male"), c(0,1)) +
-  theme_bw()+
+  theme_bw()+scale_y_continuous(NULL,labels=scales::percent) +
   scale_fill_discrete(name = "Treatment")+
   theme(text = element_text(size=20))
 
