@@ -31,9 +31,9 @@ conDB= odbcConnectAccess2007("C:\\Users\\malika.ihle\\Dropbox\\HabronatusPyrrith
 
 
 MY_TABLE_BugTest <- sqlQuery(conDB,"
-SELECT Behav_Female.FID, Basic_Trials.GroupName AS Trt, Behav_Female.AttackRedYN AS AttackBugYN, Max(Morph_Measurements.CarapaceWidth) AS CarapaceWidth, Max(Morph_Measurements.Mass) AS Mass
+SELECT Behav_Female.FID, Basic_Trials.GroupName AS Trt, Behav_Female.AttackRedYN AS AttackBugYN, Behav_Female.LatencyAttack, Max(Morph_Measurements.CarapaceWidth) AS CarapaceWidth, Max(Morph_Measurements.Mass) AS Mass
 FROM Morph_Measurements RIGHT JOIN (Basic_Trials INNER JOIN Behav_Female ON Basic_Trials.Ind_ID = Behav_Female.FID) ON Morph_Measurements.Ind_ID = Behav_Female.FID
-GROUP BY Behav_Female.FID, Basic_Trials.GroupName, Basic_Trials.Sex, Basic_Trials.Experiment, Behav_Female.TestName, Behav_Female.AttackRedYN
+GROUP BY Behav_Female.FID, Basic_Trials.GroupName, Basic_Trials.Sex, Basic_Trials.Experiment, Behav_Female.TestName, Behav_Female.AttackRedYN, Behav_Female.LatencyAttack
 HAVING (((Basic_Trials.Sex)=0) AND ((Basic_Trials.Experiment)='MatedFemaleCannibalism') AND ((Behav_Female.TestName)='Bug'))
 ")
 
@@ -99,22 +99,22 @@ MY_TABLE_MIDValid <- merge(
       MY_TABLE_MIDValid[MY_TABLE_MIDValid$Color == 'Red',c('FID','CarapaceWidth','Mcondition')],
       MY_TABLE_MIDValid[MY_TABLE_MIDValid$Color == 'Black',c('FID','CarapaceWidth','Mcondition')],by='FID')
 
-
 MY_TABLE_MIDValid$DeltaMsize <- MY_TABLE_MIDValid$CarapaceWidth.x - MY_TABLE_MIDValid$CarapaceWidth.y
 MY_TABLE_MIDValid$DeltaMcondition <- MY_TABLE_MIDValid$Mcondition.x - MY_TABLE_MIDValid$Mcondition.y
 
 # merge Delta Male traits to  MY_TABLE_MaleTestValid
 
 MY_TABLE_MaleTestValid <- merge(MY_TABLE_MaleTestValid, MY_TABLE_MIDValid[,c('FID','DeltaMsize','DeltaMcondition')], by = 'FID')
-  
-
+MY_TABLE_MaleTestValid$TrialDateEnd[MY_TABLE_MaleTestValid$DuringVideo == 1] <-  MY_TABLE_MaleTestValid$TrialDate[MY_TABLE_MaleTestValid$DuringVideo == 1]
+MY_TABLE_MaleTestValid$LatencyAttackDay <- as.numeric(as.character(difftime(MY_TABLE_MaleTestValid$TrialDateEnd, MY_TABLE_MaleTestValid$TrialDate, unit ='days'))) 
+MY_TABLE_MaleTestValid$LatencyAttack <- MY_TABLE_MaleTestValid$LatencyAttackDay*8*60+60
 
 # combine into MY_TABLE_Step
 
-MY_TABLE_Step <-data.frame(mapply(c,MY_TABLE_BugTest[,c('FID','Trt','AttackBugYN')],
-                       MY_TABLE_TermiteTest[,c('FID','Trt','AttackNewRedYN')],
-                       MY_TABLE_MaleTestValid[,c('FID','Trt','CannibalizedRedYN')]))
-colnames(MY_TABLE_Step) <- c('FID','Trt','AttackRedYN')
+MY_TABLE_Step <-data.frame(mapply(c,MY_TABLE_BugTest[,c('FID','Trt','AttackBugYN','LatencyAttack')],
+                       MY_TABLE_TermiteTest[,c('FID','Trt','AttackNewRedYN','LatencyAttack')],
+                       MY_TABLE_MaleTestValid[,c('FID','Trt','CannibalizedRedYN','LatencyAttack')]))
+colnames(MY_TABLE_Step) <- c('FID','Trt','AttackRedYN','LatencyAttack')
 MY_TABLE_Step$Trt[MY_TABLE_Step$Trt == 1] <- 'RedAverse'
 MY_TABLE_Step$Trt[MY_TABLE_Step$Trt == 2] <- 'RedPreference'
 MY_TABLE_Step <- MY_TABLE_Step[ order(MY_TABLE_Step$FID), ]
@@ -204,24 +204,9 @@ head(MY_TABLE_MaleTestValid)
 nrow(MY_TABLE_MaleTestValid) # 83
 nrow(MY_TABLE_MaleTestValid[MY_TABLE_MaleTestValid$DuringVideo == 1,]) # 15
 
-MY_TABLE_MaleTestValid$TrialDateEnd[MY_TABLE_MaleTestValid$DuringVideo == 1] <-  MY_TABLE_MaleTestValid$TrialDate[MY_TABLE_MaleTestValid$DuringVideo == 1]
-
 Within1stDay <- nrow(MY_TABLE_MaleTestValid[!(is.na(MY_TABLE_MaleTestValid$TrialDateEnd)) & MY_TABLE_MaleTestValid$TrialDate == MY_TABLE_MaleTestValid$TrialDateEnd,]) # 22
-
 PercentageWithinFirstDay <- Within1stDay*  100/nrow(MY_TABLE_MaleTestValid) # 26.5
-
-
-TimeDiffInDays <- MY_TABLE_MaleTestValid$TrialDateEnd[!(is.na(MY_TABLE_MaleTestValid$TrialDateEnd)) 
-                                    & MY_TABLE_MaleTestValid$TrialDate != MY_TABLE_MaleTestValid$TrialDateEnd] -
-      MY_TABLE_MaleTestValid$TrialDate[!(is.na(MY_TABLE_MaleTestValid$TrialDateEnd)) 
-                                       & MY_TABLE_MaleTestValid$TrialDate != MY_TABLE_MaleTestValid$TrialDateEnd]
-
-summary(as.numeric(as.character(TimeDiffInDays)))
-
- 
-
-TimeDiffInDaysGlobal <- difftime(MY_TABLE_MaleTestValid$TrialDateEnd, MY_TABLE_MaleTestValid$TrialDate, unit ='days')
-summary(as.numeric(as.character(TimeDiffInDaysGlobal)))
+summary(MY_TABLE_MaleTestValid$LatencyAttackDay)
 
 }
 
@@ -246,6 +231,15 @@ summary(mod1)
   hist(MY_TABLE_BugTest$Fcondition)
   t.test(MY_TABLE_BugTest$Fcondition[MY_TABLE_BugTest$Trt == "RedPreference"],
         MY_TABLE_BugTest$Fcondition[MY_TABLE_BugTest$Trt == "RedAverse"])
+
+  
+# exploration: among those tat did attack, red averse took longer time ?
+  shapiro.test(log(MY_TABLE_BugTest$LatencyAttack,10))
+  hist(log(MY_TABLE_BugTest$LatencyAttack,10))
+  t.test(log(MY_TABLE_BugTest$LatencyAttack[MY_TABLE_BugTest$Trt == "RedPreference"]),
+        log( MY_TABLE_BugTest$LatencyAttack[MY_TABLE_BugTest$Trt == "RedAverse"]), na.rm=TRUE)
+  kruskal.test(MY_TABLE_BugTest$LatencyAttack~MY_TABLE_BugTest$Trt)
+  
   
 }
 
@@ -339,6 +333,13 @@ print(rpt(formula = AttackRedYN ~ Trt + (1|FID),
           nboot = 1000,
           npermut = 0,
           adjusted = FALSE))
+
+
+# Repeatability of female latency to attack
+
+mod5 <- lmer(LatencyAttack ~ Trt + (1|FID), data=MY_TABLE_Step) # weird
+summary(mod5)
+
 }
 
 
