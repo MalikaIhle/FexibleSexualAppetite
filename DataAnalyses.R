@@ -382,7 +382,7 @@ chisq.test(table(MY_TABLE_BugTest$AttackBugYN[MY_TABLE_BugTest$Trt == 'RedAverse
 
 ggplot(MY_TABLE_BugTest,aes(x=AttackBugYN,group=Trt,fill=Trt))+
   geom_bar(position="dodge",aes(y = ..prop.., fill = Trt)) +
-  scale_x_discrete(NULL, c(0,1), c("Did not attack bug", "Attacked bug"), c(0,1)) +
+  scale_x_discrete(NULL, c(0,1), c("Did not consumed bug", "Consumed bug"), c(0,1)) +
  scale_y_continuous(NULL,labels=scales::percent) +
   theme_bw()+
   scale_fill_discrete(name = "Treatment")+
@@ -395,7 +395,7 @@ chisq.test(table(MY_TABLE_TermiteTestValid$AttackNewRedYN[MY_TABLE_TermiteTestVa
 
 ggplot(MY_TABLE_TermiteTestValid,aes(x=AttackNewRedYN,group=Trt,fill=Trt))+
   geom_bar(position="dodge",aes(y = ..prop.., fill = Trt)) +
-  scale_x_discrete(NULL, c(0,1), c("Attacked grey termite", "Attacked red termite"), c(0,1)) +
+  scale_x_discrete(NULL, c(0,1), c("Consumed grey termite", "Consumed red termite"), c(0,1)) +
   scale_y_continuous(NULL,labels=scales::percent) + theme_bw()+
   scale_fill_discrete(name = "Treatment")+
   theme(text = element_text(size=20))
@@ -407,7 +407,7 @@ chisq.test(table(MY_TABLE_MaleTestValid$CannibalizedRedYN[MY_TABLE_MaleTestValid
 
 ggplot(MY_TABLE_MaleTestValid,aes(x=CannibalizedRedYN,group=Trt,fill=Trt))+
   geom_bar(position="dodge",aes(y = ..prop.., fill = Trt)) +
-  scale_x_discrete(NULL, c(0,1), c("Attacked black male", "Attacked red male"), c(0,1)) +
+  scale_x_discrete(NULL, c(0,1), c("Consumed black male", "Consumed red male"), c(0,1)) +
   theme_bw()+scale_y_continuous(NULL,labels=scales::percent) +
   scale_fill_discrete(name = "Treatment")+
   theme(text = element_text(size=20))
