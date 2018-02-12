@@ -109,6 +109,10 @@ MY_TABLE_MaleTestValid$TrialDateEnd[MY_TABLE_MaleTestValid$DuringVideo == 1] <- 
 MY_TABLE_MaleTestValid$LatencyAttackDay <- as.numeric(as.character(difftime(MY_TABLE_MaleTestValid$TrialDateEnd, MY_TABLE_MaleTestValid$TrialDate, unit ='days'))) 
 MY_TABLE_MaleTestValid$LatencyAttack <- MY_TABLE_MaleTestValid$LatencyAttackDay*8*60+60
 
+# remove Male tests not finished yet
+MY_TABLE_MaleTestValid <- MY_TABLE_MaleTestValid[!is.na(MY_TABLE_MaleTestValid$LatencyAttack),]
+
+
 # combine into MY_TABLE_Step
 
 MY_TABLE_Step <-data.frame(mapply(c,MY_TABLE_BugTest[,c('FID','Trt','AttackBugYN','LatencyAttack')],
@@ -201,7 +205,7 @@ chisq.test(rbind(c(10,3),c(97,104)))
   
 head(MY_TABLE_MaleTestValid)
   
-nrow(MY_TABLE_MaleTestValid) # 83
+nrow(MY_TABLE_MaleTestValid) # 82
 nrow(MY_TABLE_MaleTestValid[MY_TABLE_MaleTestValid$DuringVideo == 1,]) # 15
 
 Within1stDay <- nrow(MY_TABLE_MaleTestValid[!(is.na(MY_TABLE_MaleTestValid$TrialDateEnd)) & MY_TABLE_MaleTestValid$TrialDate == MY_TABLE_MaleTestValid$TrialDateEnd,]) # 22
@@ -216,7 +220,7 @@ summary(MY_TABLE_MaleTestValid$LatencyAttackDay)
 
 {# step 1
 
-mod1 <- glm (AttackBugYN ~ Trt + Fcondition, "binomial", data = MY_TABLE_BugTest)
+mod1 <- glm (AttackBugYN ~ Trt + Fcondition , "binomial", data = MY_TABLE_BugTest)
 
 par(mfrow=c(2,2))
 plot(mod1)
@@ -354,6 +358,7 @@ table(MY_TABLE_TermiteTest$Trt, MY_TABLE_TermiteTest$AttackNewRedYN)
 oddsTermite <- exp(cbind(OR=coef(mod2), confint(mod2)))[2,]
 
 ## step 3: odds ratio ?
+table(MY_TABLE_MaleTestValid$Trt, MY_TABLE_MaleTestValid$CannibalizedRedYN)
 oddsMales <- exp(cbind(OR=coef(mod3), confint(mod3)))[2,]  
 oddsMales1stDay <- exp(cbind(OR=coef(mod3_firstDay), confint(mod3_firstDay)))[2,]
 
@@ -412,5 +417,13 @@ ggplot(MY_TABLE_MaleTestValid,aes(x=CannibalizedRedYN,group=Trt,fill=Trt))+
   scale_fill_discrete(name = "Treatment")+
   theme(text = element_text(size=20))
 
+
+# juvenile females painted black or left white faces, predated by adult female (red preference females finished with the experiment)
+
+contingencyTable <- rbind(table(MY_TABLE_MaleTestValid$Trt, MY_TABLE_MaleTestValid$CannibalizedRedYN), c(13,5))
+rownames(contingencyTable)[3] <- 'Control'
+
+
+chisq.test(contingencyTable)
 
 }
