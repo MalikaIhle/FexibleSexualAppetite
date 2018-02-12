@@ -61,7 +61,7 @@ for (i in 1:nrow(DailySchedule)){
 
 DailySchedule <- arrange(DailySchedule,as.POSIXct(EventDate),GrossEvent, GroupName, Ind_ID)
 DailySchedule$EventDate <- as.character(DailySchedule$EventDate)
-SubDailySchedule <- DailySchedule[as.POSIXct(DailySchedule$EventDate)>=format(Sys.time(),"%Y-%m-%d"),]
+SubDailySchedule <- DailySchedule[as.POSIXct(DailySchedule$EventDate)>format(Sys.time(),"%Y-%m-%d"),]
 
 write.xlsx(SubDailySchedule,"C:\\Users\\malika.ihle\\Dropbox\\HabronatusPyrrithrix\\R_DailySchedule.xlsx", row.names = FALSE) 
 
@@ -74,8 +74,9 @@ DailyScheduleSummary <- as.data.frame(summarise(group_by(bb, EventDate= as.chara
                                         BugTest = sum(GrossEvent == "BugTest"),
                                         TermiteTest = sum(GrossEvent == "TermiteTest"),
                                         MaleTest = sum(GrossEvent == "MaleTest")))
+SubDailyScheduleSummary <- DailyScheduleSummary[as.POSIXct(DailyScheduleSummary$EventDate)>format(Sys.time(),"%Y-%m-%d"),]
 
-write.xlsx(DailyScheduleSummary,"C:\\Users\\malika.ihle\\Dropbox\\HabronatusPyrrithrix\\R_DailyScheduleSummary.xlsx", row.names = FALSE) 
+write.xlsx(SubDailyScheduleSummary,"C:\\Users\\malika.ihle\\Dropbox\\HabronatusPyrrithrix\\R_DailyScheduleSummary.xlsx", row.names = FALSE) 
 
 
 
