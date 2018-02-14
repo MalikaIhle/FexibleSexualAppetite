@@ -248,6 +248,21 @@ MY_TABLE_Videos_perMale$DelayNaiveFirstCourt <- as.numeric(difftime(MY_TABLE_Vid
 ### remove times
 MY_TABLE_Videos_perMale <- subset(MY_TABLE_Videos_perMale, select = - c(VideoTimeStart,FirstFAttack,ConsumTime,FirstMAttack,FirstCourt,NaiveFirstCourt))
 
+## add if end up consum 
+outcomeMCannibalized <- rbind(data.frame(ConsumYN= Behav_Female$AttackRedYN, FIDMcol = paste(Behav_Female$FID,'Yellow',sep='')), 
+                              (data.frame( ConsumYN= Behav_Female$AttackGreyBlackYN, FIDMcol = paste(Behav_Female$FID,'Blue',sep=''))))
+MY_TABLE_Videos_perMale$FIDMcol <- paste(MY_TABLE_Videos_perMale$FID,MY_TABLE_Videos_perMale$Mcol, sep='')
+
+MY_TABLE_Videos_perMale <- merge (x = MY_TABLE_Videos_perMale, y= outcomeMCannibalized, by = 'FIDMcol', all.x=TRUE)  
+
+MY_TABLE_Videos_perMale$Died <- 0
+for (i in 1:nrow(MY_TABLE_Videos_perMale)){
+if(!is.na(MY_TABLE_Videos_perMale$ReasonExclusion[i]) & MY_TABLE_Videos_perMale$ReasonExclusion[i] == 'BlackMaleDied' & MY_TABLE_Videos_perMale$Mcol[i] == 'Blue') 
+{MY_TABLE_Videos_perMale$Died[i] <- 1}
+  if(!is.na(MY_TABLE_Videos_perMale$ReasonExclusion[i]) &MY_TABLE_Videos_perMale$ReasonExclusion[i] == 'RedMaleDied' & MY_TABLE_Videos_perMale$Mcol[i] == 'Yellow') 
+  {MY_TABLE_Videos_perMale$Died[i] <- 1}
+}
+
 summary(MY_TABLE_Videos_perMale)
 }
 
@@ -298,49 +313,96 @@ summary(modDelayCourtValidTest) # n=111 NS
 {## Exploratory
 ### are black males behaving differently than red males, or are they receiving more attacks from the other male and the female ?
 
-modDelayCourtAllVideo <- lmer(DelayFirstCourt ~ Mcol + (1|FID)
+modDelayCourtAllVideo <- lmer(DelayFirstCourt ~ Mcol*Author + (1|FID)
                                ,data = MY_TABLE_Videos_perMale)
 summary(modDelayCourtAllVideo)# n=150 NS
 
 
-modDelayNaiveCourtAllVideo <- lmer(DelayNaiveFirstCourt ~ Mcol + (1|FID)
+modDelayNaiveCourtAllVideo <- lmer(DelayNaiveFirstCourt ~ Mcol*Author + (1|FID)
                               ,data = MY_TABLE_Videos_perMale)
 summary(modDelayNaiveCourtAllVideo)# n=129 NS
 
 
-modDelayLeaveDish <- lmer(DelayLeaveDish~ Mcol + (1|FID)
+modDelayLeaveDish <- lmer(DelayLeaveDish~ Mcol*Author + (1|FID)
                           ,data = MY_TABLE_Videos_perMale)
 summary(modDelayLeaveDish)# n=170 NS
 
 
-modNbFAttacks <- lmer(NbFAttacks~ Mcol + (1|FID)
+modNbFAttacks <- lmer(NbFAttacks~ Mcol
+                      *Author # I score signficantly more attacks, trends toward scoring less attacks towards yellow male
+                      + (1|FID)
                           ,data = MY_TABLE_Videos_perMale)
-summary(modNbFAttacks)# n=170 * significantly less attacks towards yellow male *
+summary(modNbFAttacks)# n=170 * significantly less attacks towards yellow male * > due to my bias
 
+  ### Lauren was blind to the treatment of the male, I wasn't
+  modNbFAttacksLG <- lmer(NbFAttacks~ Mcol
+                        + (1|FID)
+                        ,data = MY_TABLE_Videos_perMale[MY_TABLE_Videos_perMale$Author == 'LG',])
+  summary(modNbFAttacksLG)# n=72 NS !!
+  
+  modNbFAttacksMI <- lmer(NbFAttacks~ Mcol
+                          + (1|FID)
+                          ,data = MY_TABLE_Videos_perMale[MY_TABLE_Videos_perMale$Author == 'MI',])
+  summary(modNbFAttacksMI)# n=102 * significantly less attacks towards yellow *
 
-modNbFAttacks <- lmer(NbFAttacks~ Mcol + (1|FID)
+  ### Did I score more of the videos where male end up dying (which could explain why I scored more attacks against blue male ?)
+  table(MY_TABLE_Videos$Author, MY_TABLE_Videos$ReasonExclusion)
+  
+  ### I have done more of those videos of tests where the black male ended up dead
+  modNbFAttacksValidTests <- lmer(NbFAttacks~ Mcol
+                        *Author # I score signficantly more attacks, trends toward scoring less attacks towards yellow male
+                        + (1|FID)
+                        ,data = MY_TABLE_Videos_perMale[MY_TABLE_Videos_perMale$ExcludeYN == 0,])
+  summary(modNbFAttacksValidTests)
+  
+  modNbFAttacksValidTestsLG <- lmer(NbFAttacks~ Mcol
+                                  + (1|FID)
+                                  ,data = MY_TABLE_Videos_perMale[MY_TABLE_Videos_perMale$ExcludeYN == 0 & MY_TABLE_Videos_perMale$Author == 'LG',])
+  summary(modNbFAttacksValidTestsLG) 
+  
+  modNbFAttacksValidTestsMI <- lmer(NbFAttacks~ Mcol
+                                    + (1|FID)
+                                    ,data = MY_TABLE_Videos_perMale[MY_TABLE_Videos_perMale$ExcludeYN == 0 & MY_TABLE_Videos_perMale$Author == 'MI',])
+  summary(modNbFAttacksValidTestsMI) # n= 76 * significantly less attacks towards yellow *
+  
+  
+
+modNbIntendedFAttacks <- lmer(NbIntendedFAttacks~ Mcol*Author + (1|FID)
                       ,data = MY_TABLE_Videos_perMale)
-summary(modNbFAttacks)# n=170 * significantly less attacks towards yellow male *
+summary(modNbIntendedFAttacks)# n=170 . trend less attacks towards yellow male (my bias)
 
 
-modNbIntendedFAttacks <- lmer(NbIntendedFAttacks~ Mcol + (1|FID)
-                      ,data = MY_TABLE_Videos_perMale)
-summary(modNbIntendedFAttacks)# n=170 . trend less attacks towards yellow male
-
-
-modNbMAttacks <- lmer(NbMAttacks~ Mcol + (1|FID)
+modNbMAttacks <- lmer(NbMAttacks~ Mcol*Author + (1|FID)
                               ,data = MY_TABLE_Videos_perMale)
 summary(modNbMAttacks)# n=170 . trend less attacks towards yellow male
 
 
-modTotalCourtDur <- lmer(TotalCourtDur~ Mcol + (1|FID)
+modTotalCourtDur <- lmer(TotalCourtDur~ Mcol*Author + (1|FID)
                       ,data = MY_TABLE_Videos_perMale)
 summary(modTotalCourtDur)# n=170 NS
 
 
-modNaiveTotalCourtDur <- lmer(NaiveTotalCourtDur~ Mcol + (1|FID)
+modNaiveTotalCourtDur <- lmer(NaiveTotalCourtDur~ Mcol*Author + (1|FID)
                          ,data = MY_TABLE_Videos_perMale)
 summary(modNaiveTotalCourtDur)# n=170 NS
+
+## Do F attacks predict futur consumption ?
+modFconsum <- lmer(ConsumYN~ Mcol+NbFAttacks + (1|FID)
+                      ,data = MY_TABLE_Videos_perMale)
+summary(modFconsum) # ** Nb attack predicts furtur cinsumption, Yellow less consumed
+
+modFconsumAttackRate <- lmer(ConsumYN~ Mcol+I(NbFAttacks/TotalWatch) + (1|FID)
+                   ,data = MY_TABLE_Videos_perMale)
+summary(modFconsumAttackRate)
+
+## Do F and M attacks predict futur death of male for reason other than consumption ?
+modMaleDied <- lmer(Died~ Mcol+ I((NbFAttacks+NbMAttacks)) + (1|FID)
+                    ,data = MY_TABLE_Videos_perMale)
+summary(modMaleDied) 
+
+modMaleDiedrate <- lmer(Died~ Mcol+ I((NbFAttacks+NbMAttacks)/TotalWatch) + (1|FID)
+                    ,data = MY_TABLE_Videos_perMale)
+summary(modMaleDiedrate) 
 
 }
 
@@ -434,6 +496,8 @@ summary(MY_TABLE_Videos$DelayFirstMInter)/60 # in min
 ### Nb of courtships that lead to female attack
 summary(Behav_Male_Courtships$FemaleResponsiveness)
 length(Behav_Male_Courtships$FemaleResponsiveness[Behav_Male_Courtships$FemaleResponsiveness == 'Attacks'])/nrow(Behav_Male_Courtships)*100 # 11%
+
+
 
 }
 
