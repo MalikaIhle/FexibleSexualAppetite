@@ -64,25 +64,27 @@ invlogit(coef(summary(mod1))[3, 1]) # 0.0001578938 back trasnformed estimate for
   
   shapiro.test(MY_TABLE_BugTest$Fcondition)
   hist(MY_TABLE_BugTest$Fcondition)
-  t.test(MY_TABLE_BugTest$Fcondition[MY_TABLE_BugTest$Trt == "RedPreference"],
+  wilcox.test(MY_TABLE_BugTest$Fcondition[MY_TABLE_BugTest$Trt == "RedPreference"],
         MY_TABLE_BugTest$Fcondition[MY_TABLE_BugTest$Trt == "RedAverse"])
-sd(MY_TABLE_BugTest$Fcondition[MY_TABLE_BugTest$Trt == "RedPreference"])/sqrt(length(MY_TABLE_BugTest$Fcondition[MY_TABLE_BugTest$Trt == "RedPreference"]))
-sd(MY_TABLE_BugTest$Fcondition[MY_TABLE_BugTest$Trt == "RedAverse"])/sqrt(length(MY_TABLE_BugTest$Fcondition[MY_TABLE_BugTest$Trt == "RedAverse"]))
+  
+
 
 
 # exploration: among those tat did attack, red averse took longer time ?
   shapiro.test(log(MY_TABLE_BugTest$LatencyAttack,10))
   hist(log(MY_TABLE_BugTest$LatencyAttack,10))
-  t.test(log(MY_TABLE_BugTest$LatencyAttack[MY_TABLE_BugTest$Trt == "RedPreference"]),
-        log( MY_TABLE_BugTest$LatencyAttack[MY_TABLE_BugTest$Trt == "RedAverse"]), na.rm=TRUE)
-  kruskal.test(MY_TABLE_BugTest$LatencyAttack~MY_TABLE_BugTest$Trt)
+  wilcox.test(MY_TABLE_BugTest$LatencyAttack[MY_TABLE_BugTest$Trt == "RedPreference"],
+         MY_TABLE_BugTest$LatencyAttack[MY_TABLE_BugTest$Trt == "RedAverse"], na.rm=TRUE)
+ 
   
   mean(MY_TABLE_BugTest$LatencyAttack[MY_TABLE_BugTest$Trt == "RedPreference"], na.rm=TRUE)
   mean(MY_TABLE_BugTest$LatencyAttack[MY_TABLE_BugTest$Trt == "RedAverse"], na.rm=TRUE)
+  sd(MY_TABLE_BugTest$LatencyAttack[MY_TABLE_BugTest$Trt == "RedPreference"], na.rm=TRUE)/
+    sqrt(length(MY_TABLE_BugTest$LatencyAttack[MY_TABLE_BugTest$Trt == "RedPreference" & !is.na(MY_TABLE_BugTest$LatencyAttack)]))
+  sd(MY_TABLE_BugTest$LatencyAttack[MY_TABLE_BugTest$Trt == "RedAverse"], na.rm=TRUE)/
+    sqrt(length(MY_TABLE_BugTest$LatencyAttack[MY_TABLE_BugTest$Trt == "RedAverse"& !is.na(MY_TABLE_BugTest$LatencyAttack)]))
 
-  sd(MY_TABLE_BugTest$LatencyAttack[MY_TABLE_BugTest$Trt == "RedPreference"], na.rm=TRUE)/sqrt(length(MY_TABLE_BugTest$LatencyAttack[MY_TABLE_BugTest$Trt == "RedPreference"]))
-  sd(MY_TABLE_BugTest$LatencyAttack[MY_TABLE_BugTest$Trt == "RedAverse"], na.rm=TRUE)/sqrt(length(MY_TABLE_BugTest$LatencyAttack[MY_TABLE_BugTest$Trt == "RedAverse"]))
-  
+
 }
 
 {# step 2
@@ -93,6 +95,19 @@ par(mfrow=c(2,2))
 plot(mod2)
 
 summary(mod2)
+
+
+invlogit(coef(summary(mod2))[1, 1]) # likelihood of eating the red termite for red averse females
+
+invlogit(coef(summary(mod2))[1, 1] + coef(summary(mod2))[2, 1]) # likelihood of eating the red termite for red preference females
+
+(invlogit(coef(summary(mod2))[1, 1]+coef(summary(mod2))[1, 2])
+  -invlogit(coef(summary(mod2))[1, 1]-coef(summary(mod2))[1, 2]))/2	# 0.06621911 average SE for red averse
+
+(invlogit(coef(summary(mod2))[1, 1]+ coef(summary(mod2))[2, 1]+coef(summary(mod2))[2, 2])
+  -invlogit(coef(summary(mod2))[1, 1]+ coef(summary(mod2))[2, 1]-coef(summary(mod2))[2, 2]))/2	# 0.09226776 average SE for red preference
+
+
 
   ## to get one sided test p value
  mod2p <- coef(summary(mod2))[2, 4]/2
@@ -109,12 +124,16 @@ summary(mod2)
   t.test (LogLatencyAttackTermiteRedPreference, LogLatencyAttackTermiteRedAverse)
 
 
+  median(MY_TABLE_TermiteTest$LatencyAttack[MY_TABLE_TermiteTest$Trt == "RedPreference"])
+  median(MY_TABLE_TermiteTest$LatencyAttack[MY_TABLE_TermiteTest$Trt == "RedAverse"])
+  summary(MY_TABLE_TermiteTest$LatencyAttack)
+  
+  
 }
 
 {# step 3
 
-
-mod3 <- glm (CannibalizedRedYN ~ Trt+ DeltaMsize + DeltaMcondition, family = "binomial", data = MY_TABLE_MaleTestValid)
+mod3 <- glm (CannibalizedRedYN ~ Trt+ DeltaMsize + DeltaMcondition, family = "binomial", data = MY_TABLE_MaleTest)
 
 par(mfrow=c(2,2))
 plot(mod3)
@@ -125,7 +144,18 @@ summary(mod3)
  mod3p <-  coef(summary(mod3))[2, 4]/2
 
 
-
+ 
+ invlogit(coef(summary(mod3))[1, 1]) # likelihood of eating the red male for red averse females
+ 
+ invlogit(coef(summary(mod3))[1, 1] + coef(summary(mod3))[2, 1]) # likelihood of eating the red male for red preference females
+ 
+ (invlogit(coef(summary(mod3))[1, 1]+coef(summary(mod3))[1, 2])
+   -invlogit(coef(summary(mod3))[1, 1]-coef(summary(mod3))[1, 2]))/2	# 0.06621911 average SE for red averse
+ 
+ (invlogit(coef(summary(mod3))[1, 1]+ coef(summary(mod3))[2, 1]+coef(summary(mod3))[2, 2])
+   -invlogit(coef(summary(mod3))[1, 1]+ coef(summary(mod3))[2, 1]-coef(summary(mod3))[2, 2]))/2	# 0.09226776 average SE for red preference
+ 
+ 
 
   ## to check equality of male motivation to court
   # shapiro.test(MY_TABLE_MID$Latency_to_court)
@@ -134,16 +164,31 @@ summary(mod3)
 
 
  # exploration: male test for test where male consumption happened within the first day
+ MY_TABLE_MaleTest$TrialDate <-  as.POSIXct(MY_TABLE_MaleTest$TrialDate)
+ MY_TABLE_MaleTest$TrialDateEnd <-  as.POSIXct(MY_TABLE_MaleTest$TrialDateEnd)
  
  mod3_firstDay <- glm (CannibalizedRedYN ~ Trt+ DeltaMsize + DeltaMcondition
                     , family = "binomial" 
-                    , data = MY_TABLE_MaleTestValid[MY_TABLE_MaleTestValid$TrialDateEnd == MY_TABLE_MaleTestValid$TrialDate 
-                                                    & !is.na(MY_TABLE_MaleTestValid$TrialDateEnd),])
+                    , data = MY_TABLE_MaleTest[MY_TABLE_MaleTest$TrialDateEnd == MY_TABLE_MaleTest$TrialDate 
+                                                    & !is.na(MY_TABLE_MaleTest$TrialDateEnd),])
  
  par(mfrow=c(2,2))
  plot(mod3_firstDay)
  
  summary(mod3_firstDay)
+ 
+ 
+ invlogit(coef(summary(mod3_firstDay))[1, 1]) # likelihood of eating the red male for red averse females
+ 
+ invlogit(coef(summary(mod3_firstDay))[1, 1] + coef(summary(mod3_firstDay))[2, 1]) # likelihood of eating the red male for red preference females
+ 
+ (invlogit(coef(summary(mod3_firstDay))[1, 1]+coef(summary(mod3_firstDay))[1, 2])
+   -invlogit(coef(summary(mod3_firstDay))[1, 1]-coef(summary(mod3_firstDay))[1, 2]))/2	# 0.06621911 average SE for red averse
+ 
+ (invlogit(coef(summary(mod3_firstDay))[1, 1]+ coef(summary(mod3_firstDay))[2, 1]+coef(summary(mod3_firstDay))[2, 2])
+   -invlogit(coef(summary(mod3_firstDay))[1, 1]+ coef(summary(mod3_firstDay))[2, 1]-coef(summary(mod3_firstDay))[2, 2]))/2	# 0.09226776 average SE for red preference
+ 
+ 
  
  
 }  
@@ -197,8 +242,8 @@ oddsTermite <- exp(cbind(OR=coef(mod2), confint(mod2)))[2,]
 
 ## step 3: odds ratio ?
 table(MY_TABLE_MaleTestValid$Trt, MY_TABLE_MaleTestValid$CannibalizedRedYN)
-oddsMales <- exp(cbind(OR=coef(mod3), confint(mod3)))[2,]  
-oddsMales1stDay <- exp(cbind(OR=coef(mod3_firstDay), confint(mod3_firstDay)))[2,]
+oddsMales <- exp(cbind(OR=coef(mod3_firstDay), confint(mod3_firstDay)))[2,]  
+oddsMales1stDay <- exp(cbind(OR=coef(mod3_firstDay_firstDay), confint(mod3_firstDay_firstDay)))[2,]
 
 
 odds <- data.frame(rbind(oddsBug,oddsTermite,oddsMales1stDay,oddsMales))
