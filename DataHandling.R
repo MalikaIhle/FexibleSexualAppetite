@@ -118,7 +118,7 @@ library(RODBC)
   # combine into MY_TABLE_Step
   
   MY_TABLE_Step <-data.frame(mapply(c,MY_TABLE_BugTest[,c('FID','Trt','AttackBugYN','LatencyAttack')],
-                                    MY_TABLE_TermiteTest[,c('FID','Trt','AttackNewRedYN','LatencyAttack')],
+                                    MY_TABLE_TermiteTestValid[,c('FID','Trt','AttackNewRedYN','LatencyAttack')],
                                     MY_TABLE_MaleTestValid[,c('FID','Trt','CannibalizedRedYN','LatencyAttack')]))
   colnames(MY_TABLE_Step) <- c('FID','Trt','AttackRedYN','LatencyAttack')
   MY_TABLE_Step$Trt[MY_TABLE_Step$Trt == 1] <- 'RedAverse'
@@ -128,7 +128,7 @@ library(RODBC)
   
   
   head(MY_TABLE_BugTest)
-  head(MY_TABLE_TermiteTest)
+  head(MY_TABLE_TermiteTestValid)
   head(MY_TABLE_MaleTest)
   head(MY_TABLE_MaleTestValid)
   head(MY_TABLE_MID)
@@ -224,11 +224,12 @@ library(RODBC)
 
 output_folder <- "R_Data"
 
-### 20180315
+### 20180315 
 # write.csv(MY_TABLE_BugTest, file = paste(output_folder,"MY_TABLE_BugTest.csv", sep="/"), row.names = FALSE)
 # write.csv(MY_TABLE_TermiteTest, file = paste(output_folder,"MY_TABLE_TermiteTest.csv", sep="/"), row.names = FALSE)
 # write.csv(MY_TABLE_MaleTestValid, file = paste(output_folder,"MY_TABLE_MaleTest.csv", sep="/"), row.names = FALSE)
 # write.csv(MY_TABLE_MIDValid, file = paste(output_folder,"MY_TABLE_MID.csv", sep="/"), row.names = FALSE)
 # write.csv(MY_TABLE_Step, file = paste(output_folder,"MY_TABLE_Step.csv", sep="/"), row.names = FALSE)
 
-
+# 20180328 (validtermitetest)
+# write.csv(MY_TABLE_TermiteTestValid, file = paste(output_folder,"MY_TABLE_TermiteTest.csv", sep="/"), row.names = FALSE)

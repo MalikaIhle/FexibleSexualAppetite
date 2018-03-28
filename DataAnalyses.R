@@ -10,6 +10,7 @@ rm(list = ls(all = TRUE))
 
 {# packages
 library(lme4)
+library(arm)
 library(rptR)
 library(pbapply)
 library(ggplot2)
@@ -40,6 +41,23 @@ plot(mod1)
 
 summary(mod1)
 
+
+invlogit(coef(summary(mod1))[1, 1]) # likelihood of eating the bug for red averse females
+
+invlogit(coef(summary(mod1))[1, 1] + coef(summary(mod1))[2, 1]) # likelihood of eating the bug for red preference females
+
+(invlogit(coef(summary(mod1))[1, 1]+coef(summary(mod1))[1, 2])
+  -invlogit(coef(summary(mod1))[1, 1]-coef(summary(mod1))[1, 2]))/2	# 0.06510539 average SE for red averse
+
+(invlogit(coef(summary(mod1))[1, 1]+ coef(summary(mod1))[2, 1]+coef(summary(mod1))[2, 2])
+  -invlogit(coef(summary(mod1))[1, 1]+ coef(summary(mod1))[2, 1]-coef(summary(mod1))[2, 2]))/2	# 0.08832562 average SE for red preference
+
+invlogit(coef(summary(mod1))[3, 1]) # 0.0001578938 back trasnformed estimate for body condition
+(invlogit(coef(summary(mod1))[3, 1]+coef(summary(mod1))[3, 2]) 
+- invlogit(coef(summary(mod1))[3, 1]-coef(summary(mod1))[3, 2]) ) /2# 0.5 back trasnformed estimate for body condition SE
+
+
+
   ## to get one sided test p value
   mod1p <- coef(summary(mod1))[2, 4]/2
   
@@ -48,8 +66,10 @@ summary(mod1)
   hist(MY_TABLE_BugTest$Fcondition)
   t.test(MY_TABLE_BugTest$Fcondition[MY_TABLE_BugTest$Trt == "RedPreference"],
         MY_TABLE_BugTest$Fcondition[MY_TABLE_BugTest$Trt == "RedAverse"])
+sd(MY_TABLE_BugTest$Fcondition[MY_TABLE_BugTest$Trt == "RedPreference"])/sqrt(length(MY_TABLE_BugTest$Fcondition[MY_TABLE_BugTest$Trt == "RedPreference"]))
+sd(MY_TABLE_BugTest$Fcondition[MY_TABLE_BugTest$Trt == "RedAverse"])/sqrt(length(MY_TABLE_BugTest$Fcondition[MY_TABLE_BugTest$Trt == "RedAverse"]))
 
-  
+
 # exploration: among those tat did attack, red averse took longer time ?
   shapiro.test(log(MY_TABLE_BugTest$LatencyAttack,10))
   hist(log(MY_TABLE_BugTest$LatencyAttack,10))
@@ -57,12 +77,17 @@ summary(mod1)
         log( MY_TABLE_BugTest$LatencyAttack[MY_TABLE_BugTest$Trt == "RedAverse"]), na.rm=TRUE)
   kruskal.test(MY_TABLE_BugTest$LatencyAttack~MY_TABLE_BugTest$Trt)
   
+  mean(MY_TABLE_BugTest$LatencyAttack[MY_TABLE_BugTest$Trt == "RedPreference"], na.rm=TRUE)
+  mean(MY_TABLE_BugTest$LatencyAttack[MY_TABLE_BugTest$Trt == "RedAverse"], na.rm=TRUE)
+
+  sd(MY_TABLE_BugTest$LatencyAttack[MY_TABLE_BugTest$Trt == "RedPreference"], na.rm=TRUE)/sqrt(length(MY_TABLE_BugTest$LatencyAttack[MY_TABLE_BugTest$Trt == "RedPreference"]))
+  sd(MY_TABLE_BugTest$LatencyAttack[MY_TABLE_BugTest$Trt == "RedAverse"], na.rm=TRUE)/sqrt(length(MY_TABLE_BugTest$LatencyAttack[MY_TABLE_BugTest$Trt == "RedAverse"]))
   
 }
 
 {# step 2
 
-mod2 <- glm (AttackNewRedYN ~ Trt, family = "binomial",  data = MY_TABLE_TermiteTestValid)
+mod2 <- glm (AttackNewRedYN ~ Trt, family = "binomial",  data = MY_TABLE_TermiteTest)
 
 par(mfrow=c(2,2))
 plot(mod2)
