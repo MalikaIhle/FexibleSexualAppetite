@@ -10,11 +10,11 @@
   # for three female male tests, males were replaced when one died (within two days), and that males were already painted  (the day before)
   # in all three cases, the color of the male that died was the same as the color of the male which was subsequently cannibalised.
   # as this was not planed and is difficult to present succintly in a paper. those replacement tests were ignored (unfortunately reducing the sample size of valid male tests)
-  # for FID 193: initially with 24 Black, 53 Red (Died) trial ID 405  ; later 63 Black, 37 Red trial, trial ID 179
-  # for FID 112: initially with 349 Black (Died), 362 (Red) trial ID 297 ; later 230 Black trial ID 317
-  # for FID 106: initially with 60 Black (Died), 221 (Red) trial ID 406 ; later 34 Black, 32 Red, trial ID 160
-  # first trial IDs for the test on female 106 112 and 193 cannibalism are 160 405 297
-  # second trials IDs to be excluded for these females were: 406 179 317
+  # for FID 193: initially with 24 Black, 53 Red (Died) trial ID 297  ; later 63 Black, 37 Red trial, trial ID 317
+  # for FID 112: initially with 349 Black (Died), 362 (Red) trial ID 405 ; later 230 Black trial ID 179
+  # for FID 106: initially with 60 Black (Died), 221 (Red) trial ID 160 ; later 34 Black, 32 Red, trial ID 406
+  # first trial IDs for the test on female 106 112 and 193 cannibalism are 160 405 297, are excluded as one spider dies during the test (as in other such cases, entered in DB)
+  # second trials IDs to be excluded in this script for these females were: 406 179 317
 }
 
 
