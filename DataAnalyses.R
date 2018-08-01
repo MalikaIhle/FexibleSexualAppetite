@@ -42,15 +42,22 @@ plot(mod1)
 summary(mod1)
 
 
-invlogit(coef(summary(mod1))[1, 1]) # likelihood of eating the bug for red averse females
+bugaverse <- invlogit(coef(summary(mod1))[1, 1]) # likelihood of eating the bug for red averse females
 
-invlogit(coef(summary(mod1))[1, 1] + coef(summary(mod1))[2, 1]) # likelihood of eating the bug for red preference females
+bugpref <- invlogit(coef(summary(mod1))[1, 1] + coef(summary(mod1))[2, 1]) # likelihood of eating the bug for red preference females
 
-(invlogit(coef(summary(mod1))[1, 1]+coef(summary(mod1))[1, 2])
+buglowerCIaverse <-  invlogit(coef(summary(mod1))[1, 1]-coef(summary(mod1))[1, 2]*1.96)
+bugupperCIaverse <-invlogit(coef(summary(mod1))[1, 1]+coef(summary(mod1))[1, 2]*1.96)
+  
+  (invlogit(coef(summary(mod1))[1, 1]+coef(summary(mod1))[1, 2])
   -invlogit(coef(summary(mod1))[1, 1]-coef(summary(mod1))[1, 2]))/2	# 0.06510539 average SE for red averse
 
-(invlogit(coef(summary(mod1))[1, 1]+ coef(summary(mod1))[2, 1]+coef(summary(mod1))[2, 2])
+ (invlogit(coef(summary(mod1))[1, 1]+ coef(summary(mod1))[2, 1]+coef(summary(mod1))[2, 2])
   -invlogit(coef(summary(mod1))[1, 1]+ coef(summary(mod1))[2, 1]-coef(summary(mod1))[2, 2]))/2	# 0.08832562 average SE for red preference
+
+bugupperCIpref <-invlogit(coef(summary(mod1))[1, 1]+ coef(summary(mod1))[2, 1]+coef(summary(mod1))[2, 2]*1.96)
+buglowerCIpref <-invlogit(coef(summary(mod1))[1, 1]+ coef(summary(mod1))[2, 1]-coef(summary(mod1))[2, 2]*1.96)
+
 
 invlogit(coef(summary(mod1))[3, 1]) # 0.0001578938 back trasnformed estimate for body condition
 (invlogit(coef(summary(mod1))[3, 1]+coef(summary(mod1))[3, 2]) 
@@ -97,17 +104,21 @@ plot(mod2)
 summary(mod2)
 
 
-invlogit(coef(summary(mod2))[1, 1]) # likelihood of eating the red termite for red averse females
+termiteaverse <- invlogit(coef(summary(mod2))[1, 1]) # likelihood of eating the red termite for red averse females
 
-invlogit(coef(summary(mod2))[1, 1] + coef(summary(mod2))[2, 1]) # likelihood of eating the red termite for red preference females
+termitepref <- invlogit(coef(summary(mod2))[1, 1] + coef(summary(mod2))[2, 1]) # likelihood of eating the red termite for red preference females
 
 (invlogit(coef(summary(mod2))[1, 1]+coef(summary(mod2))[1, 2])
   -invlogit(coef(summary(mod2))[1, 1]-coef(summary(mod2))[1, 2]))/2	# 0.06621911 average SE for red averse
 
+termitelowerseaverse <- invlogit(coef(summary(mod2))[1, 1]-coef(summary(mod2))[1, 2]*1.96)
+termiteupperseaverse <- invlogit(coef(summary(mod2))[1, 1]+coef(summary(mod2))[1, 2]*1.96)
+
 (invlogit(coef(summary(mod2))[1, 1]+ coef(summary(mod2))[2, 1]+coef(summary(mod2))[2, 2])
   -invlogit(coef(summary(mod2))[1, 1]+ coef(summary(mod2))[2, 1]-coef(summary(mod2))[2, 2]))/2	# 0.09226776 average SE for red preference
 
-
+termiteuppersepref <- invlogit(coef(summary(mod2))[1, 1]+ coef(summary(mod2))[2, 1]+coef(summary(mod2))[2, 2]*1.96)
+termitelowersepref <- invlogit(coef(summary(mod2))[1, 1]+ coef(summary(mod2))[2, 1]-coef(summary(mod2))[2, 2]*1.96)
 
   ## to get one sided test p value
  mod2p <- coef(summary(mod2))[2, 4]/2
@@ -145,16 +156,21 @@ summary(mod3)
 
 
  
- invlogit(coef(summary(mod3))[1, 1]) # likelihood of eating the red male for red averse females
+maleaverse <- invlogit(coef(summary(mod3))[1, 1]) # likelihood of eating the red male for red averse females
  
- invlogit(coef(summary(mod3))[1, 1] + coef(summary(mod3))[2, 1]) # likelihood of eating the red male for red preference females
+malepref <- invlogit(coef(summary(mod3))[1, 1] + coef(summary(mod3))[2, 1]) # likelihood of eating the red male for red preference females
  
- (invlogit(coef(summary(mod3))[1, 1]+coef(summary(mod3))[1, 2])
+(invlogit(coef(summary(mod3))[1, 1]+coef(summary(mod3))[1, 2])
    -invlogit(coef(summary(mod3))[1, 1]-coef(summary(mod3))[1, 2]))/2	# 0.06621911 average SE for red averse
+
+maleupperseaverse <- invlogit(coef(summary(mod3))[1, 1]+coef(summary(mod3))[1, 2]*1.96)
+malelowerseaverse <- invlogit(coef(summary(mod3))[1, 1]-coef(summary(mod3))[1, 2]*1.96)
  
- (invlogit(coef(summary(mod3))[1, 1]+ coef(summary(mod3))[2, 1]+coef(summary(mod3))[2, 2])
+(invlogit(coef(summary(mod3))[1, 1]+ coef(summary(mod3))[2, 1]+coef(summary(mod3))[2, 2])
    -invlogit(coef(summary(mod3))[1, 1]+ coef(summary(mod3))[2, 1]-coef(summary(mod3))[2, 2]))/2	# 0.09226776 average SE for red preference
  
+malelowersepref <- invlogit(coef(summary(mod3))[1, 1]+ coef(summary(mod3))[2, 1]-coef(summary(mod3))[2, 2]*1.96)
+maleuppersepref <- invlogit(coef(summary(mod3))[1, 1]+ coef(summary(mod3))[2, 1]+coef(summary(mod3))[2, 2]*1.96)
  
 
   ## to check equality of male motivation to court
@@ -310,3 +326,91 @@ rownames(contingencyTable)[3] <- 'Control'
 chisq.test(contingencyTable)
 
 }
+
+
+
+
+figdata <- data.frame(rbind(c('Bug', bugaverse,buglowerCIaverse, bugupperCIaverse, 'Red Averse'), 
+                            c('Bug',bugpref, buglowerCIpref, bugupperCIpref,'Red preference'),
+                            c('Termite', termiteaverse, termitelowerseaverse, termiteupperseaverse, 'Red Averse'),
+                            c('Termite', termitepref, termitelowersepref, termiteuppersepref,'Red preference'),
+                            c('Male', maleaverse, malelowerseaverse, maleupperseaverse, 'Red averse'),
+                            c('Male', malepref, malelowersepref, maleuppersepref, 'Red preference')))
+
+colnames(figdata) <- c('test', 'estimate', 'lowerCI', 'upperCI','Treatment')
+figdata$estimate <- as.numeric(as.character(figdata$estimate))*100
+figdata$lowerCI <- as.numeric(as.character(figdata$lowerCI))*100
+figdata$upperCI <- as.numeric(as.character(figdata$upperCI))*100
+
+
+#fig 1
+Fig1 <- {ggplot(data=figdata[figdata$test == 'Bug',], aes(x=Treatment, y=estimate))+
+    xlab(NULL)+
+    ylab(NULL)+
+   # ylab("Percentage of spiders consuming the bug (+/- 95% CI)")+
+    
+   scale_y_continuous(breaks =seq(0,100, by = 10),limits = c(0,100)) +
+  
+    
+    geom_errorbar(aes(ymin=lowerCI, ymax=upperCI), size = 2, width =1,na.rm=TRUE)+
+    geom_point(size =6, stroke = 1) +   
+      theme_classic()+
+    theme(
+      #legend.position="none",
+      panel.border = element_rect(colour = "black", fill=NA), 
+      #axis.title.y=element_text(size=20,face="bold", margin=margin(l=5)),
+      axis.text=element_text(size=20),
+      axis.text.x=element_text(size=20, face="bold",margin=margin(t=5)),
+      axis.title.x = NULL,
+      plot.margin = unit(c(0.2,0.2,0.3,0.3), "cm"))
+}
+
+
+Fig2 <- {ggplot(data=figdata[figdata$test == 'Termite',], aes(x=Treatment, y=estimate))+
+    xlab(NULL)+
+    ylab(NULL)+
+    # ylab("Percentage of spiders consuming the bug (+/- 95% CI)")+
+    
+    scale_y_continuous(breaks =seq(0,100, by = 10),limits = c(0,100)) +
+    
+    
+    geom_errorbar(aes(ymin=lowerCI, ymax=upperCI), size = 2, width =1,na.rm=TRUE)+
+    geom_point(size =6, stroke = 1) +   
+    theme_classic()+
+    theme(
+      #legend.position="none",
+      panel.border = element_rect(colour = "black", fill=NA), 
+      #axis.title.y=element_text(size=20,face="bold", margin=margin(l=5)),
+      axis.text=element_text(size=20),
+      axis.text.x=element_text(size=20, face="bold",margin=margin(t=5)),
+      axis.title.x = NULL,
+      plot.margin = unit(c(0.2,0.2,0.3,0.3), "cm"))
+}
+
+
+Fig3 <- {ggplot(data=figdata[figdata$test == 'Male',], aes(x=Treatment, y=estimate))+
+    xlab(NULL)+
+    ylab(NULL)+
+    # ylab("Percentage of spiders consuming the bug (+/- 95% CI)")+
+    
+    scale_y_continuous(breaks =seq(0,100, by = 10),limits = c(0,100)) +
+    
+    
+    geom_errorbar(aes(ymin=lowerCI, ymax=upperCI), size = 2, width =1,na.rm=TRUE)+
+    geom_point(size =6,  stroke = 1) +   
+    theme_classic()+
+    theme(
+      #legend.position="none",
+      panel.border = element_rect(colour = "black", fill=NA), 
+      #axis.title.y=element_text(size=20,face="bold", margin=margin(l=5)),
+      axis.text=element_text(size=20),
+      axis.text.x=element_text(size=20, face="bold",margin=margin(t=5)),
+      axis.title.x = NULL,
+      plot.margin = unit(c(0.2,0.2,0.3,0.3), "cm"))
+}
+
+
+
+
+
+
