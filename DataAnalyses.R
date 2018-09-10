@@ -144,7 +144,7 @@ termitelowersepref <- invlogit(coef(summary(mod2))[1, 1]+ coef(summary(mod2))[2,
 
 {# step 3
 
-mod3 <- glm (CannibalizedRedYN ~ Trt+ DeltaMsize + DeltaMcondition, family = "binomial", data = MY_TABLE_MaleTest)
+mod3 <- glm (CannibalizedRedYN ~ Trt+ DeltaMsize + DeltaMcondition, family = "binomial", data = MY_TABLE_TermiteMale)
 
 par(mfrow=c(2,2))
 plot(mod3)
@@ -237,6 +237,14 @@ print(rpt(formula = AttackRedYN ~ Trt + (1|FID),
           npermut = 0,
           adjusted = FALSE))
 
+# female response with termite predict response with male ?
+MY_TABLE_TermiteMale <- merge(MY_TABLE_TermiteTest[,c('FID','AttackNewRedYN')],MY_TABLE_MaleTest[,c('FID','CannibalizedRedYN')],by='FID' )
+nrow(MY_TABLE_TermiteMale)
+
+cor.test(MY_TABLE_TermiteMale$CannibalizedRedYN,MY_TABLE_TermiteMale$AttackNewRedYN)
+summary(glm (CannibalizedRedYN ~ AttackNewRedYN, family = "binomial", data=MY_TABLE_TermiteMale))
+
+
 
 # Repeatability of female latency to attack
 
@@ -294,10 +302,10 @@ ggplot(MY_TABLE_BugTest,aes(x=AttackBugYN,group=Trt,fill=Trt))+
 
 
 ##step 2
-chisq.test(table(MY_TABLE_TermiteTestValid$AttackNewRedYN[MY_TABLE_TermiteTestValid$Trt == 'RedPreference']), p=c(0.5,0.5))
-chisq.test(table(MY_TABLE_TermiteTestValid$AttackNewRedYN[MY_TABLE_TermiteTestValid$Trt == 'RedAverse']), p=c(0.5,0.5))
+chisq.test(table(MY_TABLE_TermiteTest$AttackNewRedYN[MY_TABLE_TermiteTest$Trt == 'RedPreference']), p=c(0.5,0.5))
+chisq.test(table(MY_TABLE_TermiteTest$AttackNewRedYN[MY_TABLE_TermiteTest$Trt == 'RedAverse']), p=c(0.5,0.5))
 
-ggplot(MY_TABLE_TermiteTestValid,aes(x=AttackNewRedYN,group=Trt,fill=Trt))+
+ggplot(MY_TABLE_TermiteTest,aes(x=AttackNewRedYN,group=Trt,fill=Trt))+
   geom_bar(position="dodge",aes(y = ..prop.., fill = Trt)) +
   scale_x_discrete(NULL, c(0,1), c("Consumed grey termite", "Consumed red termite"), c(0,1)) +
   scale_y_continuous(NULL,labels=scales::percent) + theme_bw()+
@@ -305,11 +313,11 @@ ggplot(MY_TABLE_TermiteTestValid,aes(x=AttackNewRedYN,group=Trt,fill=Trt))+
   theme(text = element_text(size=20))
 
 ##step 3
-chisq.test(table(MY_TABLE_MaleTestValid$CannibalizedRedYN[MY_TABLE_MaleTestValid$Trt == 'RedPreference']), p=c(0.5,0.5))
-chisq.test(table(MY_TABLE_MaleTestValid$CannibalizedRedYN[MY_TABLE_MaleTestValid$Trt == 'RedAverse']), p=c(0.5,0.5))
+chisq.test(table(MY_TABLE_MaleTest$CannibalizedRedYN[MY_TABLE_MaleTest$Trt == 'RedPreference']), p=c(0.5,0.5))
+chisq.test(table(MY_TABLE_MaleTest$CannibalizedRedYN[MY_TABLE_MaleTest$Trt == 'RedAverse']), p=c(0.5,0.5))
 
 
-ggplot(MY_TABLE_MaleTestValid,aes(x=CannibalizedRedYN,group=Trt,fill=Trt))+
+ggplot(MY_TABLE_MaleTest,aes(x=CannibalizedRedYN,group=Trt,fill=Trt))+
   geom_bar(position="dodge",aes(y = ..prop.., fill = Trt)) +
   scale_x_discrete(NULL, c(0,1), c("Consumed black male", "Consumed red male"), c(0,1)) +
   theme_bw()+scale_y_continuous(NULL,labels=scales::percent) +
@@ -326,6 +334,31 @@ rownames(contingencyTable)[3] <- 'Control'
 chisq.test(contingencyTable)
 
 }
+
+{# Comparing all to 50/50
+  
+#step 1
+chisq.test(table(MY_TABLE_BugTest$AttackBugYN), p=c(0.5,0.5))
+
+
+#step 2
+chisq.test(table(MY_TABLE_TermiteTest$AttackNewRedYN), p=c(0.5,0.5))
+
+
+#step 3    
+chisq.test(table(MY_TABLE_MaleTest$CannibalizedRedYN), p=c(0.5,0.5))
+summary(glm ( MY_TABLE_MaleTest$CannibalizedRedYN~1, family = "binomial", data=MY_TABLE_Step))
+
+# all 
+mod4 <- glmer (AttackRedYN ~ Trt + (1|FID), family = "binomial", data=MY_TABLE_Step)
+summary(mod4) 
+
+# all 
+mod4bis <- glmer (AttackRedYN ~ (1|FID), family = "binomial", data=MY_TABLE_Step)
+summary(mod4bis)
+
+}
+
 
 
 
