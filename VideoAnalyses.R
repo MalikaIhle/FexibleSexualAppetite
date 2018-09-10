@@ -25,7 +25,7 @@ rm(list = ls(all = TRUE))
 
 {# packages
   library(lme4)
-  library(RODBC)
+  library(RODBC) # this require R AND ACCESS to run on 32 bits !
   library(stringr)
   library(dplyr)
 }
