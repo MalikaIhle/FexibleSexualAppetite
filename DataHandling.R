@@ -22,14 +22,13 @@ rm(list = ls(all = TRUE))
 
 
 {# packages
-library(RODBC)
+library(RODBC) # this require R AND ACCESS to run on 32 bits !
 }
 
 {# load data
   
   conDB= odbcConnectAccess2007("C:\\Users\\malika.ihle\\Dropbox\\HabronatusPyrrithrix\\HabronatusPyrrithrix_DB.accdb")
-  
-  
+
   MY_TABLE_BugTest <- sqlQuery(conDB,"
                                SELECT Behav_Female.FID, Basic_Trials.GroupName AS Trt, Behav_Female.AttackRedYN AS AttackBugYN, Behav_Female.LatencyAttack, Max(Morph_Measurements.CarapaceWidth) AS CarapaceWidth, Max(Morph_Measurements.Mass) AS Mass
                                FROM Morph_Measurements RIGHT JOIN (Basic_Trials INNER JOIN Behav_Female ON Basic_Trials.Ind_ID = Behav_Female.FID) ON Morph_Measurements.Ind_ID = Behav_Female.FID
