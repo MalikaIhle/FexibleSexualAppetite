@@ -327,7 +327,7 @@ ggplot(MY_TABLE_MaleTest,aes(x=CannibalizedRedYN,group=Trt,fill=Trt))+
 
 # juvenile females painted black or left white faces, predated by adult female (red preference females finished with the experiment)
 
-contingencyTable <- rbind(table(MY_TABLE_MaleTestValid$Trt, MY_TABLE_MaleTestValid$CannibalizedRedYN), c(13,5))
+contingencyTable <- rbind(table(MY_TABLE_MaleTest$Trt, MY_TABLE_MaleTest$CannibalizedRedYN), c(13,5))
 rownames(contingencyTable)[3] <- 'Control'
 
 
