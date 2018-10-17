@@ -15,8 +15,8 @@
   # for FID 106: initially with 60 Black (Died), 221 (Red) trial ID 160 ; later 34 Black, 32 Red, trial ID 406
   # first trial IDs for the test on female 106 112 and 193 cannibalism are 160 405 297, are excluded as one spider dies during the test (as in other such cases, entered in DB)
   # second trials IDs to be excluded in this script for these females were: 406 179 317
-  # videos were watched for trials 160 405 297 (video ID 29, 31, 35) (which end up being excluded trials)
-  # video from the second test of female 193 (test 317), video ID 36, need to be excluded here.
+  # videos were watched for trials 160 405 297 (video ID 29, 31, 35) (which end up being excluded trials), these are the first trial of females 193, 112 and 106 (their second tedt were not taped/watched)
+  # video from the second test of female 193 (test 317), video ID 36, was watched but need to be excluded here.
   # video recording failed for female 210 and 254
   # video recording was shorter (due to technical difficulties) for females 224 and 207
 }
@@ -48,10 +48,28 @@ Behav_MaleMale_Competition <- sqlFetch(conDB, 'Behav_Male-Male_Competition')
 FemaleTrt <- sqlFetch(conDB, 'Basic_Trials')
 
 # exclude video IDs from test with replacement males (see remarks)
+Behav_Video_MaleTest$FID[Behav_Video_MaleTest$FID >1000] # the zero at the end of the FID stands for the first trial, the 1 for the second trial
+
 Behav_Video_MaleTest <- Behav_Video_MaleTest[Behav_Video_MaleTest$VideoID != 36,] 
 Behav_Female_Attacks <- Behav_Female_Attacks[Behav_Female_Attacks$VideoID != 36,] 
 Behav_Male_Courtships <- Behav_Male_Courtships[Behav_Male_Courtships$VideoID != 36,] 
 Behav_MaleMale_Competition <- Behav_MaleMale_Competition[Behav_MaleMale_Competition$VideoID != 36,] 
+
+# exclude 'fake FID' (used to watch two trials per female - but whose second trial is now excluded, see remarks)
+Behav_Video_MaleTest$FID[Behav_Video_MaleTest$FID >1000] # the zero at the end of the FID stands for the first trial, the 1 for the second trial
+
+Behav_Video_MaleTest$FID[Behav_Video_MaleTest$FID == 1120] <- 112
+Behav_Video_MaleTest$FID[Behav_Video_MaleTest$FID == 1930] <- 193
+Behav_Video_MaleTest$FID[Behav_Video_MaleTest$FID == 1060] <- 106
+
+
+Behav_Female$FID[Behav_Female$FID == 1120] <- 112
+Behav_Female$FID[Behav_Female$FID == 1930] <- 193
+Behav_Female$FID[Behav_Female$FID == 1060] <- 106
+
+Behav_Female <- Behav_Female[Behav_Female$FID <1000,]
+
+
 
 
 close(conDB)
@@ -126,6 +144,9 @@ FAttacks <- Behav_Female_Attacks[Behav_Female_Attacks$AttackYN == 1 | Behav_Fema
   group_by(VideoID,Mcol) %>% 
   summarize(FirstFAttack = min(AttackTime),
             NbFAttacks = n())    
+
+FAttacks$VideoIDMcol <- paste(FAttacks$VideoID, FAttacks$Mcol, sep='')
+
 ### all instances of female aggression (even missed attacks)
 TotalIntendedFAttacks <- Behav_Female_Attacks %>% 
   group_by(VideoID,Mcol) %>% 
@@ -165,7 +186,7 @@ AllMInter <- Behav_MaleMale_Competition %>%
             TotalMInterDur = sum(InterDur),
             FirstMInter = min(InteractionStart))
 
-### check whether those who attack always win: we will consider that yes
+### check whether those who attack always win: we will consider that yes (very rare that it is the opposite)
 Behav_MaleMale_Competition[Behav_MaleMale_Competition$NBAttacks > 0 & 
                              Behav_MaleMale_Competition$McolStart != Behav_MaleMale_Competition$McolWin & 
                              !is.na(Behav_MaleMale_Competition$McolWin),]
@@ -180,6 +201,9 @@ MAttacks <- Behav_MaleMale_Competition[Behav_MaleMale_Competition$NBAttacks > 0 
                                   NbRollOverYN = sum(RollOverYN), 
                                   FirstMAttack = min(InteractionStart))
 
+MAttacks$VideoIDMcol <- paste(MAttacks$VideoID, MAttacks$McolStart, sep='')
+
+
 ### the opposite color is the one attacked by the male who start the malemale interaction
 MAttacks$McolAttacked <- NA
 MAttacks$McolAttacked[MAttacks$McolStart == 'Blue'] <- 'Red'
@@ -187,30 +211,50 @@ MAttacks$McolAttacked[MAttacks$McolStart == 'Yellow'] <- 'Blue'
 MAttacks$McolAttacked[MAttacks$McolAttacked == 'Red'] <- 'Yellow'
 }
   
-{## keep only courtships before attacks from other male or from female
-### Female attacks
-FAttacks$VideoIDMcol <- paste(FAttacks$VideoID,FAttacks$Mcol,sep='')
-Behav_Male_Courtships$VideoIDMcol <- paste(Behav_Male_Courtships$VideoID,Behav_Male_Courtships$Mcol,sep='')
-Behav_Male_Courtships <- merge(x=Behav_Male_Courtships,y=as.data.frame(FAttacks[c('VideoIDMcol','FirstFAttack')]), by="VideoIDMcol", all.x=TRUE)
- 
-### Male attacks: 
-MAttacks$VideoIDMcol <- paste(MAttacks$VideoID,MAttacks$McolAttacked,sep='')
-Behav_Male_Courtships <- merge(x=Behav_Male_Courtships,y=as.data.frame(MAttacks[c('VideoIDMcol','FirstMAttack')]), by="VideoIDMcol", all.x=TRUE)
+{## keep only courtships before attacks from other male or from female, use the lowest number for both males to cut time for both equally
+### Female attacks (on either male)
+FFirstAttack <- FAttacks  %>% group_by(VideoID) %>% 
+    summarize(FirstAttack  =  min(FirstFAttack))
+
+### Male attacks (from either male against either male)
+MFirstAttack <- MAttacks  %>% group_by(VideoID) %>% 
+  summarize(FirstAttack  =  min(FirstMAttack))
+
+### First attack per video: max time for any male to court
+FirstAttack <- rbind(FFirstAttack,MFirstAttack) %>% group_by(VideoID) %>% 
+  summarize(FirstAttackInVideo  =  min(FirstAttack))
 
 ### Courtships done between time start video and time first attack (by other male or female)
-    ### Courtships done after first attack
-    AfterAttackCourtshipID <- Behav_Male_Courtships$CourtshipID[Behav_Male_Courtships$CourtshipStart > Behav_Male_Courtships$FirstFAttack & !is.na(Behav_Male_Courtships$FirstFAttack)
-                           |Behav_Male_Courtships$CourtshipStart > Behav_Male_Courtships$FirstMAttack & !is.na(Behav_Male_Courtships$FirstMAttack )]
-    # Behav_Male_Courtships[Behav_Male_Courtships$VideoID == 24,]
-    # NaiveBehav_Male_Courtships[NaiveBehav_Male_Courtships$VideoID == 24,]
-    
+    ### Courtships done after first attack on any male by either the other male or the female
+
+Behav_Male_Courtships <- merge(x=Behav_Male_Courtships,y=as.data.frame(FirstAttack), by="VideoID", all.x=TRUE)
+
+AfterAttackCourtshipID <- Behav_Male_Courtships$CourtshipID[Behav_Male_Courtships$CourtshipStart > Behav_Male_Courtships$FirstAttackInVideo & !is.na(Behav_Male_Courtships$FirstAttackInVideo)]
+
 NaiveBehav_Male_Courtships <- Behav_Male_Courtships[! Behav_Male_Courtships$CourtshipID %in% AfterAttackCourtshipID,]    
-    
+    ### Behav_Male_Courtships[Behav_Male_Courtships$VideoID == 24,]
+    ### NaiveBehav_Male_Courtships[NaiveBehav_Male_Courtships$VideoID == 24,] 
+
+# duration watched for courtship (if we want to calculate fair courtship rates where both male within a video had equal time to court (before any attack happened))
+DurationWatchedForNaiveCourtship <- rbind(Behav_Video_MaleTest[,c('VideoID','TimeStoppedWatching')], setNames(FirstAttack, c('VideoID','TimeStoppedWatching')))
+
+DurationWatchedForNaiveCourtship <- DurationWatchedForNaiveCourtship %>% group_by(VideoID) %>% 
+  summarize(TotalDurationForCourtship  =  min(TimeStoppedWatching))
+
+DurationWatchedForNaiveCourtship$TotalDurationWatchedForNaiveCourt <- as.numeric(ConvertTimeToSecs(DurationWatchedForNaiveCourtship$TotalDurationForCourtship))
+
+
+NaiveBehav_Male_Courtships <- merge(x=Behav_Male_Courtships,y=as.data.frame(DurationWatchedForNaiveCourtship[,c('VideoID','TotalDurationWatchedForNaiveCourt')]), by="VideoID", all.x=TRUE)
+
+
+
 NaiveCourts <- NaiveBehav_Male_Courtships %>%
   group_by(VideoID,Mcol) %>% 
   summarize(NaiveNBCourt = n(),
             NaiveTotalCourtDur = sum(CourtDuration),
-            NaiveFirstCourt = min(CourtshipStart))
+            NaiveFirstCourt = min(CourtshipStart),
+            TotalWatchNaiveCourt = min(TotalDurationWatchedForNaiveCourt)
+            )
 
 NaiveCourts$VideoIDMcol = paste (NaiveCourts$VideoID, NaiveCourts$Mcol, sep='')
 
@@ -245,10 +289,10 @@ MY_TABLE_Videos_perMale <- merge (x=MY_TABLE_Videos_perMale, y= TotalIntendedFAt
 MY_TABLE_Videos_perMale <- merge (x=MY_TABLE_Videos_perMale, y= Cannibalism[,c('ConsumTime', 'VideoIDMcol')],by='VideoIDMcol', all.x=TRUE)
 MY_TABLE_Videos_perMale <- merge (x=MY_TABLE_Videos_perMale, y= MAttacks[,c('NbMAttacks', 'NbPushPush', 'NbRollOverYN','FirstMAttack', 'VideoIDMcol')],by='VideoIDMcol', all.x=TRUE)
 MY_TABLE_Videos_perMale <- merge (x=MY_TABLE_Videos_perMale, y= AllCourts[,c('NBCourt','TotalCourtDur', 'FirstCourt','VideoIDMcol')],by='VideoIDMcol', all.x=TRUE)
-MY_TABLE_Videos_perMale <- merge (x=MY_TABLE_Videos_perMale, y= NaiveCourts[,c('NaiveNBCourt','NaiveTotalCourtDur', 'NaiveFirstCourt','VideoIDMcol')],by='VideoIDMcol', all.x=TRUE)
+MY_TABLE_Videos_perMale <- merge (x=MY_TABLE_Videos_perMale, y= NaiveCourts[,c('NaiveNBCourt','NaiveTotalCourtDur', 'NaiveFirstCourt','TotalWatchNaiveCourt','VideoIDMcol')],by='VideoIDMcol', all.x=TRUE)
 
 MY_TABLE_Videos_perMale <- MY_TABLE_Videos_perMale %>%
-  mutate_if(is.numeric, funs(ifelse(is.na(.), 0, .)))
+  mutate_if(is.numeric, funs(ifelse(is.na(.), 0, .))) # replace all NAs by 0
 
 MY_TABLE_Videos_perMale <- merge (x = MY_TABLE_Videos_perMale, y=  Behav_Female[,c('FID', 'ExcludeYN', 'ReasonExclusion', 'Remarks')],
                           by = 'FID', all.x=TRUE)  
