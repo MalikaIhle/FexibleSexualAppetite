@@ -296,8 +296,13 @@ MY_TABLE_Videos_perMale <- merge (x=MY_TABLE_Videos_perMale, y= MAttacks[,c('NbM
 MY_TABLE_Videos_perMale <- merge (x=MY_TABLE_Videos_perMale, y= AllCourts[,c('NBCourt','TotalCourtDur', 'FirstCourt','VideoIDMcol')],by='VideoIDMcol', all.x=TRUE)
 MY_TABLE_Videos_perMale <- merge (x=MY_TABLE_Videos_perMale, y= NaiveCourts[,c('NaiveNBCourt','NaiveTotalCourtDur', 'NaiveFirstCourt','TotalWatchNaiveCourt','VideoIDMcol')],by='VideoIDMcol', all.x=TRUE)
 
+summary(MY_TABLE_Videos_perMale)
+DelayLeaveDish <- MY_TABLE_Videos_perMale$DelayLeaveDish
+
 MY_TABLE_Videos_perMale <- MY_TABLE_Videos_perMale %>%
   mutate_if(is.numeric, funs(ifelse(is.na(.), 0, .))) # replace all NAs by 0
+
+MY_TABLE_Videos_perMale$DelayLeaveDish <- DelayLeaveDish
 
 MY_TABLE_Videos_perMale <- merge (x = MY_TABLE_Videos_perMale, y=  Behav_Female[,c('FID', 'ExcludeYN', 'ReasonExclusion', 'Remarks')],
                           by = 'FID', all.x=TRUE)  
@@ -402,7 +407,9 @@ summary(modDelayCourtValidTest) # n=134 (delay not NA out of 154 valid male-vide
 
     ##### Delay to court
       ###### all courts, even if had been attacked prior to starting to court
-modDelayCourtAllVideo <- lmer(DelayFirstCourt ~ Mcol*Author + (1|FID)
+modDelayCourtAllVideo <- lmer(DelayFirstCourt ~ Mcol
+                              #*Author 
+                              + (1|FID)
                                ,data = MY_TABLE_Videos_perMale)
 summary(modDelayCourtAllVideo)# n=179 (delay not NA out of 204 total male-video (25 NA)), NS
 
@@ -424,13 +431,15 @@ summary(modDelayNaiveCourtValidTests)# n=89 NS
 
 
     ##### delay to leave dish
-modDelayLeaveDishAllVideos <- lmer(DelayLeaveDish~ Mcol*Author + (1|FID)
+modDelayLeaveDishAllVideos <- lmer(DelayLeaveDish~ Mcol
+                                   #*Author 
+                                   + (1|FID)
                           ,data = MY_TABLE_Videos_perMale)
-summary(modDelayLeaveDishAllVideos)# n=204 NS
+summary(modDelayLeaveDishAllVideos)# n=202 NS (2 were eaten in the vial)
 
 modDelayLeaveDishValidTests <- lmer(DelayLeaveDish~ Mcol*Author + (1|FID)
                           ,data = MY_TABLE_Videos_perMale[MY_TABLE_Videos_perMale$ExcludeYN == 0,])
-summary(modDelayLeaveDishValidTests)# n=154 NS
+summary(modDelayLeaveDishValidTests)# n=152 NS
 
 
 
@@ -568,11 +577,11 @@ summary(modFconsumAttackRateValidTests) # n= 154  Nb attack almost predicts furt
 {### Do F and M attacks predict futur death of male for reason other than consumption ?
 modMaleDied <- lmer(Died~ Mcol+ I((NbFAttacks+NbMAttacks)) + (1|FID)
                     ,data = MY_TABLE_Videos_perMale[MY_TABLE_Videos_perMale$ConsumYN == 0,])
-summary(modMaleDied) # nope, but maybe attacks occured after the 2 hours video... Yellow less likely to die
+summary(modMaleDied) # n= 127, nFemale = 102; nope, but maybe attacks occured after the 2 hours video... Yellow less likely to die
 
 modMaleDiedrate <- lmer(Died~ Mcol+ I((NbFAttacks+NbMAttacks)/TotalWatch) + (1|FID)
                     ,data = MY_TABLE_Videos_perMale[MY_TABLE_Videos_perMale$ConsumYN == 0,])
-summary(modMaleDiedrate) 
+summary(modMaleDiedrate) # n= 127, nFemale = 102;
 
 }
 
