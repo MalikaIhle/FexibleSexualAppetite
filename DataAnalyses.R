@@ -122,6 +122,7 @@ termiteupperseaverse <- invlogit(coef(summary(mod2))[1, 1]+coef(summary(mod2))[1
 termiteuppersepref <- invlogit(coef(summary(mod2))[1, 1]+ coef(summary(mod2))[2, 1]+coef(summary(mod2))[2, 2]*1.96)
 termitelowersepref <- invlogit(coef(summary(mod2))[1, 1]+ coef(summary(mod2))[2, 1]-coef(summary(mod2))[2, 2]*1.96)
 
+
   ## to get one sided test p value
  mod2p <- coef(summary(mod2))[2, 4]/2
 
@@ -174,6 +175,20 @@ malelowerseaverse <- invlogit(coef(summary(mod3))[1, 1]-coef(summary(mod3))[1, 2
 malelowersepref <- invlogit(coef(summary(mod3))[1, 1]+ coef(summary(mod3))[2, 1]-coef(summary(mod3))[2, 2]*1.96)
 maleuppersepref <- invlogit(coef(summary(mod3))[1, 1]+ coef(summary(mod3))[2, 1]+coef(summary(mod3))[2, 2]*1.96)
  
+
+
+
+invlogit(coef(summary(mod3))[3, 1]) # 0.001618516 back transformed estimate for DeltaMsize
+(invlogit(coef(summary(mod3))[3, 1]+coef(summary(mod3))[3, 2]) 
+  - invlogit(coef(summary(mod3))[3, 1]-coef(summary(mod3))[3, 2]) ) /2# 0.1987484 back transformed estimate for DeltaMsize SE
+
+
+invlogit(coef(summary(mod3))[4, 1]) # 3.141732e-12 back transformed estimate for DeltaMcondition
+(invlogit(coef(summary(mod3))[4, 1]+coef(summary(mod3))[4, 2]) 
+  - invlogit(coef(summary(mod3))[4, 1]-coef(summary(mod3))[4, 2]) ) /2# 0.5 back transformed estimate forDeltaMcondition SE
+
+
+
 
   ## to check equality of male motivation to court
   # shapiro.test(MY_TABLE_MID$Latency_to_court)
