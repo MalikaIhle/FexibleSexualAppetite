@@ -14,6 +14,8 @@ library(arm)
 library(rptR)
 library(pbapply)
 library(ggplot2)
+require(gridExtra)
+require(grid)
 }
 
 {# load data
@@ -144,7 +146,7 @@ termitelowersepref <- invlogit(coef(summary(mod2))[1, 1]+ coef(summary(mod2))[2,
 
 {# step 3
 
-mod3 <- glm (CannibalizedRedYN ~ Trt+ DeltaMsize + DeltaMcondition, family = "binomial", data = MY_TABLE_TermiteMale)
+mod3 <- glm (CannibalizedRedYN ~ Trt+ DeltaMsize + DeltaMcondition, family = "binomial", data = MY_TABLE_MaleTest)
 
 par(mfrow=c(2,2))
 plot(mod3)
@@ -363,86 +365,90 @@ summary(mod4bis)
 
 
 
-figdata <- data.frame(rbind(c('Bug', bugaverse,buglowerCIaverse, bugupperCIaverse, 'Red Averse'), 
-                            c('Bug',bugpref, buglowerCIpref, bugupperCIpref,'Red preference'),
-                            c('Termite', termiteaverse, termitelowerseaverse, termiteupperseaverse, 'Red Averse'),
-                            c('Termite', termitepref, termitelowersepref, termiteuppersepref,'Red preference'),
+
+
+
+# graphs 
+
+{figdata <- data.frame(rbind(c('Bug', bugaverse,buglowerCIaverse, bugupperCIaverse, 'Red averse'), 
+                            c('Bug',bugpref, buglowerCIpref, bugupperCIpref,'Red accustomed'),
+                            c('Termite', termiteaverse, termitelowerseaverse, termiteupperseaverse, 'Red averse'),
+                            c('Termite', termitepref, termitelowersepref, termiteuppersepref,'Red accustomed'),
                             c('Male', maleaverse, malelowerseaverse, maleupperseaverse, 'Red averse'),
-                            c('Male', malepref, malelowersepref, maleuppersepref, 'Red preference')))
+                            c('Male', malepref, malelowersepref, maleuppersepref, 'Red accustomed')))
 
 colnames(figdata) <- c('test', 'estimate', 'lowerCI', 'upperCI','Treatment')
 figdata$estimate <- as.numeric(as.character(figdata$estimate))*100
 figdata$lowerCI <- as.numeric(as.character(figdata$lowerCI))*100
 figdata$upperCI <- as.numeric(as.character(figdata$upperCI))*100
+}
 
-
-#fig 1
 Fig1 <- {ggplot(data=figdata[figdata$test == 'Bug',], aes(x=Treatment, y=estimate))+
-    xlab(NULL)+
-    ylab(NULL)+
-   # ylab("Percentage of spiders consuming the bug (+/- 95% CI)")+
+    labs(x=NULL, y= "Percentage of spiders 
+         consuming the red prey (95% CI)", title = "A. Bug test")+
     
    scale_y_continuous(breaks =seq(0,100, by = 10),limits = c(0,100)) +
   
+    annotate("text", x="Red averse", y = 1, label = "n = 56", size=7) +
+    annotate("text", x="Red accustomed", y = 1, label = "n = 69", size=7) +
     
     geom_errorbar(aes(ymin=lowerCI, ymax=upperCI), size = 2, width =1,na.rm=TRUE)+
     geom_point(size =6, stroke = 1) +   
       theme_classic()+
     theme(
-      #legend.position="none",
       panel.border = element_rect(colour = "black", fill=NA), 
-      #axis.title.y=element_text(size=20,face="bold", margin=margin(l=5)),
-      axis.text=element_text(size=20),
+      axis.title.y=element_text(size=20,face="bold", margin=margin(l=5)),
+      axis.text.y=element_text(size=15),
       axis.text.x=element_text(size=20, face="bold",margin=margin(t=5)),
-      axis.title.x = NULL,
+      plot.title = element_text(size=25, face="bold", hjust= 0.5, vjust = 0.5),
       plot.margin = unit(c(0.2,0.2,0.3,0.3), "cm"))
 }
 
 
 Fig2 <- {ggplot(data=figdata[figdata$test == 'Termite',], aes(x=Treatment, y=estimate))+
-    xlab(NULL)+
-    ylab(NULL)+
-    # ylab("Percentage of spiders consuming the bug (+/- 95% CI)")+
+    labs(x=NULL, y= NULL, title = "B. Termite test")+
+    
     
     scale_y_continuous(breaks =seq(0,100, by = 10),limits = c(0,100)) +
-    
+    annotate("text", x="Red averse", y = 1, label = "n = 53", size=7) +
+    annotate("text", x="Red accustomed", y = 1, label = "n = 64", size=7) +
     
     geom_errorbar(aes(ymin=lowerCI, ymax=upperCI), size = 2, width =1,na.rm=TRUE)+
     geom_point(size =6, stroke = 1) +   
     theme_classic()+
     theme(
-      #legend.position="none",
       panel.border = element_rect(colour = "black", fill=NA), 
-      #axis.title.y=element_text(size=20,face="bold", margin=margin(l=5)),
-      axis.text=element_text(size=20),
+      axis.text.y = element_blank(), 
       axis.text.x=element_text(size=20, face="bold",margin=margin(t=5)),
-      axis.title.x = NULL,
+      plot.title = element_text(size=25, face="bold", hjust= 0.5, vjust = 0.5),
       plot.margin = unit(c(0.2,0.2,0.3,0.3), "cm"))
 }
 
 
 Fig3 <- {ggplot(data=figdata[figdata$test == 'Male',], aes(x=Treatment, y=estimate))+
-    xlab(NULL)+
-    ylab(NULL)+
-    # ylab("Percentage of spiders consuming the bug (+/- 95% CI)")+
+    labs(x=NULL, y= NULL, title = "C. Male test")+
     
+       
     scale_y_continuous(breaks =seq(0,100, by = 10),limits = c(0,100)) +
-    
+    annotate("text", x="Red averse", y = 1, label = "n = 42", size=7) +
+    annotate("text", x="Red accustomed", y = 1, label = "n = 37", size=7) +
     
     geom_errorbar(aes(ymin=lowerCI, ymax=upperCI), size = 2, width =1,na.rm=TRUE)+
     geom_point(size =6,  stroke = 1) +   
     theme_classic()+
     theme(
-      #legend.position="none",
-      panel.border = element_rect(colour = "black", fill=NA), 
-      #axis.title.y=element_text(size=20,face="bold", margin=margin(l=5)),
-      axis.text=element_text(size=20),
+      panel.border = element_rect(colour = "black", fill=NA),
+      axis.text.y = element_blank(),
       axis.text.x=element_text(size=20, face="bold",margin=margin(t=5)),
-      axis.title.x = NULL,
+      plot.title = element_text(size=25, face="bold", hjust= 0.5, vjust = 0.5),
       plot.margin = unit(c(0.2,0.2,0.3,0.3), "cm"))
 }
 
+g1 <- ggplotGrob(Fig1)
+g2 <- ggplotGrob(Fig2)
+g3 <- ggplotGrob(Fig3)
 
+grid.arrange(cbind(g1, g2, g3, size = "last"))
 
 
 
