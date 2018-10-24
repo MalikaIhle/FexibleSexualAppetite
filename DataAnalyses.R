@@ -36,7 +36,7 @@ MY_TABLE_Step <- read.csv(paste(R_Data_folder,"MY_TABLE_Step.csv", sep="/"))
 
 {# step 1
 
-mod1 <- glm (AttackBugYN ~ Trt + Fcondition , "binomial", data = MY_TABLE_BugTest)
+mod1 <- glm (AttackBugYN ~ -1+Trt + Fcondition , "binomial", data = MY_TABLE_BugTest)
 
 par(mfrow=c(2,2))
 plot(mod1)
@@ -65,7 +65,7 @@ invlogit(coef(summary(mod1))[3, 1]) # 0.0001578938 back trasnformed estimate for
 (invlogit(coef(summary(mod1))[3, 1]+coef(summary(mod1))[3, 2]) 
 - invlogit(coef(summary(mod1))[3, 1]-coef(summary(mod1))[3, 2]) ) /2# 0.5 back trasnformed estimate for body condition SE
 
-
+nBugYes <- nrow(MY_TABLE_BugTest[MY_TABLE_BugTest$AttackBugYN == 1,])
 
   ## to get one sided test p value
   mod1p <- coef(summary(mod1))[2, 4]/2
@@ -123,6 +123,9 @@ termiteuppersepref <- invlogit(coef(summary(mod2))[1, 1]+ coef(summary(mod2))[2,
 termitelowersepref <- invlogit(coef(summary(mod2))[1, 1]+ coef(summary(mod2))[2, 1]-coef(summary(mod2))[2, 2]*1.96)
 
 
+nTermiteYes <- nrow(MY_TABLE_TermiteTest[MY_TABLE_TermiteTest$AttackNewRedYN == 1,])
+
+
   ## to get one sided test p value
  mod2p <- coef(summary(mod2))[2, 4]/2
 
@@ -157,7 +160,8 @@ summary(mod3)
   ## to get one sided test p value
  mod3p <-  coef(summary(mod3))[2, 4]/2
 
-
+ nMaleYes <- nrow(MY_TABLE_MaleTest[MY_TABLE_MaleTest$CannibalizedRedYN == 1,])
+ 
  
 maleaverse <- invlogit(coef(summary(mod3))[1, 1]) # likelihood of eating the red male for red averse females
  
