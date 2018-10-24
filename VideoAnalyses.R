@@ -338,6 +338,12 @@ MY_TABLE_Videos_perMale <- merge(MY_TABLE_Videos_perMale, FemaleTrt[,c('Ind_ID',
 
 summary(MY_TABLE_Videos_perMale)
 
+
+# Change Mcol Blue/Yellow to ZBlack and ARed to have red male as reference (intercept)
+MY_TABLE_Videos_perMale$Mcol <- as.character(MY_TABLE_Videos_perMale$Mcol)
+MY_TABLE_Videos_perMale$Mcol[MY_TABLE_Videos_perMale$Mcol == "Yellow"] <- 'ARed'
+MY_TABLE_Videos_perMale$Mcol[MY_TABLE_Videos_perMale$Mcol == "Blue"] <- 'ZBlack'
+
 }
 
 head(MY_TABLE_Videos_perMale)
@@ -376,6 +382,7 @@ summary(MY_TABLE_Videos)
 }
 
 head(MY_TABLE_Videos)
+
 # nrow(MY_TABLE_Videos) # 102 (out of 104 tests performed (2 videos missing, see remarks))
 # nrow(MY_TABLE_Videos[MY_TABLE_Videos$ExcludeYN==0,]) # 77 (out of 79 valid tests (2 videos missing, see remarks))
 
@@ -391,12 +398,12 @@ head(MY_TABLE_Videos)
 ### comparison delay to court for both type of male in the valid tests (i.e. not excluded because one of the three spiders died for other reason than cannibalism)
 
 modDelayCourtAllVideo <- lmer(DelayFirstCourt ~ Mcol + (1|FID)
-                              ,data = MY_TABLE_Videos_perMale)
+                              ,data = MY_TABLE_Videos_perMale, REML =FALSE)
 summary(modDelayCourtAllVideo)# n=179 (delay not NA our of 204 total male-video (25 NA)), NS
 
 
 modDelayCourtValidTest <- lmer(DelayFirstCourt ~ Mcol + (1|FID)
-                               ,data = MY_TABLE_Videos_perMale[MY_TABLE_Videos_perMale$ExcludeYN == 0,])
+                               ,data = MY_TABLE_Videos_perMale[MY_TABLE_Videos_perMale$ExcludeYN == 0,], REML =FALSE)
 summary(modDelayCourtValidTest) # n=134 (delay not NA out of 154 valid male-videos (20 NA)), NS
 
 }
@@ -410,26 +417,26 @@ summary(modDelayCourtValidTest) # n=134 (delay not NA out of 154 valid male-vide
 modDelayCourtAllVideo <- lmer(DelayFirstCourt ~ Mcol
                               #*Author 
                               + (1|FID)
-                               ,data = MY_TABLE_Videos_perMale)
+                               ,data = MY_TABLE_Videos_perMale, REML =FALSE)
 summary(modDelayCourtAllVideo)# n=179 (delay not NA out of 204 total male-video (25 NA)), NS
 
-modDelayCourtAllVideo0 <- lmer(DelayFirstCourt ~ 1+ (1|FID),data = MY_TABLE_Videos_perMale)
+modDelayCourtAllVideo0 <- lmer(DelayFirstCourt ~ 1+ (1|FID),data = MY_TABLE_Videos_perMale, REML =FALSE)
 
 anova(modDelayCourtAllVideo,modDelayCourtAllVideo0) # p value for paper
 
 
 modDelayCourtValidTests <- lmer(DelayFirstCourt ~ Mcol*Author + (1|FID)
-                              ,data = MY_TABLE_Videos_perMale[MY_TABLE_Videos_perMale$ExcludeYN == 0,])
+                              ,data = MY_TABLE_Videos_perMale[MY_TABLE_Videos_perMale$ExcludeYN == 0,], REML =FALSE)
 summary(modDelayCourtValidTests)# n=134 (delay not NA out of 154 valid male-videos (20 NA)), NS
 
 
       ###### delay to court before any attack happened on any males within test
 modDelayNaiveCourtAllVideo <- lmer(DelayNaiveFirstCourt ~ Mcol*Author + (1|FID)
-                              ,data = MY_TABLE_Videos_perMale)
+                              ,data = MY_TABLE_Videos_perMale, REML =FALSE)
 summary(modDelayNaiveCourtAllVideo)# n=121 NS
 
 modDelayNaiveCourtValidTests <- lmer(DelayNaiveFirstCourt ~ Mcol*Author + (1|FID)
-                                   ,data = MY_TABLE_Videos_perMale[MY_TABLE_Videos_perMale$ExcludeYN == 0,])
+                                   ,data = MY_TABLE_Videos_perMale[MY_TABLE_Videos_perMale$ExcludeYN == 0,], REML =FALSE)
 summary(modDelayNaiveCourtValidTests)# n=89 NS
 
 
@@ -438,16 +445,16 @@ summary(modDelayNaiveCourtValidTests)# n=89 NS
 modDelayLeaveDishAllVideos <- lmer(DelayLeaveDish~ Mcol
                                    #*Author 
                                    + (1|FID)
-                          ,data = MY_TABLE_Videos_perMale)
+                          ,data = MY_TABLE_Videos_perMale, REML =FALSE)
 summary(modDelayLeaveDishAllVideos)# n=202 NS (2 were eaten in the vial)
 
-modDelayLeaveDishAllVideos0 <- lmer(DelayLeaveDish~1+ (1|FID),data = MY_TABLE_Videos_perMale)
+modDelayLeaveDishAllVideos0 <- lmer(DelayLeaveDish~1+ (1|FID),data = MY_TABLE_Videos_perMale, REML =FALSE)
 
 anova(modDelayLeaveDishAllVideos,modDelayLeaveDishAllVideos0) # p value for paper
 
 
 modDelayLeaveDishValidTests <- lmer(DelayLeaveDish~ Mcol*Author + (1|FID)
-                          ,data = MY_TABLE_Videos_perMale[MY_TABLE_Videos_perMale$ExcludeYN == 0,])
+                          ,data = MY_TABLE_Videos_perMale[MY_TABLE_Videos_perMale$ExcludeYN == 0,], REML =FALSE)
 summary(modDelayLeaveDishValidTests)# n=152 NS
 
 
@@ -457,31 +464,31 @@ summary(modDelayLeaveDishValidTests)# n=152 NS
 modTotalCourtDur <- lmer(TotalCourtDur~  Mcol
                          #*Author 
                          + (1|FID)
-                         ,data = MY_TABLE_Videos_perMale)
+                         ,data = MY_TABLE_Videos_perMale, REML =FALSE)
 summary(modTotalCourtDur)# n=204 NS
 
-modTotalCourtDur0 <- lmer(TotalCourtDur~ 1+ (1|FID) ,data = MY_TABLE_Videos_perMale)
+modTotalCourtDur0 <- lmer(TotalCourtDur~ 1+ (1|FID) ,data = MY_TABLE_Videos_perMale, REML =FALSE)
 anova(modTotalCourtDur,modTotalCourtDur0)# p value for paper
 
 modTotalCourtDurValidTest <- lmer(TotalCourtDur~ Mcol*Author 
                          + (1|FID)
-                         ,data = MY_TABLE_Videos_perMale[MY_TABLE_Videos_perMale$ExcludeYN == 0,])
+                         ,data = MY_TABLE_Videos_perMale[MY_TABLE_Videos_perMale$ExcludeYN == 0,], REML =FALSE)
 summary(modTotalCourtDurValidTest)# n=154 NS
 
       ###### before being attacked
-modNaiveTotalCourtDur <- lmer(NaiveTotalCourtDur~ -1+Mcol
+modNaiveTotalCourtDur <- lmer(NaiveTotalCourtDur~ Mcol
                               #*Author 
                               + (1|FID)
-                              ,data = MY_TABLE_Videos_perMale)
+                              ,data = MY_TABLE_Videos_perMale, REML =FALSE)
 summary(modNaiveTotalCourtDur)# n=204 NS (no NAs but more zeros for duration, hence same sample size as above)
 
-modNaiveTotalCourtDur0 <- lmer(NaiveTotalCourtDur~ 1+ (1|FID) ,data = MY_TABLE_Videos_perMale)
+modNaiveTotalCourtDur0 <- lmer(NaiveTotalCourtDur~ 1+ (1|FID) ,data = MY_TABLE_Videos_perMale, REML =FALSE)
 anova(modNaiveTotalCourtDur,modNaiveTotalCourtDur0)# p value for paper
 
 
 modNaiveTotalCourtDurNaiveTests <- lmer(NaiveTotalCourtDur~ Mcol*Author 
                               + (1|FID)
-                              ,data = MY_TABLE_Videos_perMale[MY_TABLE_Videos_perMale$ExcludeYN == 0,])
+                              ,data = MY_TABLE_Videos_perMale[MY_TABLE_Videos_perMale$ExcludeYN == 0,], REML =FALSE)
 summary(modNaiveTotalCourtDurNaiveTests)# n=154 NS (no NAs but more zeros for duration, hence same sample size as above)
 
 }
@@ -515,14 +522,14 @@ table(MY_TABLE_Videos$Author, MY_TABLE_Videos$ReasonExclusion)
 modNbFAttacks <- lmer(NbFAttacks~  Mcol*GroupName 
                       #*Author - Mcol:GroupName:Author - GroupName:Author 
                       + (1|FID)
-                          ,data = MY_TABLE_Videos_perMale)
+                          ,data = MY_TABLE_Videos_perMale, REML =FALSE)
 summary(modNbFAttacks)# n=204 . trends for less attacks towards yellow male, independent of the female treatment
 
-modNbFAttacksinter0 <- lmer(NbFAttacks~ Mcol+ GroupName  + (1|FID),data = MY_TABLE_Videos_perMale)
+modNbFAttacksinter0 <- lmer(NbFAttacks~ -1+Mcol+ GroupName  + (1|FID),data = MY_TABLE_Videos_perMale, REML =FALSE)
 summary(modNbFAttacksinter0)
 anova(modNbFAttacks,modNbFAttacksinter0)# p value inter for paper
 
-modNbFAttacks00 <- lmer(NbFAttacks~  GroupName +(1|FID),data = MY_TABLE_Videos_perMale)
+modNbFAttacks00 <- lmer(NbFAttacks~  GroupName +(1|FID),data = MY_TABLE_Videos_perMale, REML =FALSE)
 anova(modNbFAttacksinter0,modNbFAttacks00)# p value Mcol for paper
 
 
@@ -530,7 +537,7 @@ anova(modNbFAttacksinter0,modNbFAttacks00)# p value Mcol for paper
 modNbFAttacks_ValidTests <- lmer(NbFAttacks~ Mcol* GroupName 
                       #*Author - Mcol:GroupName:Author - GroupName:Author 
                       + (1|FID)
-                      ,data = MY_TABLE_Videos_perMale[MY_TABLE_Videos_perMale$ExcludeYN == 0,])
+                      ,data = MY_TABLE_Videos_perMale[MY_TABLE_Videos_perMale$ExcludeYN == 0,], REML =FALSE)
 summary(modNbFAttacks_ValidTests)#154 . trend toward less attack against yellow males, independent of the female treatment
 
 
@@ -576,22 +583,30 @@ summary(modNbMAttacksValidTests)# n=154 NS
 modFconsum <- lmer(ConsumYN~ Mcol
                    *GroupName
                    +NbFAttacks + (1|FID)
-                      ,data = MY_TABLE_Videos_perMale)
+                      ,data = MY_TABLE_Videos_perMale, REML =FALSE)
 summary(modFconsum) # N=204 ** Nb attack predicts furtur consumption, Yellow less consumed, therefore it is expected to have yellow less attacked
 
 
-modFconsumValidTest <- lmer(ConsumYN~ Mcol
+
+modFconsumValidTest <- lmer(ConsumYN~ NbFAttacks +Mcol
                             *GroupName
-                        +NbFAttacks
                     + (1|FID)
-                   ,data = MY_TABLE_Videos_perMale[MY_TABLE_Videos_perMale$ExcludeYN == 0,])
+                   ,data = MY_TABLE_Videos_perMale[MY_TABLE_Videos_perMale$ExcludeYN == 0,], REML =FALSE)
 summary(modFconsumValidTest) # N=154  Nb attack almost predicts furtur consumption, Yellow less consumed, therefore it is expected to have yellow less attacked
 
 
-modFconsumValidTest0 <- lmer(ConsumYN~  Mcol*GroupName+  (1|FID),data = MY_TABLE_Videos_perMale[MY_TABLE_Videos_perMale$ExcludeYN == 0,])
+
+modFconsumValidTest1 <- lmer(ConsumYN~ NbFAttacks +Mcol + GroupName + (1|FID)
+                            ,data = MY_TABLE_Videos_perMale[MY_TABLE_Videos_perMale$ExcludeYN == 0,], REML =FALSE)
+summary(modFconsumValidTest1) # N=154  Nb attack almost predicts furtur consumption, Yellow less consumed, therefore it is expected to have yellow less attacked
+anova(modFconsumValidTest1,modFconsumValidTest)
+
+
+modFconsumValidTest0 <- lmer(ConsumYN~  Mcol*GroupName+  (1|FID),data = MY_TABLE_Videos_perMale[MY_TABLE_Videos_perMale$ExcludeYN == 0,], REML =FALSE)
 anova(modFconsumValidTest,modFconsumValidTest0) # p value nbFattacks for paper
 
-modFconsumValidTest00 <- lmer(ConsumYN~  NbFAttacks+  GroupName + (1|FID),data = MY_TABLE_Videos_perMale[MY_TABLE_Videos_perMale$ExcludeYN == 0,])
+modFconsumValidTest00 <- lmer(ConsumYN~  NbFAttacks+  GroupName + (1|FID),data = MY_TABLE_Videos_perMale[MY_TABLE_Videos_perMale$ExcludeYN == 0,], REML =FALSE)
+summary(modFconsumValidTest00)
 anova(modFconsumValidTest,modFconsumValidTest00) # p value Mcol for paper
 
 
@@ -600,29 +615,29 @@ anova(modFconsumValidTest,modFconsumValidTest00) # p value Mcol for paper
 modFconsumAttackRate <- lmer(ConsumYN~ Mcol
                              #*GroupName
                              +I(NbFAttacks/TotalWatch) + (1|FID)
-                   ,data = MY_TABLE_Videos_perMale)
+                   ,data = MY_TABLE_Videos_perMale, REML =FALSE)
 summary(modFconsumAttackRate) # N=204, only trendy if consider attack rate
 
 modFconsumAttackRateValidTests <- lmer(ConsumYN~ Mcol
                              #*GroupName
                              +I(NbFAttacks/TotalWatch) + (1|FID)
-                             ,data = MY_TABLE_Videos_perMale[MY_TABLE_Videos_perMale$ExcludeYN == 0,])
+                             ,data = MY_TABLE_Videos_perMale[MY_TABLE_Videos_perMale$ExcludeYN == 0,], REML =FALSE)
 summary(modFconsumAttackRateValidTests) # n= 154  Nb attack almost predicts furtur consumption, Yellow less consumed, therefore it is expected to have yellow less attacked
 
 }
 
 {### Do F and M attacks predict futur death of male for reason other than consumption ?
 modMaleDied <- lmer(Died~ Mcol+ I((NbFAttacks+NbMAttacks)) + (1|FID)
-                    ,data = MY_TABLE_Videos_perMale[MY_TABLE_Videos_perMale$ConsumYN == 0,])
+                    ,data = MY_TABLE_Videos_perMale[MY_TABLE_Videos_perMale$ConsumYN == 0,], REML =FALSE)
 summary(modMaleDied) # n= 127, nFemale = 102; nope, but maybe attacks occured after the 2 hours video... Yellow less likely to die
 
 modMaleDied <- lmer(Died~ Mcol+ NbFAttacks + (1|FID)
-                    ,data = MY_TABLE_Videos_perMale[MY_TABLE_Videos_perMale$ConsumYN == 0,])
+                    ,data = MY_TABLE_Videos_perMale[MY_TABLE_Videos_perMale$ConsumYN == 0,], REML =FALSE)
 summary(modMaleDied) # n= 127, nFemale = 102; nope, but maybe attacks occured after the 2 hours video... Yellow less likely to die
 
 
 modMaleDiedrate <- lmer(Died~ Mcol+ I((NbFAttacks+NbMAttacks)/TotalWatch) + (1|FID)
-                    ,data = MY_TABLE_Videos_perMale[MY_TABLE_Videos_perMale$ConsumYN == 0,])
+                    ,data = MY_TABLE_Videos_perMale[MY_TABLE_Videos_perMale$ConsumYN == 0,], REML =FALSE)
 summary(modMaleDiedrate) # n= 127, nFemale = 102;
 
 }
@@ -633,7 +648,7 @@ summary(modMaleDiedrate) # n= 127, nFemale = 102;
                          #I((NbFAttacks+NbMAttacks))
                          NbFAttacks
                          + (1|FID)
-                       ,data = MY_TABLE_Videos_perMale)
+                       ,data = MY_TABLE_Videos_perMale, REML =FALSE)
   summary(modMaleKaput)
 }  
 
