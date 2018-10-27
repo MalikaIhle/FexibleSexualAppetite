@@ -74,12 +74,13 @@ library(RODBC) # this require R AND ACCESS to run on 32 bits !
   MY_TABLE_MaleTestValid <-  MY_TABLE_MaleTest[MY_TABLE_MaleTest$Exclude == FALSE,]  
   
   # exclude males from replacement tests
-  
-  MY_TABLE_MIDValid <- MY_TABLE_MID[MY_TABLE_MID$MID != 63 
-                                    & MY_TABLE_MID$MID != 37
-                                    & MY_TABLE_MID$MID != 230 
-                                    & MY_TABLE_MID$MID != 34 
-                                    & MY_TABLE_MID$MID != 32 &
+  MY_TABLE_MID$FID <- MY_TABLE_MID$FID +17000
+ 
+   MY_TABLE_MIDValid <- MY_TABLE_MID[MY_TABLE_MID$MID != 17063 
+                                    & MY_TABLE_MID$MID != 17037
+                                    & MY_TABLE_MID$MID != 17230 
+                                    & MY_TABLE_MID$MID != 17034 
+                                    & MY_TABLE_MID$MID != 17032 &
                                       MY_TABLE_MID$FID%in% MY_TABLE_MaleTestValid$FID, ]
   
   
@@ -211,8 +212,8 @@ library(RODBC) # this require R AND ACCESS to run on 32 bits !
   nrow(MY_TABLE_MaleTestValid[MY_TABLE_MaleTestValid$Trt == 'RedPreference',]) # 37
   nrow(MY_TABLE_MaleTest[MY_TABLE_MaleTest$Trt == 'RedAverse',]) # 52
   nrow(MY_TABLE_MaleTest[MY_TABLE_MaleTest$Trt == 'RedPreference',]) # 52
-  nrow(MY_TABLE_MaleTestValid[MY_TABLE_MaleTestValid$DuringVideo == 1,]) # 15
-  
+  nrow(MY_TABLE_MaleTestValid[MY_TABLE_MaleTestValid$EatDuringVideo == 1,]) # 15
+
   Within1stDay <- nrow(MY_TABLE_MaleTestValid[!(is.na(MY_TABLE_MaleTestValid$TrialDateEnd)) & MY_TABLE_MaleTestValid$TrialDate == MY_TABLE_MaleTestValid$TrialDateEnd,]) # 22
   PercentageWithinFirstDay <- Within1stDay*  100/nrow(MY_TABLE_MaleTestValid) # 27.8
   summary(MY_TABLE_MaleTestValid$LatencyAttackDay)
@@ -232,5 +233,13 @@ output_folder <- "R_Data"
 # write.csv(MY_TABLE_MIDValid, file = paste(output_folder,"MY_TABLE_MID.csv", sep="/"), row.names = FALSE)
 # write.csv(MY_TABLE_Step, file = paste(output_folder,"MY_TABLE_Step.csv", sep="/"), row.names = FALSE)
 
-# 20180328 (validtermitetest)
+### 20180328 (validtermitetest)
+
+### 20181027 (updating code to fit DB new headers)
+# write.csv(MY_TABLE_BugTest, file = paste(output_folder,"MY_TABLE_BugTest.csv", sep="/"), row.names = FALSE)
+# write.csv(MY_TABLE_MaleTestValid, file = paste(output_folder,"MY_TABLE_MaleTest.csv", sep="/"), row.names = FALSE)
+# write.csv(MY_TABLE_MIDValid, file = paste(output_folder,"MY_TABLE_MID.csv", sep="/"), row.names = FALSE)
+# write.csv(MY_TABLE_Step, file = paste(output_folder,"MY_TABLE_Step.csv", sep="/"), row.names = FALSE)
 # write.csv(MY_TABLE_TermiteTestValid, file = paste(output_folder,"MY_TABLE_TermiteTest.csv", sep="/"), row.names = FALSE)
+
+
