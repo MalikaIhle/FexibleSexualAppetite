@@ -728,15 +728,25 @@ length(MY_TABLE_Videos$NbIntendedFAttacks[MY_TABLE_Videos$NbIntendedFAttacks > 0
 ### average time watched
 summary(MY_TABLE_Videos$TotalWatch)/60 # in min
 summary(MY_TABLE_Videos$TotalWatch[MY_TABLE_Videos$ExcludeYN ==0])/60 # in min
+summary(MY_TABLE_Videos$TotalWatch[MY_TABLE_Videos$GroupName == 'RedAverse'])/60
+summary(MY_TABLE_Videos$TotalWatch[MY_TABLE_Videos$GroupName == 'RedPreference'])/60
+t.test(MY_TABLE_Videos$TotalWatch[MY_TABLE_Videos$GroupName == 'RedAverse'],
+       MY_TABLE_Videos$TotalWatch[MY_TABLE_Videos$GroupName == 'RedPreference'])
+sd(MY_TABLE_Videos$TotalWatch[MY_TABLE_Videos$GroupName == 'RedAverse']/60)/length(MY_TABLE_Videos$TotalWatch[MY_TABLE_Videos$GroupName == 'RedAverse'])
+sd(MY_TABLE_Videos$TotalWatch[MY_TABLE_Videos$GroupName == 'RedPreference']/60)/length(MY_TABLE_Videos$TotalWatch[MY_TABLE_Videos$GroupName == 'RedPreference'])
+sum(MY_TABLE_Videos$TotalWatch[MY_TABLE_Videos$GroupName == 'RedAverse'])/60/60
+sum(MY_TABLE_Videos$TotalWatch[MY_TABLE_Videos$GroupName == 'RedPreference'])/60/60
+
+
 
 ### average delay to court
 summary(MY_TABLE_Videos_perMale$DelayFirstCourt)/60 # in min
 
 ### average duration courting (out of duration watched)
-summary(60*(MY_TABLE_Videos_perMale$TotalCourtDur/60)/(MY_TABLE_Videos_perMale$TotalWatch/60)) # in min of coursthip per hour
+summary(60*(MY_TABLE_Videos_perMale$TotalCourtDur)/(MY_TABLE_Videos_perMale$TotalWatch)) # in min of coursthip per hour
 
 ### average duration male male interaction (out of duration watched)
-summary(60*(MY_TABLE_Videos$TotalMInterDur/60)/(MY_TABLE_Videos$TotalWatch/60)) # in min of interaction per hour
+summary(60*(MY_TABLE_Videos$TotalMInterDur)/(MY_TABLE_Videos$TotalWatch)) # in min of interaction per hour
 
 ### average delay to male male interaction
 summary(MY_TABLE_Videos$DelayFirstMInter)/60 # in min
@@ -745,6 +755,10 @@ summary(MY_TABLE_Videos$DelayFirstMInter)/60 # in min
 summary(Behav_Male_Courtships$FemaleResponsiveness)
 length(Behav_Male_Courtships$FemaleResponsiveness[Behav_Male_Courtships$FemaleResponsiveness == 'Attacks'])/nrow(Behav_Male_Courtships)*100 # 10.7%
 
+### Nb of attack
+summary(MY_TABLE_Videos$NbFAttacks)
+length(MY_TABLE_Videos$NbFAttacks[MY_TABLE_Videos$NbFAttacks>1])/102*100
+length(MY_TABLE_Videos$NbMphysicalInter[MY_TABLE_Videos$NbMphysicalInter>1])/102*100
 
 
 }

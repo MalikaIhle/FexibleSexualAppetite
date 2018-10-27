@@ -36,7 +36,7 @@ MY_TABLE_Step <- read.csv(paste(R_Data_folder,"MY_TABLE_Step.csv", sep="/"))
 
 {# step 1
 
-mod1 <- glm (AttackBugYN ~ -1+Trt + Fcondition , "binomial", data = MY_TABLE_BugTest)
+mod1 <- glm (AttackBugYN ~ Trt + Fcondition , "binomial", data = MY_TABLE_BugTest)
 
 par(mfrow=c(2,2))
 plot(mod1)
