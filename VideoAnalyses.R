@@ -624,6 +624,17 @@ modFconsumAttackRateValidTests <- lmer(ConsumYN~ Mcol
                              ,data = MY_TABLE_Videos_perMale[MY_TABLE_Videos_perMale$ExcludeYN == 0,], REML =FALSE)
 summary(modFconsumAttackRateValidTests) # n= 154  Nb attack almost predicts furtur consumption, Yellow less consumed, therefore it is expected to have yellow less attacked
 
+
+
+### Do F attacks predict futur consumption ? 
+### should test only in valid test, as non valid test, a spider died ?
+### select a focal male per test since consumYN is the opposite for the other
+
+
+
+
+
+
 }
 
 {### Do F and M attacks predict futur death of male for reason other than consumption ?
