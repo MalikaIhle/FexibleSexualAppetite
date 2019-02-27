@@ -26,8 +26,9 @@ library(RODBC) # this require R AND ACCESS to run on 32 bits !
 }
 
 {# load data
+
+conDB= odbcConnectAccess2007(paste(here(),"1_RawData/HabronatusPyrrithrix_DB.accdb", sep="/"))
   
-  conDB= odbcConnectAccess2007("C:\\Users\\malika.ihle\\Dropbox\\HabronatusPyrrithrix\\HabronatusPyrrithrix_DB.accdb")
 
   MY_TABLE_BugTest <- sqlQuery(conDB,"
                                SELECT Behav_Female.FID, Basic_Trials.GroupName AS Trt, Behav_Female.AttackRedYN AS AttackBugYN, Behav_Female.LatencyAttack, Max(Morph_Measurements.CarapaceWidth) AS CarapaceWidth, Max(Morph_Measurements.Mass) AS Mass
@@ -224,22 +225,21 @@ library(RODBC) # this require R AND ACCESS to run on 32 bits !
 # write data
 
 
-output_folder <- "R_Data"
 
 ### 20180315 
-# write.csv(MY_TABLE_BugTest, file = paste(output_folder,"MY_TABLE_BugTest.csv", sep="/"), row.names = FALSE)
-# write.csv(MY_TABLE_TermiteTest, file = paste(output_folder,"MY_TABLE_TermiteTest.csv", sep="/"), row.names = FALSE)
-# write.csv(MY_TABLE_MaleTestValid, file = paste(output_folder,"MY_TABLE_MaleTest.csv", sep="/"), row.names = FALSE)
-# write.csv(MY_TABLE_MIDValid, file = paste(output_folder,"MY_TABLE_MID.csv", sep="/"), row.names = FALSE)
-# write.csv(MY_TABLE_Step, file = paste(output_folder,"MY_TABLE_Step.csv", sep="/"), row.names = FALSE)
+# write.csv(MY_TABLE_BugTest, file = paste(here(),"3_ProcessedData/MY_TABLE_BugTest.csv", sep="/"), row.names = FALSE)
+# write.csv(MY_TABLE_TermiteTest, file = paste(here(),"3_ProcessedData/MY_TABLE_TermiteTest.csv", sep="/"), row.names = FALSE)
+# write.csv(MY_TABLE_MaleTestValid, file = paste(here(),"3_ProcessedData/MY_TABLE_MaleTest.csv", sep="/"), row.names = FALSE)
+# write.csv(MY_TABLE_MIDValid, file = paste(here(),"3_ProcessedData/MY_TABLE_MID.csv", sep="/"), row.names = FALSE)
+# write.csv(MY_TABLE_Step, file = paste(here(),"3_ProcessedData/MY_TABLE_Step.csv", sep="/"), row.names = FALSE)
 
 ### 20180328 (validtermitetest)
 
 ### 20181027 (updating code to fit DB new headers)
-# write.csv(MY_TABLE_BugTest, file = paste(output_folder,"MY_TABLE_BugTest.csv", sep="/"), row.names = FALSE)
-# write.csv(MY_TABLE_MaleTestValid, file = paste(output_folder,"MY_TABLE_MaleTest.csv", sep="/"), row.names = FALSE)
-# write.csv(MY_TABLE_MIDValid, file = paste(output_folder,"MY_TABLE_MID.csv", sep="/"), row.names = FALSE)
-# write.csv(MY_TABLE_Step, file = paste(output_folder,"MY_TABLE_Step.csv", sep="/"), row.names = FALSE)
-# write.csv(MY_TABLE_TermiteTestValid, file = paste(output_folder,"MY_TABLE_TermiteTest.csv", sep="/"), row.names = FALSE)
+# write.csv(MY_TABLE_BugTest, file = paste(here(),"3_ProcessedData/MY_TABLE_BugTest.csv", sep="/"), row.names = FALSE)
+# write.csv(MY_TABLE_MaleTestValid, file = paste(here(),"3_ProcessedData/MY_TABLE_MaleTest.csv", sep="/"), row.names = FALSE)
+# write.csv(MY_TABLE_MIDValid, file = paste(here(),"3_ProcessedData/MY_TABLE_MID.csv", sep="/"), row.names = FALSE)
+# write.csv(MY_TABLE_Step, file = paste(here(),"3_ProcessedData/MY_TABLE_Step.csv", sep="/"), row.names = FALSE)
+# write.csv(MY_TABLE_TermiteTestValid, file = paste(here(),"3_ProcessedData/MY_TABLE_TermiteTest.csv", sep="/"), row.names = FALSE)
 
 

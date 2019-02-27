@@ -50,7 +50,7 @@ rm(list = ls(all = TRUE))
 #~~~ EXTRACT DATASET
 
 {# load data
-conDB= odbcConnectAccess2007(paste(here(),"VideoAnalyses_MaleTests_2017.accdb", sep="/"))
+conDB= odbcConnectAccess2007(paste(here(),"1_RawData/VideoAnalyses_MaleTests_2017.accdb", sep="/"))
   
 sqlTables(conDB)
 
@@ -393,9 +393,9 @@ head(MY_TABLE_Videos)
 
 #~~~ DATA ANALYSES
 
-{## Preregistered
+## Preregistered
 ### comparison delay to court for both type of male in the valid tests (i.e. not excluded because one of the three spiders died for other reason than cannibalism)
-
+{
 modDelayCourtAllVideo <- lmer(DelayFirstCourt ~ Mcol + (1|FID)
                               ,data = MY_TABLE_Videos_perMale, REML =FALSE)
 summary(modDelayCourtAllVideo)# n=179 (delay not NA our of 204 total male-video (25 NA)), NS
@@ -407,10 +407,10 @@ summary(modDelayCourtValidTest) # n=134 (delay not NA out of 154 valid male-vide
 
 }
 
-{## Exploratory
-  
-{### are black males behaving differently than red males (I included author as I knew which male was which color, not Lauren)
-
+## Exploratory
+{ 
+### are black males behaving differently than red males (I included author as I knew which male was which color, not Lauren)
+{
     ##### Delay to court
       ###### all courts, even if had been attacked prior to starting to court
 modDelayCourtAllVideo <- lmer(DelayFirstCourt ~ Mcol
@@ -492,8 +492,8 @@ summary(modNaiveTotalCourtDurNaiveTests)# n=154 NS (no NAs but more zeros for du
 
 }
 
-{### are black males receiving more attacks from the other male and/or the female ?
-  
+### are black males receiving more attacks from the other male and/or the female ?
+{ 
 #### exploration of the potential author bias in attack observed
 {  ######## attacks are binary and less subject to observation bias but
   ######## I scored signficantly more attacks
@@ -577,8 +577,8 @@ summary(modNbMAttacksValidTests)# n=154 NS
 
 }
 
-{### Do F attacks predict futur consumption ? should test only in valid test, as non valid test, a spider died ?
-  
+### Do F attacks predict futur consumption ? should test only in valid test, as non valid test, a spider died ?
+{  
 modFconsum <- lmer(ConsumYN~ Mcol
                    *GroupName
                    +NbFAttacks + (1|FID)
@@ -629,14 +629,20 @@ summary(modFconsumAttackRateValidTests) # n= 154  Nb attack almost predicts furt
 ### should test only in valid test, as non valid test, a spider died ?
 ### select a focal male per test since consumYN is the opposite for the other
 
-
+modFconsumAttackRateValidTestsWithoutPseuRep <- lmer(ConsumYN~ 
+                                       # Mcol
+                                       #*GroupName
+                                       +I(NbFAttacks/TotalWatch) + (1|FID)
+                                       ,data = MY_TABLE_Videos_perMale[MY_TABLE_Videos_perMale$ExcludeYN == 0,], REML =FALSE)
+summary(modFconsumAttackRateValidTestsWithoutPseuRep)
 
 
 
 
 }
 
-{### Do F and M attacks predict futur death of male for reason other than consumption ?
+### Do F and M attacks predict futur death of male for reason other than consumption ?
+{
 modMaleDied <- lmer(Died~ Mcol+ I((NbFAttacks+NbMAttacks)) + (1|FID)
                     ,data = MY_TABLE_Videos_perMale[MY_TABLE_Videos_perMale$ConsumYN == 0,], REML =FALSE)
 summary(modMaleDied) # n= 127, nFemale = 102; nope, but maybe attacks occured after the 2 hours video... Yellow less likely to die
@@ -652,7 +658,8 @@ summary(modMaleDiedrate) # n= 127, nFemale = 102;
 
 }
   
-{ ### Do F and M attacks predict consumed or died
+### Do F and M attacks predict consumed or died
+{  
   MY_TABLE_Videos_perMale$Kaput <- MY_TABLE_Videos_perMale$ConsumYN+ MY_TABLE_Videos_perMale$Died
   modMaleKaput <- lmer(Kaput~ Mcol+ 
                          #I((NbFAttacks+NbMAttacks))
@@ -664,8 +671,8 @@ summary(modMaleDiedrate) # n= 127, nFemale = 102;
 
 }
 
-{## Descriptive
-
+## Descriptive
+{
 {### Nb of videos with male male fight
 #### All videos
 summary(MY_TABLE_Videos$NbMAttacks)

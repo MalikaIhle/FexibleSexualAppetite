@@ -16,17 +16,16 @@ library(pbapply)
 library(ggplot2)
 require(gridExtra)
 require(grid)
+library(here)
 }
 
 {# load data
 
-R_Data_folder <- "R_Data"
-
-MY_TABLE_BugTest <- read.csv(paste(R_Data_folder,"MY_TABLE_BugTest.csv", sep="/")) 
-MY_TABLE_TermiteTest <- read.csv(paste(R_Data_folder,"MY_TABLE_TermiteTest.csv", sep="/")) 
-MY_TABLE_MaleTest <- read.csv(paste(R_Data_folder,"MY_TABLE_MaleTest.csv", sep="/")) 
-MY_TABLE_MID <- read.csv(paste(R_Data_folder,"MY_TABLE_MID.csv", sep="/")) 
-MY_TABLE_Step <- read.csv(paste(R_Data_folder,"MY_TABLE_Step.csv", sep="/")) 
+MY_TABLE_BugTest <- read.csv(paste(here(),"3_ProcessedData/MY_TABLE_BugTest.csv", sep="/")) 
+MY_TABLE_TermiteTest <- read.csv(paste(here(),"3_ProcessedData/MY_TABLE_TermiteTest.csv", sep="/")) 
+MY_TABLE_MaleTest <- read.csv(paste(here(),"3_ProcessedData/MY_TABLE_MaleTest.csv", sep="/")) 
+MY_TABLE_MID <- read.csv(paste(here(),"3_ProcessedData/MY_TABLE_MID.csv", sep="/")) 
+MY_TABLE_Step <- read.csv(paste(here(),"3_ProcessedData/MY_TABLE_Step.csv", sep="/")) 
 
 }
 
