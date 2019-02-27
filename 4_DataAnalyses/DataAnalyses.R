@@ -14,6 +14,8 @@ library(arm)
 library(rptR)
 library(pbapply)
 library(ggplot2)
+require(gridExtra)
+require(grid)
 }
 
 {# load data
@@ -42,21 +44,28 @@ plot(mod1)
 summary(mod1)
 
 
-invlogit(coef(summary(mod1))[1, 1]) # likelihood of eating the bug for red averse females
+bugaverse <- invlogit(coef(summary(mod1))[1, 1]) # likelihood of eating the bug for red averse females
 
-invlogit(coef(summary(mod1))[1, 1] + coef(summary(mod1))[2, 1]) # likelihood of eating the bug for red preference females
+bugpref <- invlogit(coef(summary(mod1))[1, 1] + coef(summary(mod1))[2, 1]) # likelihood of eating the bug for red preference females
 
-(invlogit(coef(summary(mod1))[1, 1]+coef(summary(mod1))[1, 2])
+buglowerCIaverse <-  invlogit(coef(summary(mod1))[1, 1]-coef(summary(mod1))[1, 2]*1.96)
+bugupperCIaverse <-invlogit(coef(summary(mod1))[1, 1]+coef(summary(mod1))[1, 2]*1.96)
+  
+  (invlogit(coef(summary(mod1))[1, 1]+coef(summary(mod1))[1, 2])
   -invlogit(coef(summary(mod1))[1, 1]-coef(summary(mod1))[1, 2]))/2	# 0.06510539 average SE for red averse
 
-(invlogit(coef(summary(mod1))[1, 1]+ coef(summary(mod1))[2, 1]+coef(summary(mod1))[2, 2])
+ (invlogit(coef(summary(mod1))[1, 1]+ coef(summary(mod1))[2, 1]+coef(summary(mod1))[2, 2])
   -invlogit(coef(summary(mod1))[1, 1]+ coef(summary(mod1))[2, 1]-coef(summary(mod1))[2, 2]))/2	# 0.08832562 average SE for red preference
+
+bugupperCIpref <-invlogit(coef(summary(mod1))[1, 1]+ coef(summary(mod1))[2, 1]+coef(summary(mod1))[2, 2]*1.96)
+buglowerCIpref <-invlogit(coef(summary(mod1))[1, 1]+ coef(summary(mod1))[2, 1]-coef(summary(mod1))[2, 2]*1.96)
+
 
 invlogit(coef(summary(mod1))[3, 1]) # 0.0001578938 back trasnformed estimate for body condition
 (invlogit(coef(summary(mod1))[3, 1]+coef(summary(mod1))[3, 2]) 
 - invlogit(coef(summary(mod1))[3, 1]-coef(summary(mod1))[3, 2]) ) /2# 0.5 back trasnformed estimate for body condition SE
 
-
+nBugYes <- nrow(MY_TABLE_BugTest[MY_TABLE_BugTest$AttackBugYN == 1,])
 
   ## to get one sided test p value
   mod1p <- coef(summary(mod1))[2, 4]/2
@@ -97,16 +106,24 @@ plot(mod2)
 summary(mod2)
 
 
-invlogit(coef(summary(mod2))[1, 1]) # likelihood of eating the red termite for red averse females
+termiteaverse <- invlogit(coef(summary(mod2))[1, 1]) # likelihood of eating the red termite for red averse females
 
-invlogit(coef(summary(mod2))[1, 1] + coef(summary(mod2))[2, 1]) # likelihood of eating the red termite for red preference females
+termitepref <- invlogit(coef(summary(mod2))[1, 1] + coef(summary(mod2))[2, 1]) # likelihood of eating the red termite for red preference females
 
 (invlogit(coef(summary(mod2))[1, 1]+coef(summary(mod2))[1, 2])
   -invlogit(coef(summary(mod2))[1, 1]-coef(summary(mod2))[1, 2]))/2	# 0.06621911 average SE for red averse
 
+termitelowerseaverse <- invlogit(coef(summary(mod2))[1, 1]-coef(summary(mod2))[1, 2]*1.96)
+termiteupperseaverse <- invlogit(coef(summary(mod2))[1, 1]+coef(summary(mod2))[1, 2]*1.96)
+
 (invlogit(coef(summary(mod2))[1, 1]+ coef(summary(mod2))[2, 1]+coef(summary(mod2))[2, 2])
   -invlogit(coef(summary(mod2))[1, 1]+ coef(summary(mod2))[2, 1]-coef(summary(mod2))[2, 2]))/2	# 0.09226776 average SE for red preference
 
+termiteuppersepref <- invlogit(coef(summary(mod2))[1, 1]+ coef(summary(mod2))[2, 1]+coef(summary(mod2))[2, 2]*1.96)
+termitelowersepref <- invlogit(coef(summary(mod2))[1, 1]+ coef(summary(mod2))[2, 1]-coef(summary(mod2))[2, 2]*1.96)
+
+
+nTermiteYes <- nrow(MY_TABLE_TermiteTest[MY_TABLE_TermiteTest$AttackNewRedYN == 1,])
 
 
   ## to get one sided test p value
@@ -143,19 +160,39 @@ summary(mod3)
   ## to get one sided test p value
  mod3p <-  coef(summary(mod3))[2, 4]/2
 
-
+ nMaleYes <- nrow(MY_TABLE_MaleTest[MY_TABLE_MaleTest$CannibalizedRedYN == 1,])
  
- invlogit(coef(summary(mod3))[1, 1]) # likelihood of eating the red male for red averse females
  
- invlogit(coef(summary(mod3))[1, 1] + coef(summary(mod3))[2, 1]) # likelihood of eating the red male for red preference females
+maleaverse <- invlogit(coef(summary(mod3))[1, 1]) # likelihood of eating the red male for red averse females
  
- (invlogit(coef(summary(mod3))[1, 1]+coef(summary(mod3))[1, 2])
+malepref <- invlogit(coef(summary(mod3))[1, 1] + coef(summary(mod3))[2, 1]) # likelihood of eating the red male for red preference females
+ 
+(invlogit(coef(summary(mod3))[1, 1]+coef(summary(mod3))[1, 2])
    -invlogit(coef(summary(mod3))[1, 1]-coef(summary(mod3))[1, 2]))/2	# 0.06621911 average SE for red averse
+
+maleupperseaverse <- invlogit(coef(summary(mod3))[1, 1]+coef(summary(mod3))[1, 2]*1.96)
+malelowerseaverse <- invlogit(coef(summary(mod3))[1, 1]-coef(summary(mod3))[1, 2]*1.96)
  
- (invlogit(coef(summary(mod3))[1, 1]+ coef(summary(mod3))[2, 1]+coef(summary(mod3))[2, 2])
+(invlogit(coef(summary(mod3))[1, 1]+ coef(summary(mod3))[2, 1]+coef(summary(mod3))[2, 2])
    -invlogit(coef(summary(mod3))[1, 1]+ coef(summary(mod3))[2, 1]-coef(summary(mod3))[2, 2]))/2	# 0.09226776 average SE for red preference
  
+malelowersepref <- invlogit(coef(summary(mod3))[1, 1]+ coef(summary(mod3))[2, 1]-coef(summary(mod3))[2, 2]*1.96)
+maleuppersepref <- invlogit(coef(summary(mod3))[1, 1]+ coef(summary(mod3))[2, 1]+coef(summary(mod3))[2, 2]*1.96)
  
+
+
+
+invlogit(coef(summary(mod3))[3, 1]) # 0.001618516 back transformed estimate for DeltaMsize
+(invlogit(coef(summary(mod3))[3, 1]+coef(summary(mod3))[3, 2]) 
+  - invlogit(coef(summary(mod3))[3, 1]-coef(summary(mod3))[3, 2]) ) /2# 0.1987484 back transformed estimate for DeltaMsize SE
+
+
+invlogit(coef(summary(mod3))[4, 1]) # 3.141732e-12 back transformed estimate for DeltaMcondition
+(invlogit(coef(summary(mod3))[4, 1]+coef(summary(mod3))[4, 2]) 
+  - invlogit(coef(summary(mod3))[4, 1]-coef(summary(mod3))[4, 2]) ) /2# 0.5 back transformed estimate forDeltaMcondition SE
+
+
+
 
   ## to check equality of male motivation to court
   # shapiro.test(MY_TABLE_MID$Latency_to_court)
@@ -221,6 +258,14 @@ print(rpt(formula = AttackRedYN ~ Trt + (1|FID),
           npermut = 0,
           adjusted = FALSE))
 
+# female response with termite predict response with male ?
+MY_TABLE_TermiteMale <- merge(MY_TABLE_TermiteTest[,c('FID','AttackNewRedYN')],MY_TABLE_MaleTest[,c('FID','CannibalizedRedYN')],by='FID' )
+nrow(MY_TABLE_TermiteMale)
+
+cor.test(MY_TABLE_TermiteMale$CannibalizedRedYN,MY_TABLE_TermiteMale$AttackNewRedYN)
+summary(glm (CannibalizedRedYN ~ AttackNewRedYN, family = "binomial", data=MY_TABLE_TermiteMale))
+
+
 
 # Repeatability of female latency to attack
 
@@ -278,10 +323,10 @@ ggplot(MY_TABLE_BugTest,aes(x=AttackBugYN,group=Trt,fill=Trt))+
 
 
 ##step 2
-chisq.test(table(MY_TABLE_TermiteTestValid$AttackNewRedYN[MY_TABLE_TermiteTestValid$Trt == 'RedPreference']), p=c(0.5,0.5))
-chisq.test(table(MY_TABLE_TermiteTestValid$AttackNewRedYN[MY_TABLE_TermiteTestValid$Trt == 'RedAverse']), p=c(0.5,0.5))
+chisq.test(table(MY_TABLE_TermiteTest$AttackNewRedYN[MY_TABLE_TermiteTest$Trt == 'RedPreference']), p=c(0.5,0.5))
+chisq.test(table(MY_TABLE_TermiteTest$AttackNewRedYN[MY_TABLE_TermiteTest$Trt == 'RedAverse']), p=c(0.5,0.5))
 
-ggplot(MY_TABLE_TermiteTestValid,aes(x=AttackNewRedYN,group=Trt,fill=Trt))+
+ggplot(MY_TABLE_TermiteTest,aes(x=AttackNewRedYN,group=Trt,fill=Trt))+
   geom_bar(position="dodge",aes(y = ..prop.., fill = Trt)) +
   scale_x_discrete(NULL, c(0,1), c("Consumed grey termite", "Consumed red termite"), c(0,1)) +
   scale_y_continuous(NULL,labels=scales::percent) + theme_bw()+
@@ -289,11 +334,11 @@ ggplot(MY_TABLE_TermiteTestValid,aes(x=AttackNewRedYN,group=Trt,fill=Trt))+
   theme(text = element_text(size=20))
 
 ##step 3
-chisq.test(table(MY_TABLE_MaleTestValid$CannibalizedRedYN[MY_TABLE_MaleTestValid$Trt == 'RedPreference']), p=c(0.5,0.5))
-chisq.test(table(MY_TABLE_MaleTestValid$CannibalizedRedYN[MY_TABLE_MaleTestValid$Trt == 'RedAverse']), p=c(0.5,0.5))
+chisq.test(table(MY_TABLE_MaleTest$CannibalizedRedYN[MY_TABLE_MaleTest$Trt == 'RedPreference']), p=c(0.5,0.5))
+chisq.test(table(MY_TABLE_MaleTest$CannibalizedRedYN[MY_TABLE_MaleTest$Trt == 'RedAverse']), p=c(0.5,0.5))
 
 
-ggplot(MY_TABLE_MaleTestValid,aes(x=CannibalizedRedYN,group=Trt,fill=Trt))+
+ggplot(MY_TABLE_MaleTest,aes(x=CannibalizedRedYN,group=Trt,fill=Trt))+
   geom_bar(position="dodge",aes(y = ..prop.., fill = Trt)) +
   scale_x_discrete(NULL, c(0,1), c("Consumed black male", "Consumed red male"), c(0,1)) +
   theme_bw()+scale_y_continuous(NULL,labels=scales::percent) +
@@ -303,10 +348,127 @@ ggplot(MY_TABLE_MaleTestValid,aes(x=CannibalizedRedYN,group=Trt,fill=Trt))+
 
 # juvenile females painted black or left white faces, predated by adult female (red preference females finished with the experiment)
 
-contingencyTable <- rbind(table(MY_TABLE_MaleTestValid$Trt, MY_TABLE_MaleTestValid$CannibalizedRedYN), c(13,5))
+contingencyTable <- rbind(table(MY_TABLE_MaleTest$Trt, MY_TABLE_MaleTest$CannibalizedRedYN), c(13,5))
 rownames(contingencyTable)[3] <- 'Control'
 
 
 chisq.test(contingencyTable)
 
 }
+
+{# Comparing all to 50/50
+  
+#step 1
+chisq.test(table(MY_TABLE_BugTest$AttackBugYN), p=c(0.5,0.5))
+
+
+#step 2
+chisq.test(table(MY_TABLE_TermiteTest$AttackNewRedYN), p=c(0.5,0.5))
+
+
+#step 3    
+chisq.test(table(MY_TABLE_MaleTest$CannibalizedRedYN), p=c(0.5,0.5))
+summary(glm ( MY_TABLE_MaleTest$CannibalizedRedYN~1, family = "binomial", data=MY_TABLE_Step))
+
+# all 
+mod4 <- glmer (AttackRedYN ~ Trt + (1|FID), family = "binomial", data=MY_TABLE_Step)
+summary(mod4) 
+
+# all 
+mod4bis <- glmer (AttackRedYN ~ (1|FID), family = "binomial", data=MY_TABLE_Step)
+summary(mod4bis)
+
+}
+
+
+
+
+
+
+
+
+# graphs 
+
+{figdata <- data.frame(rbind(c('Bug', bugaverse,buglowerCIaverse, bugupperCIaverse, 'Red averse'), 
+                            c('Bug',bugpref, buglowerCIpref, bugupperCIpref,'Red accustomed'),
+                            c('Termite', termiteaverse, termitelowerseaverse, termiteupperseaverse, 'Red averse'),
+                            c('Termite', termitepref, termitelowersepref, termiteuppersepref,'Red accustomed'),
+                            c('Male', maleaverse, malelowerseaverse, maleupperseaverse, 'Red averse'),
+                            c('Male', malepref, malelowersepref, maleuppersepref, 'Red accustomed')))
+
+colnames(figdata) <- c('test', 'estimate', 'lowerCI', 'upperCI','Treatment')
+figdata$estimate <- as.numeric(as.character(figdata$estimate))*100
+figdata$lowerCI <- as.numeric(as.character(figdata$lowerCI))*100
+figdata$upperCI <- as.numeric(as.character(figdata$upperCI))*100
+}
+
+Fig1 <- {ggplot(data=figdata[figdata$test == 'Bug',], aes(x=Treatment, y=estimate))+
+    labs(x=NULL, y= "Percentage of spiders 
+         consuming the red prey (95% CI)", title = "A. Bug test")+
+    
+   scale_y_continuous(breaks =seq(0,100, by = 10),limits = c(0,100)) +
+  
+    annotate("text", x="Red averse", y = 1, label = "n = 56", size=7) +
+    annotate("text", x="Red accustomed", y = 1, label = "n = 69", size=7) +
+    
+    geom_errorbar(aes(ymin=lowerCI, ymax=upperCI), size = 2, width =1,na.rm=TRUE)+
+    geom_point(size =6, stroke = 1) +   
+      theme_classic()+
+    theme(
+      panel.border = element_rect(colour = "black", fill=NA), 
+      axis.title.y=element_text(size=20,face="bold", margin=margin(l=5)),
+      axis.text.y=element_text(size=15),
+      axis.text.x=element_text(size=20, face="bold",margin=margin(t=5)),
+      plot.title = element_text(size=25, face="bold", hjust= 0.5, vjust = 0.5),
+      plot.margin = unit(c(0.2,0.2,0.3,0.3), "cm"))
+}
+
+
+Fig2 <- {ggplot(data=figdata[figdata$test == 'Termite',], aes(x=Treatment, y=estimate))+
+    labs(x=NULL, y= NULL, title = "B. Termite test")+
+    
+    
+    scale_y_continuous(breaks =seq(0,100, by = 10),limits = c(0,100)) +
+    annotate("text", x="Red averse", y = 1, label = "n = 53", size=7) +
+    annotate("text", x="Red accustomed", y = 1, label = "n = 64", size=7) +
+    
+    geom_errorbar(aes(ymin=lowerCI, ymax=upperCI), size = 2, width =1,na.rm=TRUE)+
+    geom_point(size =6, stroke = 1) +   
+    theme_classic()+
+    theme(
+      panel.border = element_rect(colour = "black", fill=NA), 
+      axis.text.y = element_blank(), 
+      axis.text.x=element_text(size=20, face="bold",margin=margin(t=5)),
+      plot.title = element_text(size=25, face="bold", hjust= 0.5, vjust = 0.5),
+      plot.margin = unit(c(0.2,0.2,0.3,0.3), "cm"))
+}
+
+
+Fig3 <- {ggplot(data=figdata[figdata$test == 'Male',], aes(x=Treatment, y=estimate))+
+    labs(x=NULL, y= NULL, title = "C. Male test")+
+    
+       
+    scale_y_continuous(breaks =seq(0,100, by = 10),limits = c(0,100)) +
+    annotate("text", x="Red averse", y = 1, label = "n = 42", size=7) +
+    annotate("text", x="Red accustomed", y = 1, label = "n = 37", size=7) +
+    
+    geom_errorbar(aes(ymin=lowerCI, ymax=upperCI), size = 2, width =1,na.rm=TRUE)+
+    geom_point(size =6,  stroke = 1) +   
+    theme_classic()+
+    theme(
+      panel.border = element_rect(colour = "black", fill=NA),
+      axis.text.y = element_blank(),
+      axis.text.x=element_text(size=20, face="bold",margin=margin(t=5)),
+      plot.title = element_text(size=25, face="bold", hjust= 0.5, vjust = 0.5),
+      plot.margin = unit(c(0.2,0.2,0.3,0.3), "cm"))
+}
+
+g1 <- ggplotGrob(Fig1)
+g2 <- ggplotGrob(Fig2)
+g3 <- ggplotGrob(Fig3)
+
+grid.arrange(cbind(g1, g2, g3, size = "last"))
+
+
+
+

@@ -2,33 +2,56 @@
 #	 Malika IHLE      malika_ihle@hotmail.fr
 #	 Video analyses FlexibleSexualAppetite part 1
 #	 Start : 12 Feb 2018
-#	 last modif : 13/02/2018
-#	 commit: combine raw data
+#	 last modif : 17 October 2018
+#	 commit: corrected data prep
+# 1. FID rename to what they are (remove fake ID that avoided duplicated during video analyses)
+# 2. cut the time watch for both males after any of them receive an attack (to have duration of courtship comparable between the two, or courtship rate calculated on same duration)
+# 3. added number of second watched for naive courtship (those prior to attack, removing delay to start video)
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 {# Remarks
-  # for two females male test, males were replaces when one died:
-  # for FID 193: initially with 24 Black, 53 Red (Died) trial ID 405  ; later 63 Black, 37 Red trial, trial ID 179
-  # for FID 112: initially with 349 Black (Died), 362 (Red) trial ID 297 ; later 230 Black trial ID 317
-  # for FID 106: initially with 60 Black (Died), 221 (Red) trial ID 406 ; later 34 Black, 32 Red, trial ID 160
-  # first trial IDs were excluded for the test on female cannibalism 405 297 406
+  # for three female male tests, males were replaced when one died (within two days), and that males were already painted  (the day before)
+  # in all three cases, the color of the male that died was the same as the color of the male which was subsequently cannibalised.
+  # as this was not planed and is difficult to present succintly in a paper. those replacement tests were ignored (unfortunately reducing the sample size of valid male tests)
+  # for FID 193: initially with 24 Black, 53 Red (Died) trial ID 297  ; later 63 Black, 37 Red trial, trial ID 317
+  # for FID 112: initially with 349 Black (Died), 362 (Red) trial ID 405 ; later 230 Black trial ID 179
+  # for FID 106: initially with 60 Black (Died), 221 (Red) trial ID 160 ; later 34 Black, 32 Red, trial ID 406
+  # first trial IDs for the test on female 106 112 and 193 cannibalism are 160 405 297, are excluded as one spider dies during the test (as in other such cases, entered in DB)
+  # second trials IDs to be excluded in this script for these females were: 406 179 317
+  # videos were watched for trials 160 405 297 (video ID 29, 31, 35) (which end up being excluded trials), these are the first trial of females 193, 112 and 106 (their second tedt were not taped/watched)
+  # video from the second test of female 193 (test 317), video ID 36, was watched but need to be excluded here.
+  # video recording failed for female 210 and 254
+  # video recording was shorter (due to technical difficulties) for females 224 and 207
 }
 
 rm(list = ls(all = TRUE))
 
 {# packages
   library(lme4)
-  library(RODBC)
+  library(RODBC) # this require R AND ACCESS to run on 32 bits !
   library(stringr)
   library(dplyr)
   library(here)
 }
 
+{# functions
+  
+  ## read text column into time
+  
+  ConvertToTime <- function(x){
+    as.POSIXct(str_pad(x, 6, pad = "0"), format="%H%M%S") # this adds the date of today to every time... stupid but hard to get around and not important
+  }
+  
+  ConvertTimeToSecs <- function(x){difftime(x, as.POSIXct(as.character('000000'), format="%H%M%S"), unit='secs')}
+  
+}
 
-#~~~ GET DATASET
+
+#~~~ EXTRACT DATASET
 
 {# load data
 conDB= odbcConnectAccess2007(paste(here(),"VideoAnalyses_MaleTests_2017.accdb", sep="/"))
+  
 sqlTables(conDB)
 
 Behav_Video_MaleTest <- sqlFetch(conDB, 'Behav_Video_MaleTest')
@@ -36,22 +59,38 @@ Behav_Female <- sqlFetch(conDB, 'Behav_Female')
 Behav_Female_Attacks <- sqlFetch(conDB, 'Behav_Female_Attacks')
 Behav_Male_Courtships <- sqlFetch(conDB, 'Behav_Male_Courtships')
 Behav_MaleMale_Competition <- sqlFetch(conDB, 'Behav_Male-Male_Competition')
+FemaleTrt <- sqlFetch(conDB, 'Basic_Trials')
+
+# exclude video IDs from test with replacement males (see remarks)
+Behav_Video_MaleTest$FID[Behav_Video_MaleTest$FID >1000] # the zero at the end of the FID stands for the first trial, the 1 for the second trial
+
+Behav_Video_MaleTest <- Behav_Video_MaleTest[Behav_Video_MaleTest$VideoID != 36,] 
+Behav_Female_Attacks <- Behav_Female_Attacks[Behav_Female_Attacks$VideoID != 36,] 
+Behav_Male_Courtships <- Behav_Male_Courtships[Behav_Male_Courtships$VideoID != 36,] 
+Behav_MaleMale_Competition <- Behav_MaleMale_Competition[Behav_MaleMale_Competition$VideoID != 36,] 
+
+# exclude 'fake FID' (used to watch two trials per female - but whose second trial is now excluded, see remarks)
+Behav_Video_MaleTest$FID[Behav_Video_MaleTest$FID >1000] # the zero at the end of the FID stands for the first trial, the 1 for the second trial
+
+Behav_Video_MaleTest$FID[Behav_Video_MaleTest$FID == 1120] <- 112
+Behav_Video_MaleTest$FID[Behav_Video_MaleTest$FID == 1930] <- 193
+Behav_Video_MaleTest$FID[Behav_Video_MaleTest$FID == 1060] <- 106
+
+
+Behav_Female$FID[Behav_Female$FID == 1120] <- 112
+Behav_Female$FID[Behav_Female$FID == 1930] <- 193
+Behav_Female$FID[Behav_Female$FID == 1060] <- 106
+
+Behav_Female <- Behav_Female[Behav_Female$FID <1000,]
 
 close(conDB)
 
 }
 
-{# functions
 
-## read text column into time
+#~~~ PROCESS DATA
 
-ConvertToTime <- function(x){
-  as.POSIXct(str_pad(x, 6, pad = "0"), format="%H%M%S") # this adds the date of today to every time... stupid but hard to get around and not important
-}
-  
-ConvertTimeToSecs <- function(x){difftime(x, as.POSIXct(as.character('000000'), format="%H%M%S"), unit='secs')}
-
-}
+{
 
 {# convert time and calculate delays, convert color
 
@@ -109,7 +148,10 @@ FAttacks <- Behav_Female_Attacks[Behav_Female_Attacks$AttackYN == 1 | Behav_Fema
   group_by(VideoID,Mcol) %>% 
   summarize(FirstFAttack = min(AttackTime),
             NbFAttacks = n())    
-### all instances of female aggression (even missed attackes)
+
+FAttacks$VideoIDMcol <- paste(FAttacks$VideoID, FAttacks$Mcol, sep='')
+
+### all instances of female aggression (even missed attacks)
 TotalIntendedFAttacks <- Behav_Female_Attacks %>% 
   group_by(VideoID,Mcol) %>% 
   summarize(NbIntendedFAttacks = n())  
@@ -148,7 +190,7 @@ AllMInter <- Behav_MaleMale_Competition %>%
             TotalMInterDur = sum(InterDur),
             FirstMInter = min(InteractionStart))
 
-### check whether those who attack always win: we will consider that yes
+### check whether those who attack always win: we will consider that yes (very rare that it is the opposite)
 Behav_MaleMale_Competition[Behav_MaleMale_Competition$NBAttacks > 0 & 
                              Behav_MaleMale_Competition$McolStart != Behav_MaleMale_Competition$McolWin & 
                              !is.na(Behav_MaleMale_Competition$McolWin),]
@@ -163,6 +205,9 @@ MAttacks <- Behav_MaleMale_Competition[Behav_MaleMale_Competition$NBAttacks > 0 
                                   NbRollOverYN = sum(RollOverYN), 
                                   FirstMAttack = min(InteractionStart))
 
+MAttacks$VideoIDMcol <- paste(MAttacks$VideoID, MAttacks$McolStart, sep='')
+
+
 ### the opposite color is the one attacked by the male who start the malemale interaction
 MAttacks$McolAttacked <- NA
 MAttacks$McolAttacked[MAttacks$McolStart == 'Blue'] <- 'Red'
@@ -170,30 +215,50 @@ MAttacks$McolAttacked[MAttacks$McolStart == 'Yellow'] <- 'Blue'
 MAttacks$McolAttacked[MAttacks$McolAttacked == 'Red'] <- 'Yellow'
 }
   
-{## keep only courtships before attacks from other male or from female
-### Female attacks
-FAttacks$VideoIDMcol <- paste(FAttacks$VideoID,FAttacks$Mcol,sep='')
-Behav_Male_Courtships$VideoIDMcol <- paste(Behav_Male_Courtships$VideoID,Behav_Male_Courtships$Mcol,sep='')
-Behav_Male_Courtships <- merge(x=Behav_Male_Courtships,y=as.data.frame(FAttacks[c('VideoIDMcol','FirstFAttack')]), by="VideoIDMcol", all.x=TRUE)
- 
-### Male attacks: 
-MAttacks$VideoIDMcol <- paste(MAttacks$VideoID,MAttacks$McolAttacked,sep='')
-Behav_Male_Courtships <- merge(x=Behav_Male_Courtships,y=as.data.frame(MAttacks[c('VideoIDMcol','FirstMAttack')]), by="VideoIDMcol", all.x=TRUE)
+{## keep only courtships before attacks from other male or from female, use the lowest number for both males to cut time for both equally
+### Female attacks (on either male)
+FFirstAttack <- FAttacks  %>% group_by(VideoID) %>% 
+    summarize(FirstAttack  =  min(FirstFAttack))
+
+### Male attacks (from either male against either male)
+MFirstAttack <- MAttacks  %>% group_by(VideoID) %>% 
+  summarize(FirstAttack  =  min(FirstMAttack))
+
+### First attack per video: max time for any male to court
+FirstAttack <- rbind(FFirstAttack,MFirstAttack) %>% group_by(VideoID) %>% 
+  summarize(FirstAttackInVideo  =  min(FirstAttack))
 
 ### Courtships done between time start video and time first attack (by other male or female)
-    ### Courtships done after first attack
-    AfterAttackCourtshipID <- Behav_Male_Courtships$CourtshipID[Behav_Male_Courtships$CourtshipStart > Behav_Male_Courtships$FirstFAttack & !is.na(Behav_Male_Courtships$FirstFAttack)
-                           |Behav_Male_Courtships$CourtshipStart > Behav_Male_Courtships$FirstMAttack & !is.na(Behav_Male_Courtships$FirstMAttack )]
-    # Behav_Male_Courtships[Behav_Male_Courtships$VideoID == 24,]
-    # NaiveBehav_Male_Courtships[NaiveBehav_Male_Courtships$VideoID == 24,]
-    
+    ### Courtships done after first attack on any male by either the other male or the female
+
+Behav_Male_Courtships <- merge(x=Behav_Male_Courtships,y=as.data.frame(FirstAttack), by="VideoID", all.x=TRUE)
+
+AfterAttackCourtshipID <- Behav_Male_Courtships$CourtshipID[Behav_Male_Courtships$CourtshipStart > Behav_Male_Courtships$FirstAttackInVideo & !is.na(Behav_Male_Courtships$FirstAttackInVideo)]
+
 NaiveBehav_Male_Courtships <- Behav_Male_Courtships[! Behav_Male_Courtships$CourtshipID %in% AfterAttackCourtshipID,]    
-    
+    ### Behav_Male_Courtships[Behav_Male_Courtships$VideoID == 24,]
+    ### NaiveBehav_Male_Courtships[NaiveBehav_Male_Courtships$VideoID == 24,] 
+
+# duration watched for courtship (if we want to calculate fair courtship rates where both male within a video had equal time to court (before any attack happened))
+DurationWatchedForNaiveCourtship <- rbind(Behav_Video_MaleTest[,c('VideoID','TimeStoppedWatching')], setNames(FirstAttack, c('VideoID','TimeStoppedWatching')))
+
+DurationWatchedForNaiveCourtship <- DurationWatchedForNaiveCourtship %>% group_by(VideoID) %>% 
+  summarize(TotalDurationForCourtship  =  min(TimeStoppedWatching))
+
+DurationWatchedForNaiveCourtship <- merge(x=Behav_Video_MaleTest[,c('VideoID','VideoTimeStart')],y=as.data.frame(DurationWatchedForNaiveCourtship), by="VideoID", all.x=TRUE)
+DurationWatchedForNaiveCourtship$TotalDurationWatchedForNaiveCourt <- as.numeric(difftime(DurationWatchedForNaiveCourtship$TotalDurationForCourtship, DurationWatchedForNaiveCourtship$VideoTimeStart, units='secs'))
+
+NaiveBehav_Male_Courtships <- merge(x=NaiveBehav_Male_Courtships,y=as.data.frame(DurationWatchedForNaiveCourtship[,c('VideoID','TotalDurationWatchedForNaiveCourt')]), by="VideoID", all.x=TRUE)
+
+
+
 NaiveCourts <- NaiveBehav_Male_Courtships %>%
   group_by(VideoID,Mcol) %>% 
   summarize(NaiveNBCourt = n(),
             NaiveTotalCourtDur = sum(CourtDuration),
-            NaiveFirstCourt = min(CourtshipStart))
+            NaiveFirstCourt = min(CourtshipStart),
+            TotalWatchNaiveCourt = min(TotalDurationWatchedForNaiveCourt)
+            )
 
 NaiveCourts$VideoIDMcol = paste (NaiveCourts$VideoID, NaiveCourts$Mcol, sep='')
 
@@ -228,10 +293,15 @@ MY_TABLE_Videos_perMale <- merge (x=MY_TABLE_Videos_perMale, y= TotalIntendedFAt
 MY_TABLE_Videos_perMale <- merge (x=MY_TABLE_Videos_perMale, y= Cannibalism[,c('ConsumTime', 'VideoIDMcol')],by='VideoIDMcol', all.x=TRUE)
 MY_TABLE_Videos_perMale <- merge (x=MY_TABLE_Videos_perMale, y= MAttacks[,c('NbMAttacks', 'NbPushPush', 'NbRollOverYN','FirstMAttack', 'VideoIDMcol')],by='VideoIDMcol', all.x=TRUE)
 MY_TABLE_Videos_perMale <- merge (x=MY_TABLE_Videos_perMale, y= AllCourts[,c('NBCourt','TotalCourtDur', 'FirstCourt','VideoIDMcol')],by='VideoIDMcol', all.x=TRUE)
-MY_TABLE_Videos_perMale <- merge (x=MY_TABLE_Videos_perMale, y= NaiveCourts[,c('NaiveNBCourt','NaiveTotalCourtDur', 'NaiveFirstCourt','VideoIDMcol')],by='VideoIDMcol', all.x=TRUE)
+MY_TABLE_Videos_perMale <- merge (x=MY_TABLE_Videos_perMale, y= NaiveCourts[,c('NaiveNBCourt','NaiveTotalCourtDur', 'NaiveFirstCourt','TotalWatchNaiveCourt','VideoIDMcol')],by='VideoIDMcol', all.x=TRUE)
+
+summary(MY_TABLE_Videos_perMale)
+DelayLeaveDish <- MY_TABLE_Videos_perMale$DelayLeaveDish
 
 MY_TABLE_Videos_perMale <- MY_TABLE_Videos_perMale %>%
-  mutate_if(is.numeric, funs(ifelse(is.na(.), 0, .)))
+  mutate_if(is.numeric, funs(ifelse(is.na(.), 0, .))) # replace all NAs by 0
+
+MY_TABLE_Videos_perMale$DelayLeaveDish <- DelayLeaveDish
 
 MY_TABLE_Videos_perMale <- merge (x = MY_TABLE_Videos_perMale, y=  Behav_Female[,c('FID', 'ExcludeYN', 'ReasonExclusion', 'Remarks')],
                           by = 'FID', all.x=TRUE)  
@@ -262,10 +332,23 @@ if(!is.na(MY_TABLE_Videos_perMale$ReasonExclusion[i]) & MY_TABLE_Videos_perMale$
   {MY_TABLE_Videos_perMale$Died[i] <- 1}
 }
 
+# add Female Trt
+MY_TABLE_Videos_perMale <- merge(MY_TABLE_Videos_perMale, FemaleTrt[,c('Ind_ID','GroupName')], by.x='FID', by.y='Ind_ID')
+
 summary(MY_TABLE_Videos_perMale)
+
+
+# Change Mcol Blue/Yellow to ZBlack and ARed to have red male as reference (intercept)
+MY_TABLE_Videos_perMale$Mcol <- as.character(MY_TABLE_Videos_perMale$Mcol)
+MY_TABLE_Videos_perMale$Mcol[MY_TABLE_Videos_perMale$Mcol == "Yellow"] <- 'ARed'
+MY_TABLE_Videos_perMale$Mcol[MY_TABLE_Videos_perMale$Mcol == "Blue"] <- 'ZBlack'
+
 }
 
 head(MY_TABLE_Videos_perMale)
+# nrow(MY_TABLE_Videos_perMale) # 204 (104 tests performed - 2 videos missing, see remarks, = 102*2 males))
+# nrow(MY_TABLE_Videos_perMale[MY_TABLE_Videos_perMale$ExcludeYN==0,]) # 154 (79 valid tests - 2 videos missing, see remarks, =76*2 = 154 males))
+
 
 {# Combine summaries per video
 
@@ -291,117 +374,293 @@ MY_TABLE_Videos <- MY_TABLE_Videos %>%
 MY_TABLE_Videos$DelayFirstMInter <-  as.numeric(difftime(MY_TABLE_Videos$FirstMInter,MY_TABLE_Videos$VideoTimeStart, units = 'secs'))
 MY_TABLE_Videos <- subset(MY_TABLE_Videos, select = - c(VideoTimeStart,FirstMInter))
 
-summary(MY_TABLE_Videos)
+# add Female Trt
+MY_TABLE_Videos <- merge(MY_TABLE_Videos, FemaleTrt[,c('Ind_ID','GroupName')], by.x='FID', by.y='Ind_ID')
 
+summary(MY_TABLE_Videos)
 }
 
 head(MY_TABLE_Videos)
 
+# nrow(MY_TABLE_Videos) # 102 (out of 104 tests performed (2 videos missing, see remarks))
+# nrow(MY_TABLE_Videos[MY_TABLE_Videos$ExcludeYN==0,]) # 77 (out of 79 valid tests (2 videos missing, see remarks))
+
+}
+
+head(MY_TABLE_Videos_perMale)
+head(MY_TABLE_Videos)
 
 
-#~~~ ANALYSES
+#~~~ DATA ANALYSES
 
 {## Preregistered
-### comparison delay to court for both type of male in the valid tests (not excluded because one of the three spiders died for other reason than cannibalism)
+### comparison delay to court for both type of male in the valid tests (i.e. not excluded because one of the three spiders died for other reason than cannibalism)
+
+modDelayCourtAllVideo <- lmer(DelayFirstCourt ~ Mcol + (1|FID)
+                              ,data = MY_TABLE_Videos_perMale, REML =FALSE)
+summary(modDelayCourtAllVideo)# n=179 (delay not NA our of 204 total male-video (25 NA)), NS
+
 
 modDelayCourtValidTest <- lmer(DelayFirstCourt ~ Mcol + (1|FID)
-                               ,data = MY_TABLE_Videos_perMale[MY_TABLE_Videos_perMale$ExcludeYN == 0,])
-summary(modDelayCourtValidTest) # n=111 NS
+                               ,data = MY_TABLE_Videos_perMale[MY_TABLE_Videos_perMale$ExcludeYN == 0,], REML =FALSE)
+summary(modDelayCourtValidTest) # n=134 (delay not NA out of 154 valid male-videos (20 NA)), NS
+
 }
 
 {## Exploratory
-### are black males behaving differently than red males, or are they receiving more attacks from the other male and the female ?
+  
+{### are black males behaving differently than red males (I included author as I knew which male was which color, not Lauren)
 
-modDelayCourtAllVideo <- lmer(DelayFirstCourt ~ Mcol*Author + (1|FID)
-                               ,data = MY_TABLE_Videos_perMale)
-summary(modDelayCourtAllVideo)# n=150 NS
+    ##### Delay to court
+      ###### all courts, even if had been attacked prior to starting to court
+modDelayCourtAllVideo <- lmer(DelayFirstCourt ~ Mcol
+                              #*Author 
+                              + (1|FID)
+                               ,data = MY_TABLE_Videos_perMale, REML =FALSE)
+summary(modDelayCourtAllVideo)# n=179 (delay not NA out of 204 total male-video (25 NA)), NS
+
+modDelayCourtAllVideo0 <- lmer(DelayFirstCourt ~ 1+ (1|FID),data = MY_TABLE_Videos_perMale, REML =FALSE)
+
+anova(modDelayCourtAllVideo,modDelayCourtAllVideo0) # p value for paper
 
 
+modDelayCourtValidTests <- lmer(DelayFirstCourt ~ Mcol*Author + (1|FID)
+                              ,data = MY_TABLE_Videos_perMale[MY_TABLE_Videos_perMale$ExcludeYN == 0,], REML =FALSE)
+summary(modDelayCourtValidTests)# n=134 (delay not NA out of 154 valid male-videos (20 NA)), NS
+
+
+      ###### delay to court before any attack happened on any males within test
 modDelayNaiveCourtAllVideo <- lmer(DelayNaiveFirstCourt ~ Mcol*Author + (1|FID)
-                              ,data = MY_TABLE_Videos_perMale)
-summary(modDelayNaiveCourtAllVideo)# n=129 NS
+                              ,data = MY_TABLE_Videos_perMale, REML =FALSE)
+summary(modDelayNaiveCourtAllVideo)# n=121 NS
+
+modDelayNaiveCourtValidTests <- lmer(DelayNaiveFirstCourt ~ Mcol*Author + (1|FID)
+                                   ,data = MY_TABLE_Videos_perMale[MY_TABLE_Videos_perMale$ExcludeYN == 0,], REML =FALSE)
+summary(modDelayNaiveCourtValidTests)# n=89 NS
 
 
-modDelayLeaveDish <- lmer(DelayLeaveDish~ Mcol*Author + (1|FID)
-                          ,data = MY_TABLE_Videos_perMale)
-summary(modDelayLeaveDish)# n=170 NS
+
+    ##### delay to leave dish
+modDelayLeaveDishAllVideos <- lmer(DelayLeaveDish~ Mcol
+                                   #*Author 
+                                   + (1|FID)
+                          ,data = MY_TABLE_Videos_perMale, REML =FALSE)
+summary(modDelayLeaveDishAllVideos)# n=202 NS (2 were eaten in the vial)
+
+modDelayLeaveDishAllVideos0 <- lmer(DelayLeaveDish~1+ (1|FID),data = MY_TABLE_Videos_perMale, REML =FALSE)
+
+anova(modDelayLeaveDishAllVideos,modDelayLeaveDishAllVideos0) # p value for paper
 
 
-modNbFAttacks <- lmer(NbFAttacks~ Mcol
-                      *Author # I score signficantly more attacks, trends toward scoring less attacks towards yellow male
-                      + (1|FID)
-                          ,data = MY_TABLE_Videos_perMale)
-summary(modNbFAttacks)# n=170 * significantly less attacks towards yellow male * > due to my bias
+modDelayLeaveDishValidTests <- lmer(DelayLeaveDish~ Mcol*Author + (1|FID)
+                          ,data = MY_TABLE_Videos_perMale[MY_TABLE_Videos_perMale$ExcludeYN == 0,], REML =FALSE)
+summary(modDelayLeaveDishValidTests)# n=152 NS
 
-  ### Lauren was blind to the treatment of the male, I wasn't
-  modNbFAttacksLG <- lmer(NbFAttacks~ Mcol
+
+
+  ##### Courtship effort 
+      ###### even if had been attacked prior to starting to court
+modTotalCourtDur <- lmer(TotalCourtDur~  Mcol
+                         #*Author 
+                         + (1|FID)
+                         ,data = MY_TABLE_Videos_perMale, REML =FALSE)
+summary(modTotalCourtDur)# n=204 NS
+
+modTotalCourtDur0 <- lmer(TotalCourtDur~ 1+ (1|FID) ,data = MY_TABLE_Videos_perMale, REML =FALSE)
+anova(modTotalCourtDur,modTotalCourtDur0)# p value for paper
+
+modTotalCourtDurValidTest <- lmer(TotalCourtDur~ Mcol*Author 
+                         + (1|FID)
+                         ,data = MY_TABLE_Videos_perMale[MY_TABLE_Videos_perMale$ExcludeYN == 0,], REML =FALSE)
+summary(modTotalCourtDurValidTest)# n=154 NS
+
+      ###### before being attacked
+modNaiveTotalCourtDur <- lmer(NaiveTotalCourtDur~ Mcol
+                              #*Author 
+                              + (1|FID)
+                              ,data = MY_TABLE_Videos_perMale, REML =FALSE)
+summary(modNaiveTotalCourtDur)# n=204 NS (no NAs but more zeros for duration, hence same sample size as above)
+
+modNaiveTotalCourtDur0 <- lmer(NaiveTotalCourtDur~ 1+ (1|FID) ,data = MY_TABLE_Videos_perMale, REML =FALSE)
+anova(modNaiveTotalCourtDur,modNaiveTotalCourtDur0)# p value for paper
+
+
+modNaiveTotalCourtDurNaiveTests <- lmer(NaiveTotalCourtDur~ Mcol*Author 
+                              + (1|FID)
+                              ,data = MY_TABLE_Videos_perMale[MY_TABLE_Videos_perMale$ExcludeYN == 0,], REML =FALSE)
+summary(modNaiveTotalCourtDurNaiveTests)# n=154 NS (no NAs but more zeros for duration, hence same sample size as above)
+
+}
+
+{### are black males receiving more attacks from the other male and/or the female ?
+  
+#### exploration of the potential author bias in attack observed
+{  ######## attacks are binary and less subject to observation bias but
+  ######## I scored signficantly more attacks
+  ######## with trends or significant effect toward scoring less attacks towards the red male, but 
+ 
+modNbFAttacksLG <- lmer(NbFAttacks~ Mcol
                         + (1|FID)
                         ,data = MY_TABLE_Videos_perMale[MY_TABLE_Videos_perMale$Author == 'LG',])
-  summary(modNbFAttacksLG)# n=72 NS !!
-  
-  modNbFAttacksMI <- lmer(NbFAttacks~ Mcol
-                          + (1|FID)
-                          ,data = MY_TABLE_Videos_perMale[MY_TABLE_Videos_perMale$Author == 'MI',])
-  summary(modNbFAttacksMI)# n=102 * significantly less attacks towards yellow *
+summary(modNbFAttacksLG)# n=104 NS 
 
-  ### Did I score more of the videos where male end up dying (which could explain why I scored more attacks against blue male ?)
-  table(MY_TABLE_Videos$Author, MY_TABLE_Videos$ReasonExclusion)
-  
-  ### I have done more of those videos of tests where the black male ended up dead
-  modNbFAttacksValidTests <- lmer(NbFAttacks~ Mcol
-                        *Author # I score signficantly more attacks, trends toward scoring less attacks towards yellow male
+modNbFAttacksMI <- lmer(NbFAttacks~ Mcol
                         + (1|FID)
-                        ,data = MY_TABLE_Videos_perMale[MY_TABLE_Videos_perMale$ExcludeYN == 0,])
-  summary(modNbFAttacksValidTests)
-  
-  modNbFAttacksValidTestsLG <- lmer(NbFAttacks~ Mcol
-                                  + (1|FID)
-                                  ,data = MY_TABLE_Videos_perMale[MY_TABLE_Videos_perMale$ExcludeYN == 0 & MY_TABLE_Videos_perMale$Author == 'LG',])
-  summary(modNbFAttacksValidTestsLG) 
-  
-  modNbFAttacksValidTestsMI <- lmer(NbFAttacks~ Mcol
-                                    + (1|FID)
-                                    ,data = MY_TABLE_Videos_perMale[MY_TABLE_Videos_perMale$ExcludeYN == 0 & MY_TABLE_Videos_perMale$Author == 'MI',])
-  summary(modNbFAttacksValidTestsMI) # n= 76 * significantly less attacks towards yellow *
-  
-  
+                        ,data = MY_TABLE_Videos_perMale[MY_TABLE_Videos_perMale$Author == 'MI',])
+summary(modNbFAttacksMI)# n=100 * significantly less attacks towards yellow *
 
-modNbIntendedFAttacks <- lmer(NbIntendedFAttacks~ Mcol*Author + (1|FID)
+  ######## I did watch more of those videos where the black male ended up dead
+table(MY_TABLE_Videos$Author, MY_TABLE_Videos$ReasonExclusion)
+
+  ######## Although it is possible that difference are due to me being biased, differences may be due to the random subset of videos we watched
+}
+
+
+#### Female attack toward male of  specific colors, in function of their training
+
+modNbFAttacks <- lmer(NbFAttacks~  Mcol*GroupName 
+                      #*Author - Mcol:GroupName:Author - GroupName:Author 
+                      + (1|FID)
+                          ,data = MY_TABLE_Videos_perMale, REML =FALSE)
+summary(modNbFAttacks)# n=204 . trends for less attacks towards yellow male, independent of the female treatment
+
+modNbFAttacksinter0 <- lmer(NbFAttacks~ -1+Mcol+ GroupName  + (1|FID),data = MY_TABLE_Videos_perMale, REML =FALSE)
+summary(modNbFAttacksinter0)
+anova(modNbFAttacks,modNbFAttacksinter0)# p value inter for paper
+
+modNbFAttacks00 <- lmer(NbFAttacks~  GroupName +(1|FID),data = MY_TABLE_Videos_perMale, REML =FALSE)
+anova(modNbFAttacksinter0,modNbFAttacks00)# p value Mcol for paper
+
+
+
+modNbFAttacks_ValidTests <- lmer(NbFAttacks~ Mcol* GroupName 
+                      #*Author - Mcol:GroupName:Author - GroupName:Author 
+                      + (1|FID)
+                      ,data = MY_TABLE_Videos_perMale[MY_TABLE_Videos_perMale$ExcludeYN == 0,], REML =FALSE)
+summary(modNbFAttacks_ValidTests)#154 . trend toward less attack against yellow males, independent of the female treatment
+
+
+
+
+  
+#### Intended Female attack toward male of specific colors, in function of their training
+
+modNbIntendedFAttacks <- lmer(NbIntendedFAttacks~ Mcol*GroupName
+                              #*Author  - Mcol:GroupName:Author - GroupName:Author 
+                              + (1|FID)
                       ,data = MY_TABLE_Videos_perMale)
-summary(modNbIntendedFAttacks)# n=170 . trend less attacks towards yellow male (my bias)
+summary(modNbIntendedFAttacks)# n=204 . trend less attacks towards yellow male 
 
 
-modNbMAttacks <- lmer(NbMAttacks~ Mcol*Author + (1|FID)
+modNbIntendedFAttacksValidTest <- lmer(NbIntendedFAttacks~ Mcol*GroupName
+                              #*Author  - Mcol:GroupName:Author - GroupName:Author 
+                              + (1|FID)
+                              ,data = MY_TABLE_Videos_perMale[MY_TABLE_Videos_perMale$ExcludeYN == 0,])
+summary(modNbIntendedFAttacksValidTest)# n=154 . trend less attacks towards yellow male 
+
+
+
+#### Male attack toward other male
+
+modNbMAttacks <- lmer(NbMAttacks~ Mcol
+                      #*Author 
+                      + (1|FID)
                               ,data = MY_TABLE_Videos_perMale)
-summary(modNbMAttacks)# n=170 . trend less attacks towards yellow male
+summary(modNbMAttacks)# n=204 NS
 
 
-modTotalCourtDur <- lmer(TotalCourtDur~ Mcol*Author + (1|FID)
-                      ,data = MY_TABLE_Videos_perMale)
-summary(modTotalCourtDur)# n=170 NS
+modNbMAttacksValidTests <- lmer(NbMAttacks~ Mcol
+                      #*Author 
+                      + (1|FID)
+                      ,data = MY_TABLE_Videos_perMale[MY_TABLE_Videos_perMale$ExcludeYN == 0,])
+summary(modNbMAttacksValidTests)# n=154 NS
+
+}
+
+{### Do F attacks predict futur consumption ? should test only in valid test, as non valid test, a spider died ?
+  
+modFconsum <- lmer(ConsumYN~ Mcol
+                   *GroupName
+                   +NbFAttacks + (1|FID)
+                      ,data = MY_TABLE_Videos_perMale, REML =FALSE)
+summary(modFconsum) # N=204 ** Nb attack predicts furtur consumption, Yellow less consumed, therefore it is expected to have yellow less attacked
 
 
-modNaiveTotalCourtDur <- lmer(NaiveTotalCourtDur~ Mcol*Author + (1|FID)
-                         ,data = MY_TABLE_Videos_perMale)
-summary(modNaiveTotalCourtDur)# n=170 NS
 
-## Do F attacks predict futur consumption ?
-modFconsum <- lmer(ConsumYN~ Mcol+NbFAttacks + (1|FID)
-                      ,data = MY_TABLE_Videos_perMale)
-summary(modFconsum) # ** Nb attack predicts furtur cinsumption, Yellow less consumed
+modFconsumValidTest <- lmer(ConsumYN~ NbFAttacks +Mcol
+                            *GroupName
+                    + (1|FID)
+                   ,data = MY_TABLE_Videos_perMale[MY_TABLE_Videos_perMale$ExcludeYN == 0,], REML =FALSE)
+summary(modFconsumValidTest) # N=154  Nb attack almost predicts furtur consumption, Yellow less consumed, therefore it is expected to have yellow less attacked
 
-modFconsumAttackRate <- lmer(ConsumYN~ Mcol+I(NbFAttacks/TotalWatch) + (1|FID)
-                   ,data = MY_TABLE_Videos_perMale)
-summary(modFconsumAttackRate)
 
-## Do F and M attacks predict futur death of male for reason other than consumption ?
+
+modFconsumValidTest1 <- lmer(ConsumYN~ NbFAttacks +Mcol + GroupName + (1|FID)
+                            ,data = MY_TABLE_Videos_perMale[MY_TABLE_Videos_perMale$ExcludeYN == 0,], REML =FALSE)
+summary(modFconsumValidTest1) # N=154  Nb attack almost predicts furtur consumption, Yellow less consumed, therefore it is expected to have yellow less attacked
+anova(modFconsumValidTest1,modFconsumValidTest)
+
+
+modFconsumValidTest0 <- lmer(ConsumYN~  Mcol*GroupName+  (1|FID),data = MY_TABLE_Videos_perMale[MY_TABLE_Videos_perMale$ExcludeYN == 0,], REML =FALSE)
+anova(modFconsumValidTest,modFconsumValidTest0) # p value nbFattacks for paper
+
+modFconsumValidTest00 <- lmer(ConsumYN~  NbFAttacks+  GroupName + (1|FID),data = MY_TABLE_Videos_perMale[MY_TABLE_Videos_perMale$ExcludeYN == 0,], REML =FALSE)
+summary(modFconsumValidTest00)
+anova(modFconsumValidTest,modFconsumValidTest00) # p value Mcol for paper
+
+
+
+
+modFconsumAttackRate <- lmer(ConsumYN~ Mcol
+                             #*GroupName
+                             +I(NbFAttacks/TotalWatch) + (1|FID)
+                   ,data = MY_TABLE_Videos_perMale, REML =FALSE)
+summary(modFconsumAttackRate) # N=204, only trendy if consider attack rate
+
+modFconsumAttackRateValidTests <- lmer(ConsumYN~ Mcol
+                             #*GroupName
+                             +I(NbFAttacks/TotalWatch) + (1|FID)
+                             ,data = MY_TABLE_Videos_perMale[MY_TABLE_Videos_perMale$ExcludeYN == 0,], REML =FALSE)
+summary(modFconsumAttackRateValidTests) # n= 154  Nb attack almost predicts furtur consumption, Yellow less consumed, therefore it is expected to have yellow less attacked
+
+
+
+### Do F attacks predict futur consumption ? 
+### should test only in valid test, as non valid test, a spider died ?
+### select a focal male per test since consumYN is the opposite for the other
+
+
+
+
+
+
+}
+
+{### Do F and M attacks predict futur death of male for reason other than consumption ?
 modMaleDied <- lmer(Died~ Mcol+ I((NbFAttacks+NbMAttacks)) + (1|FID)
-                    ,data = MY_TABLE_Videos_perMale)
-summary(modMaleDied) 
+                    ,data = MY_TABLE_Videos_perMale[MY_TABLE_Videos_perMale$ConsumYN == 0,], REML =FALSE)
+summary(modMaleDied) # n= 127, nFemale = 102; nope, but maybe attacks occured after the 2 hours video... Yellow less likely to die
+
+modMaleDied <- lmer(Died~ Mcol+ NbFAttacks + (1|FID)
+                    ,data = MY_TABLE_Videos_perMale[MY_TABLE_Videos_perMale$ConsumYN == 0,], REML =FALSE)
+summary(modMaleDied) # n= 127, nFemale = 102; nope, but maybe attacks occured after the 2 hours video... Yellow less likely to die
+
 
 modMaleDiedrate <- lmer(Died~ Mcol+ I((NbFAttacks+NbMAttacks)/TotalWatch) + (1|FID)
-                    ,data = MY_TABLE_Videos_perMale)
-summary(modMaleDiedrate) 
+                    ,data = MY_TABLE_Videos_perMale[MY_TABLE_Videos_perMale$ConsumYN == 0,], REML =FALSE)
+summary(modMaleDiedrate) # n= 127, nFemale = 102;
+
+}
+  
+{ ### Do F and M attacks predict consumed or died
+  MY_TABLE_Videos_perMale$Kaput <- MY_TABLE_Videos_perMale$ConsumYN+ MY_TABLE_Videos_perMale$Died
+  modMaleKaput <- lmer(Kaput~ Mcol+ 
+                         #I((NbFAttacks+NbMAttacks))
+                         NbFAttacks
+                         + (1|FID)
+                       ,data = MY_TABLE_Videos_perMale, REML =FALSE)
+  summary(modMaleKaput)
+}  
 
 }
 
@@ -411,44 +670,44 @@ summary(modMaleDiedrate)
 #### All videos
 summary(MY_TABLE_Videos$NbMAttacks)
 length(MY_TABLE_Videos$NbMAttacks[MY_TABLE_Videos$NbMAttacks > 0])/
-  length(MY_TABLE_Videos$NbMAttacks)*100 # 36%
+  length(MY_TABLE_Videos$NbMAttacks)*100 # 42%
 #### valid tests
 summary(MY_TABLE_Videos$NbMAttacks[MY_TABLE_Videos$ExcludeYN ==0])
 length(MY_TABLE_Videos$NbMAttacks[MY_TABLE_Videos$NbMAttacks > 0 & MY_TABLE_Videos$ExcludeYN ==0])/
-  length(MY_TABLE_Videos$NbMAttacks[MY_TABLE_Videos$ExcludeYN ==0])*100 # 38%
+  length(MY_TABLE_Videos$NbMAttacks[MY_TABLE_Videos$ExcludeYN ==0])*100 # 44%
 }
 
 {### Nb of videos with male male physical interaction
 #### All videos
 summary(MY_TABLE_Videos$NbMphysicalInter)
 length(MY_TABLE_Videos$NbMphysicalInter[MY_TABLE_Videos$NbMphysicalInter > 0])/
-  length(MY_TABLE_Videos$NbMphysicalInter)*100 # 43%
+  length(MY_TABLE_Videos$NbMphysicalInter)*100 # 48%
 #### valid tests
 summary(MY_TABLE_Videos$NbMphysicalInter[MY_TABLE_Videos$ExcludeYN ==0])
 length(MY_TABLE_Videos$NbMphysicalInter[MY_TABLE_Videos$NbMphysicalInter > 0 & MY_TABLE_Videos$ExcludeYN ==0])/
-  length(MY_TABLE_Videos$NbMphysicalInter[MY_TABLE_Videos$ExcludeYN ==0])*100 # 46%
+  length(MY_TABLE_Videos$NbMphysicalInter[MY_TABLE_Videos$ExcludeYN ==0])*100 # 50.6%
 }
 
 {### Nb of videos with male male any interaction (include display)
 #### All videos
 summary(MY_TABLE_Videos$NbMInter)
 length(MY_TABLE_Videos$NbMInter[MY_TABLE_Videos$NbMInter > 0])/
-  length(MY_TABLE_Videos$NbMInter)*100 # 68%
+  length(MY_TABLE_Videos$NbMInter)*100 # 73.5%
 #### valid tests
 summary(MY_TABLE_Videos$NbMInter[MY_TABLE_Videos$ExcludeYN ==0])
 length(MY_TABLE_Videos$NbMInter[MY_TABLE_Videos$NbMInter > 0 & MY_TABLE_Videos$ExcludeYN ==0])/
-  length(MY_TABLE_Videos$NbMInter[MY_TABLE_Videos$ExcludeYN ==0])*100 # 74%
+  length(MY_TABLE_Videos$NbMInter[MY_TABLE_Videos$ExcludeYN ==0])*100 # 80.5%
 }
 
 {### Nb of males who didn't court
 #### All videos
 summary(MY_TABLE_Videos_perMale$NBCourt)
 length(MY_TABLE_Videos_perMale$NBCourt[MY_TABLE_Videos_perMale$NBCourt == 0])/
-  length(MY_TABLE_Videos_perMale$NBCourt)*100 # 11%
+  length(MY_TABLE_Videos_perMale$NBCourt)*100 # 12.25%
 #### valid tests
 summary(MY_TABLE_Videos_perMale$NBCourt[MY_TABLE_Videos_perMale$ExcludeYN ==0])
 length(MY_TABLE_Videos_perMale$NBCourt[MY_TABLE_Videos_perMale$NBCourt == 0 & MY_TABLE_Videos_perMale$ExcludeYN ==0])/
-  length(MY_TABLE_Videos_perMale$NBCourt[MY_TABLE_Videos_perMale$ExcludeYN ==0])*100 # 12%
+  length(MY_TABLE_Videos_perMale$NBCourt[MY_TABLE_Videos_perMale$ExcludeYN ==0])*100 # 13%
 }
 
 {### Nb of males who didn't court BUT not because they were eaten (video Done = YES, ConsumYN = NO)
@@ -456,46 +715,60 @@ length(MY_TABLE_Videos_perMale$NBCourt[MY_TABLE_Videos_perMale$NBCourt == 0 & MY
 #### All videos
 summary(MY_TABLE_Videos_perMale$NBCourt[MY_TABLE_Videos_perMale$Done == 1 & !MY_TABLE_Videos_perMale$VideoID%in%Cannibalism$VideoID])
 length(MY_TABLE_Videos_perMale$NBCourt[MY_TABLE_Videos_perMale$NBCourt == 0 & MY_TABLE_Videos_perMale$Done == 1 & !MY_TABLE_Videos_perMale$VideoID%in%Cannibalism$VideoID])/
-  length(MY_TABLE_Videos_perMale$NBCourt[MY_TABLE_Videos_perMale$Done == 1 & !MY_TABLE_Videos_perMale$VideoID%in%Cannibalism$VideoID])*100 # 25% (3/12)
-MY_TABLE_Videos_perMale$Mcol[MY_TABLE_Videos_perMale$NBCourt == 0 & MY_TABLE_Videos_perMale$Done == 1 & !MY_TABLE_Videos_perMale$VideoID%in%Cannibalism$VideoID]
+  length(MY_TABLE_Videos_perMale$NBCourt[MY_TABLE_Videos_perMale$Done == 1 & !MY_TABLE_Videos_perMale$VideoID%in%Cannibalism$VideoID])*100 # 28.6% (4/14)
+MY_TABLE_Videos_perMale$Mcol[MY_TABLE_Videos_perMale$NBCourt == 0 & MY_TABLE_Videos_perMale$Done == 1 & !MY_TABLE_Videos_perMale$VideoID%in%Cannibalism$VideoID] # 2 blues, 2 yellows
 #### valid tests
 summary(MY_TABLE_Videos_perMale$NBCourt[MY_TABLE_Videos_perMale$ExcludeYN ==0 & MY_TABLE_Videos_perMale$Done == 1 & !MY_TABLE_Videos_perMale$VideoID%in%Cannibalism$VideoID])
 length(MY_TABLE_Videos_perMale$NBCourt[MY_TABLE_Videos_perMale$NBCourt == 0 & MY_TABLE_Videos_perMale$ExcludeYN ==0 & MY_TABLE_Videos_perMale$Done == 1 & !MY_TABLE_Videos_perMale$VideoID%in%Cannibalism$VideoID])/
-  length(MY_TABLE_Videos_perMale$NBCourt[MY_TABLE_Videos_perMale$ExcludeYN ==0 & MY_TABLE_Videos_perMale$Done == 1 & !MY_TABLE_Videos_perMale$VideoID%in%Cannibalism$VideoID])*100 # 17% (1/6)
-MY_TABLE_Videos_perMale$Mcol[MY_TABLE_Videos_perMale$ExcludeYN ==0 & MY_TABLE_Videos_perMale$NBCourt == 0 & MY_TABLE_Videos_perMale$Done == 1 & !MY_TABLE_Videos_perMale$VideoID%in%Cannibalism$VideoID]
+  length(MY_TABLE_Videos_perMale$NBCourt[MY_TABLE_Videos_perMale$ExcludeYN ==0 & MY_TABLE_Videos_perMale$Done == 1 & !MY_TABLE_Videos_perMale$VideoID%in%Cannibalism$VideoID])*100 # 25% (2/8)
+MY_TABLE_Videos_perMale$Mcol[MY_TABLE_Videos_perMale$ExcludeYN ==0 & MY_TABLE_Videos_perMale$NBCourt == 0 & MY_TABLE_Videos_perMale$Done == 1 & !MY_TABLE_Videos_perMale$VideoID%in%Cannibalism$VideoID] # 2 yellows
 }
 
 {### Nb of videos where female attacked (or at least intended to)
 #### All videos
 summary(MY_TABLE_Videos$NbIntendedFAttacks)
 length(MY_TABLE_Videos$NbIntendedFAttacks[MY_TABLE_Videos$NbIntendedFAttacks > 0])/
-  length(MY_TABLE_Videos$NbIntendedFAttacks)*100 # 49%
+  length(MY_TABLE_Videos$NbIntendedFAttacks)*100 # 48.0%
 #### valid tests
 summary(MY_TABLE_Videos$NbIntendedFAttacks[MY_TABLE_Videos$ExcludeYN ==0])
 length(MY_TABLE_Videos$NbIntendedFAttacks[MY_TABLE_Videos$NbIntendedFAttacks > 0 & MY_TABLE_Videos$ExcludeYN ==0])/
-  length(MY_TABLE_Videos$NbIntendedFAttacks[MY_TABLE_Videos$ExcludeYN ==0])*100 # 59% 
+  length(MY_TABLE_Videos$NbIntendedFAttacks[MY_TABLE_Videos$ExcludeYN ==0])*100 # 57.1% 
 } 
 
 ### average time watched
 summary(MY_TABLE_Videos$TotalWatch)/60 # in min
 summary(MY_TABLE_Videos$TotalWatch[MY_TABLE_Videos$ExcludeYN ==0])/60 # in min
+summary(MY_TABLE_Videos$TotalWatch[MY_TABLE_Videos$GroupName == 'RedAverse'])/60
+summary(MY_TABLE_Videos$TotalWatch[MY_TABLE_Videos$GroupName == 'RedPreference'])/60
+t.test(MY_TABLE_Videos$TotalWatch[MY_TABLE_Videos$GroupName == 'RedAverse'],
+       MY_TABLE_Videos$TotalWatch[MY_TABLE_Videos$GroupName == 'RedPreference'])
+sd(MY_TABLE_Videos$TotalWatch[MY_TABLE_Videos$GroupName == 'RedAverse']/60)/length(MY_TABLE_Videos$TotalWatch[MY_TABLE_Videos$GroupName == 'RedAverse'])
+sd(MY_TABLE_Videos$TotalWatch[MY_TABLE_Videos$GroupName == 'RedPreference']/60)/length(MY_TABLE_Videos$TotalWatch[MY_TABLE_Videos$GroupName == 'RedPreference'])
+sum(MY_TABLE_Videos$TotalWatch[MY_TABLE_Videos$GroupName == 'RedAverse'])/60/60
+sum(MY_TABLE_Videos$TotalWatch[MY_TABLE_Videos$GroupName == 'RedPreference'])/60/60
+
+
 
 ### average delay to court
 summary(MY_TABLE_Videos_perMale$DelayFirstCourt)/60 # in min
 
 ### average duration courting (out of duration watched)
-summary(60*(MY_TABLE_Videos_perMale$TotalCourtDur/60)/(MY_TABLE_Videos_perMale$TotalWatch/60)) # in min of coursthip per hour
+summary(60*(MY_TABLE_Videos_perMale$TotalCourtDur)/(MY_TABLE_Videos_perMale$TotalWatch)) # in min of coursthip per hour
 
 ### average duration male male interaction (out of duration watched)
-summary(60*(MY_TABLE_Videos$TotalMInterDur/60)/(MY_TABLE_Videos$TotalWatch/60)) # in min of interaction per hour
+summary(60*(MY_TABLE_Videos$TotalMInterDur)/(MY_TABLE_Videos$TotalWatch)) # in min of interaction per hour
 
 ### average delay to male male interaction
 summary(MY_TABLE_Videos$DelayFirstMInter)/60 # in min
 
 ### Nb of courtships that lead to female attack
 summary(Behav_Male_Courtships$FemaleResponsiveness)
-length(Behav_Male_Courtships$FemaleResponsiveness[Behav_Male_Courtships$FemaleResponsiveness == 'Attacks'])/nrow(Behav_Male_Courtships)*100 # 11%
+length(Behav_Male_Courtships$FemaleResponsiveness[Behav_Male_Courtships$FemaleResponsiveness == 'Attacks'])/nrow(Behav_Male_Courtships)*100 # 10.7%
 
+### Nb of attack
+summary(MY_TABLE_Videos$NbFAttacks)
+length(MY_TABLE_Videos$NbFAttacks[MY_TABLE_Videos$NbFAttacks>1])/102*100
+length(MY_TABLE_Videos$NbMphysicalInter[MY_TABLE_Videos$NbMphysicalInter>1])/102*100
 
 
 }
