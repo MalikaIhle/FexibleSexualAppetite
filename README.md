@@ -4,7 +4,8 @@
 simulation of data to see whether planned analyses code works  
 
 ## Raw Data
-databases for individual and breeding monitoring and experimental data as well as for video analyses
+database for individual and breeding monitoring and experimental data ('still' version uploaded 20190227 - evolving version updated elsewhere for newer experiments)
+database for video analyses (still - one database per experiment so this one is 'closed')
 
 ## Data processing
 extract and handle data to create table for analyses
