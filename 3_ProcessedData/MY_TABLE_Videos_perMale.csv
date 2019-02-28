@@ -1,0 +1,205 @@
+"FID","FIDMcol","VideoIDMcol","VideoID","Author","VideoDate","TotalWatch","Done","Mcol","MID","DelayLeaveDish","NbFAttacks","NbIntendedFAttacks","NbMAttacks","NbPushPush","NbRollOverYN","NBCourt","TotalCourtDur","NaiveNBCourt","NaiveTotalCourtDur","TotalWatchNaiveCourt","ExcludeYN","ReasonExclusion","Remarks","DelayFirstFAttack","DelayConsum","DelayFirstMAttack","DelayFirstCourt","DelayNaiveFirstCourt","ConsumYN","Died","GroupName","Kaput"
+102,"102Blue","9Blue",9,"MI",2017-08-26,64,1,"ZBlack",400,23,1,1,0,0,0,0,0,0,0,0,0,NA,NA,42,42,NA,NA,NA,1,0,"RedAverse",1
+102,"102Yellow","9Yellow",9,"MI",2017-08-26,64,1,"ARed",292,0,0,0,0,0,0,0,0,0,0,0,0,NA,NA,NA,NA,NA,NA,NA,0,0,"RedAverse",0
+104,"104Blue","51Blue",51,"LG",2017-09-03,1465,0,"ZBlack",257,15,0,0,0,0,0,1,89,1,89,1465,0,NA,NA,NA,NA,NA,204,204,0,0,"RedAverse",0
+104,"104Yellow","51Yellow",51,"LG",2017-09-03,1465,0,"ARed",54,226,0,0,0,0,0,1,81,1,81,1465,0,NA,NA,NA,NA,NA,1291,1291,1,0,"RedAverse",1
+106,"106Blue","29Blue",29,"MI",2017-08-16,692,0,"ZBlack",60,0,0,0,0,0,0,2,23,2,23,692,1,"BlackMaleDied",NA,NA,NA,NA,490,490,0,1,"RedAverse",1
+106,"106Yellow","29Yellow",29,"MI",2017-08-16,692,0,"ARed",221,0,0,0,0,0,0,2,14,2,14,692,1,"BlackMaleDied",NA,NA,NA,NA,261,261,0,0,"RedAverse",0
+108,"108Blue","27Blue",27,"LG",2017-08-08,6837,1,"ZBlack",94,137,0,0,0,0,0,0,0,0,0,0,1,"FemaleDied","female died during video",NA,NA,NA,NA,NA,0,0,"RedAverse",0
+108,"108Yellow","27Yellow",27,"LG",2017-08-08,6837,1,"ARed",36,0,0,0,2,1,0,1,2,1,2,5089,1,"FemaleDied","female died during video",NA,NA,5089,246,246,0,0,"RedAverse",0
+111,"111Blue","7Blue",7,"MI",2017-08-19,1743,0,"ZBlack",15,22,0,0,0,0,0,0,0,0,0,0,0,NA," Male male competition very intense on video.",NA,NA,NA,NA,NA,0,0,"RedAverse",0
+111,"111Yellow","7Yellow",7,"MI",2017-08-19,1743,0,"ARed",373,3,0,0,1,1,1,0,0,0,0,0,0,NA," Male male competition very intense on video.",NA,NA,91,NA,NA,1,0,"RedAverse",1
+112,"112Blue","31Blue",31,"MI",2017-08-19,426,0,"ZBlack",349,46,1,1,0,0,0,1,8,1,8,291,1,"BlackMaleDied",NA,401,NA,NA,100,100,0,1,"RedPreference",1
+112,"112Yellow","31Yellow",31,"MI",2017-08-19,426,0,"ARed",362,407,0,0,2,0,0,2,21,1,8,291,1,"BlackMaleDied",NA,NA,NA,291,256,256,0,0,"RedPreference",0
+114,"114Blue","52Blue",52,"LG",2017-08-23,1752,0,"ZBlack",367,38,0,0,0,0,0,1,134,0,0,0,1,"FemaleStarved",NA,NA,NA,NA,1552,NA,0,0,"RedAverse",0
+114,"114Yellow","52Yellow",52,"LG",2017-08-23,1752,0,"ARed",368,228,0,0,1,0,1,2,207,0,0,0,1,"FemaleStarved",NA,NA,NA,268,569,NA,0,0,"RedAverse",0
+115,"115Blue","53Blue",53,"LG",2017-08-15,1679,0,"ZBlack",228,6,0,0,0,0,0,1,144,1,144,1679,0,NA,NA,NA,NA,NA,1188,1188,0,0,"RedAverse",0
+115,"115Yellow","53Yellow",53,"LG",2017-08-15,1679,0,"ARed",81,49,0,0,0,0,0,1,546,1,546,1679,0,NA,NA,NA,NA,NA,405,405,1,0,"RedAverse",1
+118,"118Blue","28Blue",28,"LG",2017-08-08,607,1,"ZBlack",44,0,1,1,0,0,0,0,0,0,0,0,0,NA,NA,346,346,NA,NA,NA,1,0,"RedAverse",1
+118,"118Yellow","28Yellow",28,"LG",2017-08-08,607,1,"ARed",41,0,0,0,1,0,1,0,0,0,0,0,0,NA,NA,NA,NA,341,NA,NA,0,0,"RedAverse",0
+119,"119Blue","54Blue",54,"LG",2017-08-12,4756,0,"ZBlack",40,0,0,0,0,0,0,1,36,1,36,4756,0,NA,NA,NA,NA,NA,4700,4700,0,0,"RedAverse",0
+119,"119Yellow","54Yellow",54,"LG",2017-08-12,4756,0,"ARed",9,0,0,0,0,0,0,1,54,1,54,4756,0,NA,NA,NA,NA,NA,4424,4424,1,0,"RedAverse",1
+122,"122Blue","11Blue",11,"MI",2017-09-13,873,0,"ZBlack",263,0,0,0,0,0,0,1,235,1,235,873,0,NA,NA,NA,NA,NA,529,529,0,0,"RedPreference",0
+122,"122Yellow","11Yellow",11,"MI",2017-09-13,873,0,"ARed",148,0,0,0,0,0,0,2,85,2,85,873,0,NA,NA,NA,NA,NA,226,226,1,0,"RedPreference",1
+124,"124Blue","55Blue",55,"LG",2017-08-18,2412,1,"ZBlack",275,57,0,0,0,0,0,1,47,1,47,2412,0,NA,NA,NA,NA,NA,289,289,1,0,"RedAverse",1
+124,"124Yellow","55Yellow",55,"LG",2017-08-18,2412,1,"ARed",277,276,0,0,0,0,0,1,338,1,338,2412,0,NA,NA,NA,NA,NA,286,286,0,0,"RedAverse",0
+126,"126Blue","41Blue",41,"MI",2017-09-07,653,0,"ZBlack",278,12,0,0,0,0,0,6,222,6,222,653,0,NA,NA,NA,NA,NA,98,98,1,0,"RedPreference",1
+126,"126Yellow","41Yellow",41,"MI",2017-09-07,653,0,"ARed",313,0,0,0,0,0,0,1,82,1,82,653,0,NA,NA,NA,NA,NA,336,336,0,0,"RedPreference",0
+128,"128Blue","32Blue",32,"MI",2017-08-08,1343,0,"ZBlack",45,15,0,0,0,0,0,17,203,17,203,1343,1,"RedMaleDied",NA,NA,NA,NA,118,118,0,0,"RedPreference",0
+128,"128Yellow","32Yellow",32,"MI",2017-08-08,1343,0,"ARed",43,14,0,0,0,0,0,0,0,0,0,0,1,"RedMaleDied",NA,NA,NA,NA,NA,NA,0,1,"RedPreference",1
+130,"130Blue","42Blue",42,"MI",2017-09-13,2678,1,"ZBlack",243,34,4,4,0,0,0,3,171,2,167,271,0,NA,NA,271,2615,NA,76,76,0,0,"RedAverse",0
+130,"130Yellow","42Yellow",42,"MI",2017-09-13,2678,1,"ARed",258,150,0,0,0,0,0,3,120,0,0,0,0,NA,NA,NA,NA,NA,985,NA,1,0,"RedAverse",1
+131,"131Blue","33Blue",33,"MI",2017-08-17,1360,0,"ZBlack",22,115,0,0,1,0,0,2,100,2,100,675,1,"BlackMaleDied",NA,NA,NA,675,331,331,0,1,"RedPreference",1
+131,"131Yellow","33Yellow",33,"MI",2017-08-17,1360,0,"ARed",229,0,0,0,0,0,0,1,21,0,0,0,1,"BlackMaleDied",NA,NA,NA,NA,1339,NA,0,0,"RedPreference",0
+133,"133Blue","34Blue",34,"MI",2017-09-19,3227,0,"ZBlack",97,0,0,0,3,1,0,8,1289,0,0,0,1,"BlackMaleDied",NA,NA,NA,33,742,NA,0,1,"RedPreference",1
+133,"133Yellow","34Yellow",34,"MI",2017-09-19,3227,0,"ARed",64,65,0,0,0,0,0,2,42,0,0,0,1,"BlackMaleDied",NA,NA,NA,NA,2562,NA,0,0,"RedPreference",0
+134,"134Blue","69Blue",69,"MI",2017-09-07,126,1,"ZBlack",309,41,0,0,0,0,0,0,0,0,0,0,0,NA,NA,NA,NA,NA,NA,NA,0,0,"RedAverse",0
+134,"134Yellow","69Yellow",69,"MI",2017-09-07,126,1,"ARed",310,44,1,1,1,0,0,0,0,0,0,0,0,NA,NA,123,123,42,NA,NA,1,0,"RedAverse",1
+135,"135Blue","56Blue",56,"LG",2017-08-22,7713,1,"ZBlack",234,556,0,0,0,0,0,1,120,1,120,3096,0,NA,NA,NA,NA,NA,618,618,1,0,"RedPreference",1
+135,"135Yellow","56Yellow",56,"LG",2017-08-22,7713,1,"ARed",244,385,0,0,0,1,1,0,0,0,0,0,0,NA,NA,NA,NA,3096,NA,NA,0,0,"RedPreference",0
+137,"137Blue","57Blue",57,"LG",2017-08-19,1283,0,"ZBlack",231,149,0,0,0,0,0,1,183,1,183,1283,0,NA,NA,NA,NA,NA,161,161,1,0,"RedAverse",1
+137,"137Yellow","57Yellow",57,"LG",2017-08-19,1283,0,"ARed",371,0,0,1,0,0,0,1,77,1,77,1283,0,NA,NA,NA,NA,NA,1115,1115,0,0,"RedAverse",0
+139,"139Blue","58Blue",58,"LG",2017-08-29,720,0,"ZBlack",401,47,0,0,0,0,0,1,42,1,42,720,0,NA,NA,NA,NA,NA,196,196,1,0,"RedPreference",1
+139,"139Yellow","58Yellow",58,"LG",2017-08-29,720,0,"ARed",273,35,0,0,0,0,0,1,27,1,27,720,0,NA,NA,NA,NA,NA,668,668,0,0,"RedPreference",0
+140,"140Blue","59Blue",59,"LG",2017-08-29,845,0,"ZBlack",303,8,0,0,1,0,1,1,405,0,0,0,0,NA,NA,NA,NA,189,440,NA,1,0,"RedAverse",1
+140,"140Yellow","59Yellow",59,"LG",2017-08-29,845,0,"ARed",290,46,0,0,0,0,0,1,547,0,0,0,0,NA,NA,NA,NA,NA,298,NA,0,0,"RedAverse",0
+141,"141Blue","60Blue",60,"LG",2017-08-17,5023,1,"ZBlack",14,81,0,2,0,0,0,9,1428,1,30,553,0,NA,NA,NA,NA,NA,333,333,1,0,"RedAverse",1
+141,"141Yellow","60Yellow",60,"LG",2017-08-17,5023,1,"ARed",92,64,2,3,5,0,1,3,186,0,0,0,0,NA,NA,1852,4778,553,982,NA,0,0,"RedAverse",0
+142,"142Blue","61Blue",61,"LG",2017-08-23,4318,1,"ZBlack",334,5,0,0,0,0,0,2,229,2,229,2400,0,NA,NA,NA,NA,NA,275,275,0,0,"RedAverse",0
+142,"142Yellow","61Yellow",61,"LG",2017-08-23,4318,1,"ARed",18,37,1,1,0,0,0,1,87,1,87,2400,0,NA,NA,2400,2400,NA,1031,1031,1,0,"RedAverse",1
+149,"149Blue","62Blue",62,"LG",2017-08-17,4421,0,"ZBlack",23,59,0,0,1,1,0,1,45,0,0,0,0,NA,NA,NA,NA,61,4126,NA,0,0,"RedAverse",0
+149,"149Yellow","62Yellow",62,"LG",2017-08-17,4421,0,"ARed",28,0,0,1,0,0,0,1,377,0,0,0,0,NA,NA,NA,NA,NA,1286,NA,1,0,"RedAverse",1
+151,"151Blue","63Blue",63,"LG",2017-08-15,915,0,"ZBlack",1,48,0,2,0,0,0,2,148,2,148,915,0,NA,NA,NA,NA,NA,265,265,1,0,"RedAverse",1
+151,"151Yellow","63Yellow",63,"LG",2017-08-15,915,0,"ARed",235,107,0,0,0,0,0,2,101,2,101,915,0,NA,NA,NA,NA,NA,523,523,0,0,"RedAverse",0
+152,"152Blue","64Blue",64,"LG",2017-09-03,1868,0,"ZBlack",91,50,0,0,5,0,2,1,1,1,1,209,0,NA,NA,NA,NA,209,49,49,1,0,"RedAverse",1
+152,"152Yellow","64Yellow",64,"LG",2017-09-03,1868,0,"ARed",51,7,0,1,0,0,0,4,78,2,30,209,0,NA,NA,NA,NA,NA,15,15,0,0,"RedAverse",0
+158,"158Blue","26Blue",26,"LG",2017-08-01,1004,0,"ZBlack",220,72,0,0,0,0,0,1,27,0,0,0,1,"BlackMaleDied",NA,NA,NA,NA,967,NA,0,1,"RedPreference",1
+158,"158Yellow","26Yellow",26,"LG",2017-08-01,1004,0,"ARed",96,54,0,0,3,0,1,1,59,0,0,0,1,"BlackMaleDied",NA,NA,NA,172,387,NA,0,0,"RedPreference",0
+159,"159Blue","25Blue",25,"LG",2017-08-01,2753,0,"ZBlack",214,71,0,0,0,0,0,1,16,1,16,2753,1,"FemaleStarved",NA,NA,NA,NA,2726,2726,0,0,"RedAverse",0
+159,"159Yellow","25Yellow",25,"LG",2017-08-01,2753,0,"ARed",218,22,0,0,0,0,0,2,150,2,150,2753,1,"FemaleStarved",NA,NA,NA,NA,986,986,0,0,"RedAverse",0
+160,"160Blue","12Blue",12,"LG",2017-07-26,485,0,"ZBlack",145,0,0,0,0,0,0,1,191,1,191,485,0,NA,NA,NA,NA,NA,291,291,0,0,"RedAverse",0
+160,"160Yellow","12Yellow",12,"LG",2017-07-26,485,0,"ARed",59,22,0,0,0,0,0,1,61,1,61,485,0,NA,NA,NA,NA,NA,205,205,1,0,"RedAverse",1
+161,"161Blue","18Blue",18,"LG",2017-07-27,261,0,"ZBlack",100,28,0,0,0,0,0,1,49,1,49,261,1,"FemaleStarved","female dies after male black forced copulation",NA,NA,NA,182,182,0,0,"RedPreference",0
+161,"161Yellow","18Yellow",18,"LG",2017-07-27,261,0,"ARed",181,0,0,0,0,0,0,1,124,1,124,261,1,"FemaleStarved","female dies after male black forced copulation",NA,NA,NA,36,36,0,0,"RedPreference",0
+162,"162Blue","6Blue",6,"MI",2017-07-28,2140,0,"ZBlack",387,101,0,0,0,0,0,4,708,0,0,0,0,NA,NA,NA,NA,NA,1122,NA,0,0,"RedPreference",0
+162,"162Yellow","6Yellow",6,"MI",2017-07-28,2140,0,"ARed",305,46,1,1,0,0,0,2,104,2,104,904,0,NA,NA,904,NA,NA,181,181,1,0,"RedPreference",1
+163,"163Blue","19Blue",19,"LG",2017-07-27,235,0,"ZBlack",184,33,0,0,0,0,0,1,43,1,43,235,0,NA,NA,NA,NA,NA,72,72,0,0,"RedAverse",0
+163,"163Yellow","19Yellow",19,"LG",2017-07-27,235,0,"ARed",180,15,0,0,0,0,0,1,110,1,110,235,0,NA,NA,NA,NA,NA,55,55,1,0,"RedAverse",1
+164,"164Blue","13Blue",13,"LG",2017-07-26,3571,0,"ZBlack",259,89,0,2,1,0,1,5,347,4,331,1602,0,NA,NA,NA,NA,1602,96,96,1,0,"RedPreference",1
+164,"164Yellow","13Yellow",13,"LG",2017-07-26,3571,0,"ARed",57,56,0,4,0,0,0,4,322,1,15,1602,0,NA,NA,NA,NA,NA,1004,1004,0,0,"RedPreference",0
+165,"165Blue","21Blue",21,"LG",2017-07-27,1881,0,"ZBlack",213,9,0,0,0,0,0,1,107,1,107,1881,1,"FemaleStarved",NA,NA,NA,NA,1516,1516,0,0,"RedPreference",0
+165,"165Yellow","21Yellow",21,"LG",2017-07-27,1881,0,"ARed",197,3,0,0,0,0,0,1,37,1,37,1881,1,"FemaleStarved",NA,NA,NA,NA,1835,1835,0,0,"RedPreference",0
+166,"166Blue","20Blue",20,"LG",2017-07-27,640,0,"ZBlack",176,0,0,0,0,0,0,1,15,1,15,640,1,"FemaleStarved","female died less than an hour laterafter forced copulation by red male",NA,NA,NA,540,540,0,0,"RedAverse",0
+166,"166Yellow","20Yellow",20,"LG",2017-07-27,640,0,"ARed",185,0,0,0,0,0,0,1,79,1,79,640,1,"FemaleStarved","female died less than an hour laterafter forced copulation by red male",NA,NA,NA,95,95,0,0,"RedAverse",0
+167,"167Blue","14Blue",14,"LG",2017-07-26,910,0,"ZBlack",83,14,0,0,0,0,0,3,274,3,274,885,1,"BlackMaleDied",NA,NA,NA,NA,33,33,0,1,"RedAverse",1
+167,"167Yellow","14Yellow",14,"LG",2017-07-26,910,0,"ARed",84,156,0,0,0,0,1,1,41,1,41,885,1,"BlackMaleDied",NA,NA,NA,885,462,462,0,0,"RedAverse",0
+168,"168Blue","15Blue",15,"LG",2017-07-26,452,0,"ZBlack",101,0,0,0,0,0,0,0,0,0,0,0,1,"FemaleDied",NA,NA,NA,NA,NA,NA,0,0,"RedPreference",0
+168,"168Yellow","15Yellow",15,"LG",2017-07-26,452,0,"ARed",93,0,0,0,0,0,0,1,56,1,56,452,1,"FemaleDied",NA,NA,NA,NA,191,191,0,0,"RedPreference",0
+169,"169Blue","23Blue",23,"LG",2017-07-27,1037,0,"ZBlack",177,19,0,0,3,1,0,3,303,0,0,0,0,NA,NA,NA,NA,107,390,NA,1,0,"RedPreference",1
+169,"169Yellow","23Yellow",23,"LG",2017-07-27,1037,0,"ARed",147,1,0,0,0,0,0,1,56,0,0,0,0,NA,NA,NA,NA,NA,938,NA,0,0,"RedPreference",0
+171,"171Blue","5Blue",5,"MI",2017-07-28,1493,1,"ZBlack",6,20,1,1,0,0,0,4,121,1,11,348,0,NA,"male attacked and half consumed (still alive) but other male made the female dropped it (on video?)",1493,1493,NA,212,212,1,0,"RedAverse",1
+171,"171Yellow","5Yellow",5,"MI",2017-07-28,1493,1,"ARed",245,61,1,1,0,0,0,6,139,1,49,348,0,NA,"male attacked and half consumed (still alive) but other male made the female dropped it (on video?)",348,NA,NA,299,299,0,0,"RedAverse",0
+172,"172Blue","16Blue",16,"LG",2017-07-26,1754,0,"ZBlack",87,0,0,0,0,0,0,1,86,1,86,1752,0,NA,NA,NA,NA,NA,1615,1615,1,0,"RedAverse",1
+172,"172Yellow","16Yellow",16,"LG",2017-07-26,1754,0,"ARed",311,0,0,0,1,0,1,2,603,2,603,1752,0,NA,NA,NA,NA,1752,26,26,0,0,"RedAverse",0
+173,"173Blue","24Blue",24,"LG",2017-07-28,598,0,"ZBlack",256,51,0,0,0,0,0,1,62,0,0,0,0,NA,NA,NA,NA,NA,498,NA,1,0,"RedPreference",1
+173,"173Yellow","24Yellow",24,"LG",2017-07-28,598,0,"ARed",356,1,0,0,1,0,1,1,10,0,0,0,0,NA,NA,NA,NA,14,254,NA,0,0,"RedPreference",0
+174,"174Blue","22Blue",22,"LG",2017-07-27,1368,0,"ZBlack",150,720,0,0,0,0,0,1,62,1,62,1307,0,NA,NA,NA,NA,NA,1245,1245,1,0,"RedAverse",1
+174,"174Yellow","22Yellow",22,"LG",2017-07-27,1368,0,"ARed",182,7,0,0,2,1,1,3,534,3,534,1307,0,NA,NA,NA,NA,1307,356,356,0,0,"RedAverse",0
+175,"175Blue","17Blue",17,"LG",2017-07-26,570,0,"ZBlack",61,29,0,0,0,0,0,2,93,2,93,570,0,NA,NA,NA,NA,NA,75,75,1,0,"RedPreference",1
+175,"175Yellow","17Yellow",17,"LG",2017-07-26,570,0,"ARed",35,12,0,0,0,0,0,2,316,2,316,570,0,NA,NA,NA,NA,NA,375,375,0,0,"RedPreference",0
+186,"186Blue","74Blue",74,"MI",2018-09-04,2464,0,"ZBlack",372,55,0,0,0,0,0,0,0,0,0,0,0,NA,"black faded",NA,NA,NA,NA,NA,1,0,"RedPreference",1
+186,"186Yellow","74Yellow",74,"MI",2018-09-04,2464,0,"ARed",374,16,0,1,2,0,0,8,1033,0,0,0,0,NA,"black faded",NA,NA,105,416,NA,0,0,"RedPreference",0
+190,"190Blue","65Blue",65,"LG",2017-08-29,5949,1,"ZBlack",288,354,2,2,0,0,0,1,28,0,0,0,0,NA,NA,1150,4321,NA,1080,NA,1,0,"RedAverse",1
+190,"190Yellow","65Yellow",65,"LG",2017-08-29,5949,1,"ARed",308,141,0,0,9,1,1,4,1234,0,0,0,0,NA,NA,NA,NA,202,508,NA,0,0,"RedAverse",0
+191,"191Blue","8Blue",8,"MI",2017-08-29,5298,1,"ZBlack",351,0,0,0,0,0,0,0,0,0,0,0,1,"BlackMaleDied","red male copulated on video, black male dies on video",NA,NA,NA,NA,NA,0,1,"RedPreference",1
+191,"191Yellow","8Yellow",8,"MI",2017-08-29,5298,1,"ARed",307,59,0,0,0,0,0,7,945,7,945,5298,1,"BlackMaleDied","red male copulated on video, black male dies on video",NA,NA,NA,479,479,0,0,"RedPreference",0
+192,"192Blue","39Blue",39,"MI",2017-09-13,4201,0,"ZBlack",306,143,0,0,0,0,0,3,286,3,286,4201,1,"RedMaleDied",NA,NA,NA,NA,2044,2044,0,0,"RedPreference",0
+192,"192Yellow","39Yellow",39,"MI",2017-09-13,4201,0,"ARed",17,375,0,0,0,0,0,5,144,5,144,4201,1,"RedMaleDied",NA,NA,NA,NA,910,910,0,1,"RedPreference",1
+193,"193Blue","35Blue",35,"MI",2017-09-13,386,0,"ZBlack",24,288,0,0,0,0,0,2,51,1,31,254,1,"RedMaleDied","replaced males 9/13 (red male painted all black back abdomen died)",NA,NA,NA,147,147,0,0,"RedPreference",0
+193,"193Yellow","35Yellow",35,"MI",2017-09-13,386,0,"ARed",53,45,1,1,0,0,0,2,94,2,94,254,1,"RedMaleDied","replaced males 9/13 (red male painted all black back abdomen died)",254,NA,NA,134,134,0,1,"RedPreference",1
+194,"194Blue","66Blue",66,"LG",2017-08-24,5622,0,"ZBlack",389,76,0,0,0,0,0,7,553,7,553,5622,0,NA,NA,NA,NA,NA,126,126,1,0,"RedAverse",1
+194,"194Yellow","66Yellow",66,"LG",2017-08-24,5622,0,"ARed",375,6,0,0,0,0,0,3,45,3,45,5622,0,NA,NA,NA,NA,NA,5008,5008,0,0,"RedAverse",0
+195,"195Blue","67Blue",67,"LG",2017-09-03,4740,0,"ZBlack",232,12,0,1,2,0,2,2,437,0,0,0,0,NA,NA,NA,NA,120,3298,NA,1,0,"RedAverse",1
+195,"195Yellow","67Yellow",67,"LG",2017-09-03,4740,0,"ARed",3,45,0,0,0,0,0,2,632,0,0,0,0,NA,NA,NA,NA,NA,1281,NA,0,0,"RedAverse",0
+200,"200Blue","90Blue",90,"MI",2018-08-29,1796,0,"ZBlack",289,0,2,2,0,0,0,4,53,0,0,0,0,NA,NA,58,NA,NA,121,NA,1,0,"RedAverse",1
+200,"200Yellow","90Yellow",90,"MI",2018-08-29,1796,0,"ARed",348,23,0,0,0,0,0,0,0,0,0,0,0,NA,NA,NA,NA,NA,NA,NA,0,0,"RedAverse",0
+202,"202Blue","75Blue",75,"MI",2018-08-23,6695,1,"ZBlack",85,298,9,9,0,0,0,15,565,6,175,1878,0,NA,NA,2136,6640,NA,505,505,1,0,"RedPreference",1
+202,"202Yellow","75Yellow",75,"MI",2018-08-23,6695,1,"ARed",80,0,0,0,1,0,0,20,504,1,46,1878,0,NA,NA,NA,NA,1878,232,232,0,0,"RedPreference",0
+203,"203Blue","76Blue",76,"MI",2018-08-22,1779,0,"ZBlack",260,71,1,1,0,0,0,6,287,1,12,718,0,NA,NA,1410,NA,NA,459,459,1,0,"RedAverse",1
+203,"203Yellow","76Yellow",76,"MI",2018-08-22,1779,0,"ARed",179,374,1,1,0,0,0,7,154,4,101,718,0,NA,NA,718,NA,NA,287,287,0,0,"RedAverse",0
+204,"204Blue","43Blue",43,"MI",2017-08-24,1757,0,"ZBlack",72,568,0,0,0,0,0,2,88,2,88,1757,0,NA,NA,NA,NA,NA,1586,1586,1,0,"RedPreference",1
+204,"204Yellow","43Yellow",43,"MI",2017-08-24,1757,0,"ARed",75,294,0,0,0,0,0,3,162,3,162,1757,0,NA,NA,NA,NA,NA,663,663,0,0,"RedPreference",0
+206,"206Blue","44Blue",44,"MI",2017-09-13,4911,1,"ZBlack",52,197,9,12,0,0,0,9,571,1,19,196,0,NA,NA,229,4911,NA,145,145,1,0,"RedAverse",1
+206,"206Yellow","44Yellow",44,"MI",2017-09-13,4911,1,"ARed",99,62,1,2,2,0,0,2,107,0,0,0,0,NA,NA,263,NA,196,260,NA,0,0,"RedAverse",0
+207,"207Blue","38Blue",38,"MI",2017-09-13,3787,0,"ZBlack",86,86,0,0,0,0,0,3,65,3,65,3787,1,"BlackMaleDied","video on and off (looking in trees half way);skipped on day when males repainted 9/21",NA,NA,NA,46,46,0,1,"RedPreference",1
+207,"207Yellow","38Yellow",38,"MI",2017-09-13,3787,0,"ARed",13,0,0,0,0,0,0,0,0,0,0,0,1,"BlackMaleDied","video on and off (looking in trees half way);skipped on day when males repainted 9/21",NA,NA,NA,NA,NA,0,0,"RedPreference",0
+209,"209Blue","45Blue",45,"MI",2017-08-31,1670,0,"ZBlack",233,275,0,0,2,0,0,3,115,2,114,927,0,NA,NA,NA,NA,927,796,796,1,0,"RedAverse",1
+209,"209Yellow","45Yellow",45,"MI",2017-08-31,1670,0,"ARed",272,0,0,0,0,0,0,1,4,1,4,927,0,NA,NA,NA,NA,NA,68,68,0,0,"RedAverse",0
+211,"211Blue","46Blue",46,"MI",2017-09-17,2176,0,"ZBlack",291,268,0,0,0,0,0,2,30,2,30,2176,0,NA,NA,NA,NA,NA,2051,2051,1,0,"RedPreference",1
+211,"211Yellow","46Yellow",46,"MI",2017-09-17,2176,0,"ARed",388,89,0,0,0,0,0,1,191,1,191,2176,0,NA,NA,NA,NA,NA,1616,1616,0,0,"RedPreference",0
+223,"223Blue","70Blue",70,"MI",2017-09-04,4785,1,"ZBlack",376,15,0,1,0,1,0,9,273,0,0,0,0,NA,NA,NA,NA,334,383,NA,0,0,"RedPreference",0
+223,"223Yellow","70Yellow",70,"MI",2017-09-04,4785,1,"ARed",50,507,1,5,0,0,0,3,297,0,0,0,0,NA,NA,4321,4321,NA,389,NA,1,0,"RedPreference",1
+224,"224Blue","93Blue",93,"LG",2017-10-04,6064,1,"ZBlack",346,75,0,0,0,0,0,2,641,0,0,0,0,NA,"video only 1h40",NA,NA,NA,810,NA,1,0,"RedPreference",1
+224,"224Yellow","93Yellow",93,"LG",2017-10-04,6064,1,"ARed",328,157,0,0,15,7,2,2,289,0,0,0,0,NA,"video only 1h40",NA,NA,498,2548,NA,0,0,"RedPreference",0
+226,"226Blue","96Blue",96,"LG",2017-08-26,5425,0,"ZBlack",11,261,0,0,2,0,2,2,523,0,0,0,0,NA,NA,NA,NA,1119,2486,NA,1,0,"RedPreference",1
+226,"226Yellow","96Yellow",96,"LG",2017-08-26,5425,0,"ARed",10,170,0,0,0,0,0,2,396,1,44,1119,0,NA,NA,NA,NA,NA,335,335,0,0,"RedPreference",0
+227,"227Blue","97Blue",97,"LG",2017-08-31,7225,1,"ZBlack",361,163,0,2,2,1,1,1,34,0,0,0,0,NA,NA,NA,NA,183,4058,NA,1,0,"RedPreference",1
+227,"227Yellow","97Yellow",97,"LG",2017-08-31,7225,1,"ARed",335,39,0,0,0,0,0,0,0,0,0,0,0,NA,NA,NA,NA,NA,NA,NA,0,0,"RedPreference",0
+236,"236Blue","98Blue",98,"LG",2017-09-05,3586,0,"ZBlack",12,0,0,0,0,0,0,2,57,0,0,0,0,NA,NA,NA,NA,NA,2895,NA,1,0,"RedAverse",1
+236,"236Yellow","98Yellow",98,"LG",2017-09-05,3586,0,"ARed",8,227,0,1,1,1,1,4,349,2,218,1802,0,NA,NA,NA,NA,1802,375,375,0,0,"RedAverse",0
+241,"241Blue","37Blue",37,"MI",2017-09-03,450,0,"ZBlack",90,29,1,1,0,0,0,3,89,3,89,432,1,"BlackMaleDied",NA,432,NA,NA,104,104,0,1,"RedPreference",1
+241,"241Yellow","37Yellow",37,"MI",2017-09-03,450,0,"ARed",146,63,0,0,0,0,0,4,118,4,118,432,1,"BlackMaleDied",NA,NA,NA,NA,95,95,0,0,"RedPreference",0
+249,"249Blue","77Blue",77,"MI",2018-09-04,7172,1,"ZBlack",382,13,0,0,0,0,0,2,28,0,0,0,1,"FemaleStarved",NA,NA,NA,NA,6976,NA,0,0,"RedAverse",0
+249,"249Yellow","77Yellow",77,"MI",2018-09-04,7172,1,"ARed",355,0,1,2,1,0,0,7,180,0,0,0,1,"FemaleStarved",NA,6927,NA,412,4090,NA,0,0,"RedAverse",0
+250,"250Blue","99Blue",99,"LG",2017-09-13,2266,0,"ZBlack",198,378,0,0,2,1,0,3,848,1,47,441,0,NA,NA,NA,NA,441,394,394,0,0,"RedPreference",0
+250,"250Yellow","99Yellow",99,"LG",2017-09-13,2266,0,"ARed",88,130,0,1,0,0,0,1,5,0,0,0,0,NA,NA,NA,NA,NA,575,NA,1,0,"RedPreference",1
+252,"252Blue","71Blue",71,"MI",2017-09-07,4541,1,"ZBlack",293,20,3,3,0,1,0,3,54,0,0,0,0,NA,NA,97,4503,3205,3867,NA,1,0,"RedAverse",1
+252,"252Yellow","71Yellow",71,"MI",2017-09-07,4541,1,"ARed",312,51,2,3,0,0,0,4,60,0,0,0,0,NA,NA,3802,NA,NA,3706,NA,0,0,"RedAverse",0
+253,"253Blue","100Blue",100,"LG",2017-09-04,2968,0,"ZBlack",39,19,0,0,1,0,0,4,800,3,490,1298,1,"FemaleStarved","skipped on day when males repainted; Red forced copulation when female dying.",NA,NA,1298,29,29,0,0,"RedAverse",0
+253,"253Yellow","100Yellow",100,"LG",2017-09-04,2968,0,"ARed",364,2044,0,0,0,0,0,1,219,0,0,0,1,"FemaleStarved","skipped on day when males repainted; Red forced copulation when female dying.",NA,NA,NA,2566,NA,0,0,"RedAverse",0
+264,"264Blue","101Blue",101,"LG",2017-09-07,2548,0,"ZBlack",314,129,0,0,0,0,0,1,378,1,378,2548,1,"FemaleStarved",NA,NA,NA,NA,2170,2170,0,0,"RedPreference",0
+264,"264Yellow","101Yellow",101,"LG",2017-09-07,2548,0,"ARed",279,299,0,0,0,0,0,1,168,1,168,2548,1,"FemaleStarved",NA,NA,NA,NA,1473,1473,0,0,"RedPreference",0
+265,"265Blue","102Blue",102,"LG",2017-09-15,2507,0,"ZBlack",353,0,0,0,3,1,1,0,0,0,0,0,0,NA,NA,NA,NA,25,NA,NA,0,0,"RedAverse",0
+265,"265Yellow","102Yellow",102,"LG",2017-09-15,2507,0,"ARed",19,0,0,0,0,0,0,0,0,0,0,0,0,NA,NA,NA,NA,NA,NA,NA,1,0,"RedAverse",1
+266,"266Blue","103Blue",103,"LG",2017-09-23,2537,0,"ZBlack",280,406,0,0,0,0,0,2,137,2,137,2537,0,NA,NA,NA,NA,NA,1596,1596,1,0,"RedPreference",1
+266,"266Yellow","103Yellow",103,"LG",2017-09-23,2537,0,"ARed",326,0,0,0,0,0,0,2,94,2,94,2537,0,NA,NA,NA,NA,NA,1481,1481,0,0,"RedPreference",0
+267,"267Blue","104Blue",104,"LG",2017-09-15,2998,0,"ZBlack",354,16,0,0,0,0,0,1,179,1,179,2998,0,NA,NA,NA,NA,NA,1879,1879,1,0,"RedPreference",1
+267,"267Yellow","104Yellow",104,"LG",2017-09-15,2998,0,"ARed",369,47,0,1,0,0,0,1,77,1,77,2998,0,NA,NA,NA,NA,NA,2812,2812,0,0,"RedPreference",0
+269,"269Blue","105Blue",105,"LG",2017-09-17,3256,0,"ZBlack",363,220,0,0,0,0,0,1,62,1,62,3256,0,NA,NA,NA,NA,NA,1919,1919,0,0,"RedPreference",0
+269,"269Yellow","105Yellow",105,"LG",2017-09-17,3256,0,"ARed",352,97,0,1,0,0,0,3,769,3,769,3256,0,NA,NA,NA,NA,NA,1116,1116,1,0,"RedPreference",1
+270,"270Blue","106Blue",106,"LG",2017-09-23,1257,0,"ZBlack",317,120,0,2,3,1,0,2,106,1,76,156,0,NA,NA,NA,NA,484,80,80,0,0,"RedPreference",0
+270,"270Yellow","106Yellow",106,"LG",2017-09-23,1257,0,"ARed",48,156,0,1,2,1,0,1,292,0,0,0,0,NA,NA,NA,NA,156,959,NA,1,0,"RedPreference",1
+271,"271Blue","47Blue",47,"MI",2017-09-19,556,0,"ZBlack",183,115,1,1,0,0,0,2,43,1,23,191,0,NA,NA,191,NA,NA,178,178,1,0,"RedPreference",1
+271,"271Yellow","47Yellow",47,"MI",2017-09-19,556,0,"ARed",67,0,0,0,1,0,0,1,68,0,0,0,0,NA,NA,NA,NA,406,488,NA,0,0,"RedPreference",0
+281,"281Blue","72Blue",72,"MI",2017-09-13,4290,1,"ZBlack",16,27,2,2,0,0,0,5,276,3,129,1496,0,NA,NA,1496,NA,NA,90,90,0,0,"RedAverse",0
+281,"281Yellow","72Yellow",72,"MI",2017-09-13,4290,1,"ARed",73,843,1,1,0,0,0,0,0,0,0,0,0,NA,NA,4221,4221,NA,NA,NA,1,0,"RedAverse",1
+282,"282Blue","107Blue",107,"LG",2017-10-04,2244,0,"ZBlack",403,122,0,0,0,0,0,1,30,0,0,0,1,"FemaleStarved","female died after red male forced copulation",NA,NA,NA,1511,NA,0,0,"RedAverse",0
+282,"282Yellow","107Yellow",107,"LG",2017-10-04,2244,0,"ARed",336,40,0,0,5,2,1,2,417,0,0,0,1,"FemaleStarved","female died after red male forced copulation",NA,NA,375,483,NA,0,0,"RedAverse",0
+283,"283Blue","108Blue",108,"LG",2017-09-23,1037,0,"ZBlack",324,93,0,0,0,0,0,2,508,1,468,752,0,NA,NA,NA,NA,NA,31,31,0,0,"RedPreference",0
+283,"283Yellow","108Yellow",108,"LG",2017-09-23,1037,0,"ARed",33,103,0,0,2,1,0,2,310,1,277,752,0,NA,NA,NA,NA,752,473,473,1,0,"RedPreference",1
+284,"284Blue","109Blue",109,"LG",2017-09-15,4799,0,"ZBlack",7,149,0,0,2,0,1,0,0,0,0,0,0,NA,NA,NA,NA,267,NA,NA,1,0,"RedAverse",1
+284,"284Yellow","109Yellow",109,"LG",2017-09-15,4799,0,"ARed",262,85,0,0,0,0,0,0,0,0,0,0,0,NA,NA,NA,NA,NA,NA,NA,0,0,"RedAverse",0
+285,"285Blue","110Blue",110,"LG",2017-09-22,2368,0,"ZBlack",62,145,0,0,2,2,0,2,502,0,0,0,0,NA,NA,NA,NA,121,211,NA,1,0,"RedPreference",1
+285,"285Yellow","110Yellow",110,"LG",2017-09-22,2368,0,"ARed",242,NA,0,0,0,0,0,2,194,0,0,0,0,NA,NA,NA,NA,NA,1617,NA,0,0,"RedPreference",0
+286,"286Blue","111Blue",111,"LG",2017-09-15,2089,0,"ZBlack",332,NA,0,2,0,0,0,2,177,2,177,2089,0,NA,NA,NA,NA,NA,1588,1588,1,0,"RedPreference",1
+286,"286Yellow","111Yellow",111,"LG",2017-09-15,2089,0,"ARed",347,37,0,0,0,0,0,1,252,1,252,2089,0,NA,NA,NA,NA,NA,285,285,0,0,"RedPreference",0
+295,"295Blue","112Blue",112,"LG",2017-09-22,1185,0,"ZBlack",69,43,0,1,0,0,0,1,148,1,148,1185,0,NA,"black male looked weak in vial, female attacked red who escaped then black who couldn’t",NA,NA,NA,105,105,1,0,"RedPreference",1
+295,"295Yellow","112Yellow",112,"LG",2017-09-22,1185,0,"ARed",77,113,0,0,0,0,0,1,481,1,481,1185,0,NA,"black male looked weak in vial, female attacked red who escaped then black who couldn’t",NA,NA,NA,483,483,0,0,"RedPreference",0
+297,"297Blue","78Blue",78,"MI",2018-09-13,172,0,"ZBlack",31,169,0,0,3,1,1,0,0,0,0,0,0,NA,NA,NA,NA,72,NA,NA,0,0,"RedAverse",0
+297,"297Yellow","78Yellow",78,"MI",2018-09-13,172,0,"ARed",25,24,0,0,2,1,0,0,0,0,0,0,0,NA,NA,NA,NA,67,NA,NA,1,0,"RedAverse",1
+298,"298Blue","79Blue",79,"MI",2018-09-22,1784,0,"ZBlack",246,197,0,0,0,0,0,1,154,1,154,1784,0,NA,NA,NA,NA,NA,1580,1580,1,0,"RedPreference",1
+298,"298Yellow","79Yellow",79,"MI",2018-09-22,1784,0,"ARed",5,78,0,0,0,0,0,1,29,1,29,1784,0,NA,NA,NA,NA,NA,426,426,0,0,"RedPreference",0
+299,"299Blue","80Blue",80,"MI",2018-09-22,1184,0,"ZBlack",78,114,0,0,0,0,0,1,32,1,32,593,0,NA,NA,NA,NA,NA,427,427,1,0,"RedPreference",1
+299,"299Yellow","80Yellow",80,"MI",2018-09-22,1184,0,"ARed",316,16,1,1,0,1,0,3,388,0,0,0,0,NA,NA,1118,NA,593,674,NA,0,0,"RedPreference",0
+301,"301Blue","81Blue",81,"MI",2018-09-16,936,0,"ZBlack",304,37,1,1,1,0,0,1,3,0,0,0,0,NA,NA,872,NA,922,869,NA,1,0,"RedPreference",1
+301,"301Yellow","81Yellow",81,"MI",2018-09-16,936,0,"ARed",2,0,0,0,1,0,0,1,181,0,0,0,0,NA,NA,NA,NA,346,703,NA,0,0,"RedPreference",0
+318,"318Blue","30Blue",30,"MI",2017-09-16,1693,0,"ZBlack",144,16,0,0,0,0,0,17,219,17,219,1693,1,"BlackMaleDied","black faded (day after - initially found by Calum - black male could have been consumed)",NA,NA,NA,332,332,0,1,"RedAverse",1
+318,"318Yellow","30Yellow",30,"MI",2017-09-16,1693,0,"ARed",222,1693,0,0,0,0,0,1,3,1,3,1693,1,"BlackMaleDied","black faded (day after - initially found by Calum - black male could have been consumed)",NA,NA,NA,918,918,0,0,"RedAverse",0
+319,"319Blue","82Blue",82,"MI",2018-10-04,913,0,"ZBlack",276,21,1,1,0,0,0,3,158,0,0,0,0,NA,NA,346,NA,NA,327,NA,0,0,"RedAverse",0
+319,"319Yellow","82Yellow",82,"MI",2018-10-04,913,0,"ARed",331,67,1,1,3,0,0,4,239,0,0,0,0,NA,NA,346,NA,243,353,NA,1,0,"RedAverse",1
+320,"320Blue","73Blue",73,"MI",2017-09-16,1124,1,"ZBlack",216,59,1,1,0,0,0,6,92,1,38,462,0,NA,NA,1064,1064,NA,212,212,1,0,"RedPreference",1
+320,"320Yellow","73Yellow",73,"MI",2017-09-16,1124,1,"ARed",217,91,1,1,0,0,0,1,5,0,0,0,0,NA,NA,462,NA,NA,513,NA,0,0,"RedPreference",0
+323,"323Blue","83Blue",83,"MI",2018-09-24,4484,0,"ZBlack",26,206,0,0,0,0,0,5,440,5,440,4484,0,NA,NA,NA,NA,NA,1039,1039,1,0,"RedAverse",1
+323,"323Yellow","83Yellow",83,"MI",2018-09-24,4484,0,"ARed",70,0,0,0,0,0,0,1,111,1,111,4484,0,NA,NA,NA,NA,NA,4104,4104,0,0,"RedAverse",0
+337,"337Blue","84Blue",84,"MI",2018-10-04,5408,0,"ZBlack",219,0,0,0,0,0,0,3,64,0,0,0,0,NA,NA,NA,NA,NA,5253,NA,0,0,"RedPreference",0
+337,"337Yellow","84Yellow",84,"MI",2018-10-04,5408,0,"ARed",380,45,2,2,0,0,0,7,109,0,0,0,0,NA,NA,40,NA,NA,47,NA,1,0,"RedPreference",1
+340,"340Blue","85Blue",85,"MI",2018-09-23,1484,0,"ZBlack",55,744,1,1,0,0,0,4,309,4,309,734,0,NA,NA,744,NA,NA,166,166,0,0,"RedPreference",0
+340,"340Yellow","85Yellow",85,"MI",2018-09-23,1484,0,"ARed",56,673,0,0,1,0,0,2,41,0,0,0,0,NA,NA,NA,NA,734,934,NA,1,0,"RedPreference",1
+341,"341Blue","86Blue",86,"MI",2018-10-20,3954,0,"ZBlack",47,14,0,0,0,0,0,3,508,3,508,3954,0,NA,NA,NA,NA,NA,1309,1309,1,0,"RedAverse",1
+341,"341Yellow","86Yellow",86,"MI",2018-10-20,3954,0,"ARed",366,120,0,0,0,0,0,2,92,2,92,3954,0,NA,NA,NA,NA,NA,3765,3765,0,0,"RedAverse",0
+342,"342Blue","87Blue",87,"MI",2018-09-19,2562,0,"ZBlack",199,0,1,1,0,0,0,2,77,1,24,2160,1,"FemaleDied","female died, black male try to copulate or eat her (weird)",2160,NA,NA,424,424,0,0,"RedPreference",0
+342,"342Yellow","87Yellow",87,"MI",2018-09-19,2562,0,"ARed",95,60,0,0,0,0,0,5,56,0,0,0,1,"FemaleDied","female died, black male try to copulate or eat her (weird)",NA,NA,NA,2282,NA,0,0,"RedPreference",0
+343,"343Blue","88Blue",88,"MI",2018-09-24,1294,0,"ZBlack",82,58,0,0,7,2,2,0,0,0,0,0,0,NA,NA,NA,NA,661,NA,NA,1,0,"RedPreference",1
+343,"343Yellow","88Yellow",88,"MI",2018-09-24,1294,0,"ARed",74,92,0,0,1,1,0,2,47,1,43,661,0,NA,NA,NA,NA,1134,619,619,0,0,"RedPreference",0
+404,"404Blue","48Blue",48,"MI",2017-11-01,2364,0,"ZBlack",402,256,0,0,0,0,0,4,98,0,0,0,0,NA,NA,NA,NA,NA,1768,NA,0,0,"RedAverse",0
+404,"404Yellow","48Yellow",48,"MI",2017-11-01,2364,0,"ARed",379,439,1,1,0,0,0,3,60,1,51,1371,0,NA,NA,1371,NA,NA,1331,1331,1,0,"RedAverse",1
+406,"406Blue","49Blue",49,"MI",2017-11-01,874,0,"ZBlack",370,14,0,1,0,0,0,2,61,2,61,874,0,NA,NA,NA,NA,NA,700,700,1,0,"RedPreference",1
+406,"406Yellow","49Yellow",49,"MI",2017-11-01,874,0,"ARed",378,0,0,1,0,0,0,1,182,1,182,874,0,NA,NA,NA,NA,NA,164,164,0,0,"RedPreference",0
+408,"408Blue","50Blue",50,"MI",2017-11-03,2429,0,"ZBlack",350,88,1,1,0,0,0,9,442,1,16,981,0,NA,NA,2124,NA,NA,958,958,1,0,"RedAverse",1
+408,"408Yellow","50Yellow",50,"MI",2017-11-03,2429,0,"ARed",384,18,0,0,0,1,0,3,40,0,0,0,0,NA,NA,NA,NA,981,2199,NA,0,0,"RedAverse",0
+409,"409Blue","89Blue",89,"MI",2018-11-01,1543,0,"ZBlack",383,378,1,1,0,0,0,2,141,1,124,1463,0,NA,NA,1463,NA,NA,182,182,1,0,"RedPreference",1
+409,"409Yellow","89Yellow",89,"MI",2018-11-01,1543,0,"ARed",381,16,0,0,0,0,0,3,344,3,344,1463,0,NA,NA,NA,NA,NA,503,503,0,0,"RedPreference",0
+411,"411Blue","91Blue",91,"MI",2018-11-03,2850,0,"ZBlack",386,25,1,3,0,0,0,14,938,14,938,2846,0,NA,NA,2846,NA,NA,1180,1180,0,0,"RedAverse",0
+411,"411Yellow","91Yellow",91,"MI",2018-11-03,2850,0,"ARed",385,952,0,1,0,0,0,7,177,7,177,2846,0,NA,NA,NA,NA,NA,2386,2386,1,0,"RedAverse",1
+414,"414Blue","92Blue",92,"MI",2018-11-01,3134,0,"ZBlack",325,634,1,2,0,0,0,1,145,0,0,0,0,NA,NA,632,NA,NA,2946,NA,1,0,"RedAverse",1
+414,"414Yellow","92Yellow",92,"MI",2018-11-01,3134,0,"ARed",330,419,0,0,0,0,0,6,197,0,0,0,0,NA,NA,NA,NA,NA,1027,NA,0,0,"RedAverse",0

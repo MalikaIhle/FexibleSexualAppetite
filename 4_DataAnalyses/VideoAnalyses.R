@@ -617,7 +617,13 @@ modFconsumAttackRate <- lmer(ConsumYN~ Mcol
                    ,data = MY_TABLE_Videos_perMale, REML =FALSE)
 summary(modFconsumAttackRate) # N=204, only trendy if consider attack rate
 
-modFconsumAttackRateValidTests <- lmer(ConsumYN~ Mcol
+
+##
+## the correct version??
+##
+
+modFconsumAttackRateValidTests <- lmer(ConsumYN~ 
+                             #Mcol
                              #*GroupName
                              +I(NbFAttacks/TotalWatch) + (1|FID)
                              ,data = MY_TABLE_Videos_perMale[MY_TABLE_Videos_perMale$ExcludeYN == 0,], REML =FALSE)
@@ -629,13 +635,18 @@ summary(modFconsumAttackRateValidTests) # n= 154  Nb attack almost predicts furt
 ### should test only in valid test, as non valid test, a spider died ?
 ### select a focal male per test since consumYN is the opposite for the other
 
-modFconsumAttackRateValidTestsWithoutPseuRep <- lmer(ConsumYN~ 
-                                       # Mcol
-                                       #*GroupName
-                                       +I(NbFAttacks/TotalWatch) + (1|FID)
-                                       ,data = MY_TABLE_Videos_perMale[MY_TABLE_Videos_perMale$ExcludeYN == 0,], REML =FALSE)
+  ##### sample one male per test
+#MY_TABLE_Videos_perFocalMale <- data.frame(MY_TABLE_Videos_perMale %>% group_by(FID) %>% sample_n(1))
+MY_TABLE_Videos_perFocalMale1 <- data.frame(MY_TABLE_Videos_perMale %>% group_by(FID) %>% filter(row_number()==1))
+MY_TABLE_Videos_perFocalMale2 <- data.frame(MY_TABLE_Videos_perMale %>% group_by(FID) %>% filter(row_number()==2))
+
+modFconsumAttackRateValidTestsWithoutPseuRep <- lm(ConsumYN~ I(NbFAttacks/TotalWatch)
+                                       ,data = MY_TABLE_Videos_perFocalMale1[MY_TABLE_Videos_perFocalMale1$ExcludeYN == 0,])
 summary(modFconsumAttackRateValidTestsWithoutPseuRep)
 
+modFconsumAttackRateValidTestsWithoutPseuRep2 <- lm(ConsumYN~ I(NbFAttacks/TotalWatch)
+                                                   ,data = MY_TABLE_Videos_perFocalMale2[MY_TABLE_Videos_perFocalMale2$ExcludeYN == 0,])
+summary(modFconsumAttackRateValidTestsWithoutPseuRep2)
 
 
 
@@ -655,6 +666,15 @@ summary(modMaleDied) # n= 127, nFemale = 102; nope, but maybe attacks occured af
 modMaleDiedrate <- lmer(Died~ Mcol+ I((NbFAttacks+NbMAttacks)/TotalWatch) + (1|FID)
                     ,data = MY_TABLE_Videos_perMale[MY_TABLE_Videos_perMale$ConsumYN == 0,], REML =FALSE)
 summary(modMaleDiedrate) # n= 127, nFemale = 102;
+
+
+### in subset of trials where male died, did the one that ended up dead receive more aggression?
+
+subsetTrialwhereMaleDied <- MY_TABLE_Videos_perMale[MY_TABLE_Videos_perMale$FID %in% MY_TABLE_Videos_perMale$FID[MY_TABLE_Videos_perMale$Died == 1],]
+subsetTrialwhereMaleDied$NbMFAttacks <- subsetTrialwhereMaleDied$NbFAttacks+subsetTrialwhereMaleDied$NbMAttacks
+t.test(subsetTrialwhereMaleDied$NbMFAttacks[subsetTrialwhereMaleDied$Died == 1],
+       subsetTrialwhereMaleDied$NbMFAttacks[subsetTrialwhereMaleDied$Died == 0],
+       paired = TRUE)
 
 }
   
@@ -682,6 +702,10 @@ length(MY_TABLE_Videos$NbMAttacks[MY_TABLE_Videos$NbMAttacks > 0])/
 summary(MY_TABLE_Videos$NbMAttacks[MY_TABLE_Videos$ExcludeYN ==0])
 length(MY_TABLE_Videos$NbMAttacks[MY_TABLE_Videos$NbMAttacks > 0 & MY_TABLE_Videos$ExcludeYN ==0])/
   length(MY_TABLE_Videos$NbMAttacks[MY_TABLE_Videos$ExcludeYN ==0])*100 # 44%
+
+# subset of trials to test our hypothesis in, in case male male competition is a counfounding factor
+MY_TABLE_Videos$FID[MY_TABLE_Videos$NbMAttacks == 0 & MY_TABLE_Videos$ExcludeYN ==0]
+
 }
 
 {### Nb of videos with male male physical interaction
@@ -784,5 +808,10 @@ length(MY_TABLE_Videos$NbMphysicalInter[MY_TABLE_Videos$NbMphysicalInter>1])/102
 head(MY_TABLE_Videos)
 head(MY_TABLE_Videos_perMale)
 
+
+
+### 20190227
+# write.csv(MY_TABLE_Videos, file = paste(here(),"3_ProcessedData/MY_TABLE_Videos.csv", sep="/"), row.names = FALSE)
+# write.csv(MY_TABLE_Videos_perMale, file = paste(here(),"3_ProcessedData/MY_TABLE_Videos_perMale.csv", sep="/"), row.names = FALSE)
 
 
