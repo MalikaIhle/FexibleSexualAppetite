@@ -1,0 +1,95 @@
+---
+title: "Exploratory Analyses Discussed on the 10th of December 2018"
+author: "Malika Ihle"
+date: "February 28, 2019"
+output: pdf_document
+---
+
+```{r, echo=FALSE, results="hide", message=FALSE, warnings=FALSE, include =FALSE}
+library(here)
+source(paste(here(),'4_DataAnalyses/VideoAnalyses.R', sep='/'))
+```
+
+## Are females' attacks predicting cannibalism?
+
+here I use trials that we considered 'valid' (no spider died from another reason than cannibalism)  
+since the outcome in terms of cannibalism is the exact opposite for males within a trial, I use the difference in attack rate towards a randomly picked focal male and the non focal male
+
+```{r, echo = TRUE}
+head(FocalMaleTable)
+summary(lm(FocalConsumYN ~ AttackRateDifference,data = FocalMaleTable))
+```
+
+Females' attack rate tend to predict cannibalism
+
+
+## Are females' attacks also predicting male death (for other reasons than cannibalism)?
+
+here we compare the number of female attacks towards male that ended up dying and male that survived, within trials where one of the male died.
+
+```{r, echo=TRUE}
+t.test(subsetTrialwhereMaleDied$NbFAttacks[subsetTrialwhereMaleDied$Died == 1],
+       subsetTrialwhereMaleDied$NbFAttacks[subsetTrialwhereMaleDied$Died == 0],
+       paired = TRUE)
+```
+
+females' attacks tend to predict male death. Just fyi, in the paper, we present results of the confirmatory analyses excluding those tests (as preregistered), we otherwise present behavioural data for the video on all trials performed.
+
+
+## Male male interaction
+
+First off, I have to say we didn't clearly identified the winner and loser, but have only tentative data on this. 
+Here, we assumed the one male who started the aggressive interaction was the winner.
+
+### Descriptive
+
+the number of test with male male physical interaction is all trials is `r length(MY_TABLE_Videos$NbMphysicalInter[MY_TABLE_Videos$NbMphysicalInter > 0])/length(MY_TABLE_Videos$NbMphysicalInter)*100`%
+and `r length(MY_TABLE_Videos$NbMphysicalInter[MY_TABLE_Videos$NbMphysicalInter > 0 & MY_TABLE_Videos$ExcludeYN ==0])/
+  length(MY_TABLE_Videos$NbMphysicalInter[MY_TABLE_Videos$ExcludeYN ==0])*100`% of the valid tests.
+
+### Does male color predict the number of aggressions received from the other male?
+
+```{r, echo=TRUE}
+summary(lmer(NbMphysicalInter ~ Mcol+ (1|FID), data = MY_TABLE_Videos_perMale))
+```
+Male color does not predict Nb of male attacks received
+
+
+### Excluding trials with male male interactions to remove this potential confounding factor
+
+#### Run our confirmatory analyses in this new subset
+
+```{r, echo=FALSE}
+MY_TABLE_MaleTest <- read.csv(paste(here(),"3_ProcessedData/MY_TABLE_MaleTest.csv", sep="/")) 
+FID_NoMaleMaleFight <- 17000 + MY_TABLE_Videos$FID[MY_TABLE_Videos$NbMphysicalInter == 0 & MY_TABLE_Videos$ExcludeYN ==0]
+MY_TABLE_MaleTest_NoMaleMaleFight <- MY_TABLE_MaleTest[MY_TABLE_MaleTest$FID %in% FID_NoMaleMaleFight,]
+```
+```{r, echo=TRUE}
+summary(glm (CannibalizedRedYN ~ Trt+ DeltaMsize + DeltaMcondition
+                              , family = "binomial"
+                              , data = MY_TABLE_MaleTest_NoMaleMaleFight))
+```
+Red preference females are (non significantly) less likely to cannibalise the red male, even more so in this subset that exclude male male competiion as a confounding factor
+
+#### Are females' attacks  more likely on specific males depending on their training diet?
+
+##### In all the data
+```{r, echo=TRUE}
+summary(lmer(NbFAttacks~  Mcol*GroupName + (1|FID),data = MY_TABLE_Videos_perMale, REML =FALSE))
+```
+##### In the valid tests
+```{r, echo=TRUE}
+summary(lmer(NbFAttacks~  Mcol*GroupName + (1|FID)
+             ,data = MY_TABLE_Videos_perMale[MY_TABLE_Videos_perMale$ExcludeYN == 0,], REML =FALSE))
+```
+##### In the valid tests subset without male male competition
+```{r, echo=TRUE}
+summary(lmer(NbFAttacks~ Mcol* GroupName + (1|FID)
+             ,data = MY_TABLE_Videos_perMale_NoMaleMaleFight, REML =FALSE))
+plot_model(modNbFAttacks_ValidTests_NoMaleMaleFight, type = "pred", terms = c("Mcol", "GroupName"))
+```
+
+If we remove trials with male male fights, red preferences females tend to be less likely to attack the black male than the red averse females. Both have quite similar rates of attacks toward the red males.
+
+
+

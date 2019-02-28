@@ -552,11 +552,12 @@ summary(modNbFAttacks_ValidTests)#154 . trend toward less attack against yellow 
       # !!! this is assuming than attack is a proxy for cannibalism which may not be the case - see below
       FID_NoMaleMaleFight <- MY_TABLE_Videos$FID[MY_TABLE_Videos$NbMphysicalInter == 0 & MY_TABLE_Videos$ExcludeYN ==0]
       FID_NoMaleMaleAttack <- MY_TABLE_Videos$FID[MY_TABLE_Videos$NbMAttacks == 0 & MY_TABLE_Videos$ExcludeYN ==0]
+      MY_TABLE_Videos_perMale_NoMaleMaleFight <- MY_TABLE_Videos_perMale[MY_TABLE_Videos_perMale$FID %in% FID_NoMaleMaleFight,]
       ### this is used in DataAnalysis script to test mod3 (spill over) in this subset
 
       modNbFAttacks_ValidTests_NoMaleMaleFight <- lmer(NbFAttacks~ Mcol* GroupName 
                                         + (1|FID)
-                                       ,data = MY_TABLE_Videos_perMale[MY_TABLE_Videos_perMale$FID %in% FID_NoMaleMaleFight,], REML =FALSE)
+                                       ,data = MY_TABLE_Videos_perMale_NoMaleMaleFight, REML =FALSE)
       summary(modNbFAttacks_ValidTests_NoMaleMaleFight)#86 * signi toward less attack against yellow males, independent of the female treatment
       
       
@@ -754,12 +755,12 @@ summary(modFconsumAttackRateDifference)
           # summary(modMaleDiedrate) # n= 127, nFemale = 102;
 
 
-### in subset of trials where male died, did the one that ended up dead received more aggression?
+### in subset of trials where male died, did the one that ended up dead received more aggression from the female?
 
 subsetTrialwhereMaleDied <- MY_TABLE_Videos_perMale[MY_TABLE_Videos_perMale$FID %in% MY_TABLE_Videos_perMale$FID[MY_TABLE_Videos_perMale$Died == 1],]
-subsetTrialwhereMaleDied$NbMFAttacks <- subsetTrialwhereMaleDied$NbFAttacks+subsetTrialwhereMaleDied$NbMAttacks
-t.test(subsetTrialwhereMaleDied$NbMFAttacks[subsetTrialwhereMaleDied$Died == 1],
-       subsetTrialwhereMaleDied$NbMFAttacks[subsetTrialwhereMaleDied$Died == 0],
+  #subsetTrialwhereMaleDied$NbMFAttacks <- subsetTrialwhereMaleDied$NbFAttacks+subsetTrialwhereMaleDied$NbMAttacks
+t.test(subsetTrialwhereMaleDied$NbFAttacks[subsetTrialwhereMaleDied$Died == 1],
+       subsetTrialwhereMaleDied$NbFAttacks[subsetTrialwhereMaleDied$Died == 0],
        paired = TRUE)
 
 }
