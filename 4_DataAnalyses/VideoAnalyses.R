@@ -300,6 +300,9 @@ MY_TABLE_Videos_perMale <- merge (x=MY_TABLE_Videos_perMale, y= MAttacksReceived
 MY_TABLE_Videos_perMale <- merge (x=MY_TABLE_Videos_perMale, y= AllCourts[,c('NBCourt','TotalCourtDur', 'FirstCourt','VideoIDMcol')],by='VideoIDMcol', all.x=TRUE)
 MY_TABLE_Videos_perMale <- merge (x=MY_TABLE_Videos_perMale, y= NaiveCourts[,c('NaiveNBCourt','NaiveTotalCourtDur', 'NaiveFirstCourt','TotalWatchNaiveCourt','VideoIDMcol')],by='VideoIDMcol', all.x=TRUE)
 
+MY_TABLE_Videos_perMale$NbMphysicalInter <- MY_TABLE_Videos_perMale$NbMAttacks+MY_TABLE_Videos_perMale$NbPushPush+ MY_TABLE_Videos_perMale$NbRollOverYN
+
+
 summary(MY_TABLE_Videos_perMale)
 DelayLeaveDish <- MY_TABLE_Videos_perMale$DelayLeaveDish
 
@@ -604,80 +607,99 @@ modNbMAttacksValidTests <- lmer(NbMAttacks~ Mcol
                       ,data = MY_TABLE_Videos_perMale[MY_TABLE_Videos_perMale$ExcludeYN == 0,])
 summary(modNbMAttacksValidTests)# n=154 NS
 
+
+
+
+modNbMFight <- lmer(NbMphysicalInter ~ Mcol
+                      #*Author 
+                      + (1|FID)
+                      ,data = MY_TABLE_Videos_perMale)
+summary(modNbMFight)# n=204 NS
+
+
+modNbMFightValidTests <- lmer(NbMphysicalInter~ Mcol
+                                #*Author 
+                                + (1|FID)
+                                ,data = MY_TABLE_Videos_perMale[MY_TABLE_Videos_perMale$ExcludeYN == 0,])
+summary(modNbMFightValidTests)# n=154 NS
+
+
+
+
 }
 
 ### Do F attacks predict futur consumption ? should test only in valid test, as non valid test, a spider died ?
 {  
-modFconsum <- lmer(ConsumYN~ Mcol
-                   *GroupName
-                   +NbFAttacks + (1|FID)
-                      ,data = MY_TABLE_Videos_perMale, REML =FALSE)
-summary(modFconsum) # N=204 ** Nb attack predicts furtur consumption, Yellow less consumed, therefore it is expected to have yellow less attacked
+              # modFconsum <- lmer(ConsumYN~ Mcol
+              #                    *GroupName
+              #                    +NbFAttacks + (1|FID)
+              #                       ,data = MY_TABLE_Videos_perMale, REML =FALSE)
+              # summary(modFconsum) # N=204 ** Nb attack predicts furtur consumption, Yellow less consumed, therefore it is expected to have yellow less attacked
+              # 
+              # 
+              # 
+              # modFconsumValidTest <- lmer(ConsumYN~ NbFAttacks +Mcol
+              #                             *GroupName
+              #                     + (1|FID)
+              #                    ,data = MY_TABLE_Videos_perMale[MY_TABLE_Videos_perMale$ExcludeYN == 0,], REML =FALSE)
+              # summary(modFconsumValidTest) # N=154  Nb attack almost predicts furtur consumption, Yellow less consumed, therefore it is expected to have yellow less attacked
+              # 
+              # 
+              # 
+              # modFconsumValidTest1 <- lmer(ConsumYN~ NbFAttacks +Mcol + GroupName + (1|FID)
+              #                             ,data = MY_TABLE_Videos_perMale[MY_TABLE_Videos_perMale$ExcludeYN == 0,], REML =FALSE)
+              # summary(modFconsumValidTest1) # N=154  Nb attack almost predicts furtur consumption, Yellow less consumed, therefore it is expected to have yellow less attacked
+              # anova(modFconsumValidTest1,modFconsumValidTest)
+              # 
+              # 
+              # modFconsumValidTest0 <- lmer(ConsumYN~  Mcol*GroupName+  (1|FID),data = MY_TABLE_Videos_perMale[MY_TABLE_Videos_perMale$ExcludeYN == 0,], REML =FALSE)
+              # anova(modFconsumValidTest,modFconsumValidTest0) # p value nbFattacks for paper... or not right model?
+              # 
+              # modFconsumValidTest00 <- lmer(ConsumYN~  NbFAttacks+  GroupName + (1|FID),data = MY_TABLE_Videos_perMale[MY_TABLE_Videos_perMale$ExcludeYN == 0,], REML =FALSE)
+              # summary(modFconsumValidTest00)
+              # anova(modFconsumValidTest,modFconsumValidTest00) # p value Mcol for paper... or not right model?
+              # 
+              # 
+              # 
+              # 
+              # modFconsumAttackRate <- lmer(ConsumYN~ Mcol
+              #                              #*GroupName
+              #                              +I(NbFAttacks/TotalWatch) + (1|FID)
+              #                    ,data = MY_TABLE_Videos_perMale, REML =FALSE)
+              # summary(modFconsumAttackRate) # N=204, only trendy if consider attack rate
+              # 
+              # 
+              # ##
+              # ## the correct version??
+              # ##
+              # 
+              # modFconsumAttackRateValidTests <- lmer(ConsumYN~ 
+              #                              #Mcol
+              #                              #*GroupName
+              #                              +I(NbFAttacks/TotalWatch) + (1|FID)
+              #                              ,data = MY_TABLE_Videos_perMale[MY_TABLE_Videos_perMale$ExcludeYN == 0,], REML =FALSE)
+              # summary(modFconsumAttackRateValidTests) # n= 154  Nb attack almost predicts furtur consumption, Yellow less consumed, therefore it is expected to have yellow less attacked
+              # 
+              # 
+              # 
+              # ### Do F attacks predict futur consumption ? 
+              # ### should test only in valid test, as non valid test, a spider died ?
+              # ### select a focal male per test since consumYN is the opposite for the other
+              # 
+              #   ##### sample one male per test
+              # #MY_TABLE_Videos_perFocalMale <- data.frame(MY_TABLE_Videos_perMale %>% group_by(FID) %>% sample_n(1))
+              # MY_TABLE_Videos_perFocalMale1 <- data.frame(MY_TABLE_Videos_perMale %>% group_by(FID) %>% filter(row_number()==1))
+              # MY_TABLE_Videos_perFocalMale2 <- data.frame(MY_TABLE_Videos_perMale %>% group_by(FID) %>% filter(row_number()==2))
+              # 
+              # modFconsumAttackRateValidTestsWithoutPseuRep <- lm(ConsumYN~ I(NbFAttacks/TotalWatch)
+              #                                        ,data = MY_TABLE_Videos_perFocalMale1[MY_TABLE_Videos_perFocalMale1$ExcludeYN == 0,])
+              # summary(modFconsumAttackRateValidTestsWithoutPseuRep)
+              # 
+              # modFconsumAttackRateValidTestsWithoutPseuRep2 <- lm(ConsumYN~ I(NbFAttacks/TotalWatch)
+              #                                                    ,data = MY_TABLE_Videos_perFocalMale2[MY_TABLE_Videos_perFocalMale2$ExcludeYN == 0,])
+              # summary(modFconsumAttackRateValidTestsWithoutPseuRep2)
 
-
-
-modFconsumValidTest <- lmer(ConsumYN~ NbFAttacks +Mcol
-                            *GroupName
-                    + (1|FID)
-                   ,data = MY_TABLE_Videos_perMale[MY_TABLE_Videos_perMale$ExcludeYN == 0,], REML =FALSE)
-summary(modFconsumValidTest) # N=154  Nb attack almost predicts furtur consumption, Yellow less consumed, therefore it is expected to have yellow less attacked
-
-
-
-modFconsumValidTest1 <- lmer(ConsumYN~ NbFAttacks +Mcol + GroupName + (1|FID)
-                            ,data = MY_TABLE_Videos_perMale[MY_TABLE_Videos_perMale$ExcludeYN == 0,], REML =FALSE)
-summary(modFconsumValidTest1) # N=154  Nb attack almost predicts furtur consumption, Yellow less consumed, therefore it is expected to have yellow less attacked
-anova(modFconsumValidTest1,modFconsumValidTest)
-
-
-modFconsumValidTest0 <- lmer(ConsumYN~  Mcol*GroupName+  (1|FID),data = MY_TABLE_Videos_perMale[MY_TABLE_Videos_perMale$ExcludeYN == 0,], REML =FALSE)
-anova(modFconsumValidTest,modFconsumValidTest0) # p value nbFattacks for paper... or not right model?
-
-modFconsumValidTest00 <- lmer(ConsumYN~  NbFAttacks+  GroupName + (1|FID),data = MY_TABLE_Videos_perMale[MY_TABLE_Videos_perMale$ExcludeYN == 0,], REML =FALSE)
-summary(modFconsumValidTest00)
-anova(modFconsumValidTest,modFconsumValidTest00) # p value Mcol for paper... or not right model?
-
-
-
-
-modFconsumAttackRate <- lmer(ConsumYN~ Mcol
-                             #*GroupName
-                             +I(NbFAttacks/TotalWatch) + (1|FID)
-                   ,data = MY_TABLE_Videos_perMale, REML =FALSE)
-summary(modFconsumAttackRate) # N=204, only trendy if consider attack rate
-
-
-##
-## the correct version??
-##
-
-modFconsumAttackRateValidTests <- lmer(ConsumYN~ 
-                             #Mcol
-                             #*GroupName
-                             +I(NbFAttacks/TotalWatch) + (1|FID)
-                             ,data = MY_TABLE_Videos_perMale[MY_TABLE_Videos_perMale$ExcludeYN == 0,], REML =FALSE)
-summary(modFconsumAttackRateValidTests) # n= 154  Nb attack almost predicts furtur consumption, Yellow less consumed, therefore it is expected to have yellow less attacked
-
-
-
-### Do F attacks predict futur consumption ? 
-### should test only in valid test, as non valid test, a spider died ?
-### select a focal male per test since consumYN is the opposite for the other
-
-  ##### sample one male per test
-#MY_TABLE_Videos_perFocalMale <- data.frame(MY_TABLE_Videos_perMale %>% group_by(FID) %>% sample_n(1))
-MY_TABLE_Videos_perFocalMale1 <- data.frame(MY_TABLE_Videos_perMale %>% group_by(FID) %>% filter(row_number()==1))
-MY_TABLE_Videos_perFocalMale2 <- data.frame(MY_TABLE_Videos_perMale %>% group_by(FID) %>% filter(row_number()==2))
-
-modFconsumAttackRateValidTestsWithoutPseuRep <- lm(ConsumYN~ I(NbFAttacks/TotalWatch)
-                                       ,data = MY_TABLE_Videos_perFocalMale1[MY_TABLE_Videos_perFocalMale1$ExcludeYN == 0,])
-summary(modFconsumAttackRateValidTestsWithoutPseuRep)
-
-modFconsumAttackRateValidTestsWithoutPseuRep2 <- lm(ConsumYN~ I(NbFAttacks/TotalWatch)
-                                                   ,data = MY_TABLE_Videos_perFocalMale2[MY_TABLE_Videos_perFocalMale2$ExcludeYN == 0,])
-summary(modFconsumAttackRateValidTestsWithoutPseuRep2)
-
-
+############################ this is the correct version!?
 ### Do F attacks predict futur consumption ? 
 ### should test only in valid test, as non valid test, a spider died ?
 ### select a focal male per test since consumYN is the opposite for the other
@@ -718,18 +740,18 @@ summary(modFconsumAttackRateDifference)
 
 ### Do F and M attacks predict futur death of male for reason other than consumption ?
 { ##### both NbF or MAttacks are attacks received
-modMaleDiedAllAttacks <- lmer(Died~ Mcol+ I((NbFAttacks+NbMAttacks)) + (1|FID)
-                    ,data = MY_TABLE_Videos_perMale[MY_TABLE_Videos_perMale$ConsumYN == 0,], REML =FALSE)
-summary(modMaleDiedAllAttacks) # n= 127, nFemale = 102; nope, but maybe attacks occured after the 2 hours video... Yellow less likely to die
-
-modMaleDied <- lmer(Died~ Mcol+ NbFAttacks + (1|FID)
-                    ,data = MY_TABLE_Videos_perMale[MY_TABLE_Videos_perMale$ConsumYN == 0,], REML =FALSE)
-summary(modMaleDied) # n= 127, nFemale = 102; nope, but maybe attacks occured after the 2 hours video... Yellow less likely to die
-
-
-modMaleDiedrate <- lmer(Died~ Mcol+ I((NbFAttacks+NbMAttacks)/TotalWatch) + (1|FID)
-                    ,data = MY_TABLE_Videos_perMale[MY_TABLE_Videos_perMale$ConsumYN == 0,], REML =FALSE)
-summary(modMaleDiedrate) # n= 127, nFemale = 102;
+          # modMaleDiedAllAttacks <- lmer(Died~ Mcol+ I((NbFAttacks+NbMAttacks)) + (1|FID)
+          #                     ,data = MY_TABLE_Videos_perMale[MY_TABLE_Videos_perMale$ConsumYN == 0,], REML =FALSE)
+          # summary(modMaleDiedAllAttacks) # n= 127, nFemale = 102; nope, but maybe attacks occured after the 2 hours video... Yellow less likely to die
+          # 
+          # modMaleDied <- lmer(Died~ Mcol+ NbFAttacks + (1|FID)
+          #                     ,data = MY_TABLE_Videos_perMale[MY_TABLE_Videos_perMale$ConsumYN == 0,], REML =FALSE)
+          # summary(modMaleDied) # n= 127, nFemale = 102; nope, but maybe attacks occured after the 2 hours video... Yellow less likely to die
+          # 
+          # 
+          # modMaleDiedrate <- lmer(Died~ Mcol+ I((NbFAttacks+NbMAttacks)/TotalWatch) + (1|FID)
+          #                     ,data = MY_TABLE_Videos_perMale[MY_TABLE_Videos_perMale$ConsumYN == 0,], REML =FALSE)
+          # summary(modMaleDiedrate) # n= 127, nFemale = 102;
 
 
 ### in subset of trials where male died, did the one that ended up dead received more aggression?
