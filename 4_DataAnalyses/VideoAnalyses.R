@@ -7,6 +7,8 @@
 # 1. FID rename to what they are (remove fake ID that avoided duplicated during video analyses)
 # 2. cut the time watch for both males after any of them receive an attack (to have duration of courtship comparable between the two, or courtship rate calculated on same duration)
 # 3. added number of second watched for naive courtship (those prior to attack, removing delay to start video)
+# modif: 28 February 2019
+# commit: corrected NbAttacks to be the nb of attacks male received rather than gave (since it is sometimes combined with NbFattacks which obsviously is attack received)
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 {# Remarks
@@ -32,6 +34,7 @@ rm(list = ls(all = TRUE))
   library(stringr)
   library(dplyr)
   library(here)
+  require(sjPlot) # for model automatic interaction plot
 }
 
 {# functions
@@ -196,7 +199,7 @@ Behav_MaleMale_Competition[Behav_MaleMale_Competition$NBAttacks > 0 &
                              !is.na(Behav_MaleMale_Competition$McolWin),]
 
 ### all male aggression towards another (attacks or physical contact)
-MAttacks <- Behav_MaleMale_Competition[Behav_MaleMale_Competition$NBAttacks > 0 | 
+MAttacksGiven <- Behav_MaleMale_Competition[Behav_MaleMale_Competition$NBAttacks > 0 | 
                                             Behav_MaleMale_Competition$PushPushYN == 1 | 
                                             Behav_MaleMale_Competition$RollOverYN == 1 ,] %>%
                         group_by(VideoID, McolStart) %>% 
@@ -205,14 +208,16 @@ MAttacks <- Behav_MaleMale_Competition[Behav_MaleMale_Competition$NBAttacks > 0 
                                   NbRollOverYN = sum(RollOverYN), 
                                   FirstMAttack = min(InteractionStart))
 
-MAttacks$VideoIDMcol <- paste(MAttacks$VideoID, MAttacks$McolStart, sep='')
-
-
 ### the opposite color is the one attacked by the male who start the malemale interaction
-MAttacks$McolAttacked <- NA
-MAttacks$McolAttacked[MAttacks$McolStart == 'Blue'] <- 'Red'
-MAttacks$McolAttacked[MAttacks$McolStart == 'Yellow'] <- 'Blue'
-MAttacks$McolAttacked[MAttacks$McolAttacked == 'Red'] <- 'Yellow'
+MAttacksGiven$McolAttacked <- NA
+MAttacksGiven$McolAttacked[MAttacksGiven$McolStart == 'Blue'] <- 'Red'
+MAttacksGiven$McolAttacked[MAttacksGiven$McolStart == 'Yellow'] <- 'Blue'
+MAttacksGiven$McolAttacked[MAttacksGiven$McolAttacked == 'Red'] <- 'Yellow'
+
+MAttacksReceived <- MAttacksGiven
+MAttacksReceived$VideoIDMcol <- paste(MAttacksReceived$VideoID, MAttacksReceived$McolAttacked, sep='')
+
+
 }
   
 {## keep only courtships before attacks from other male or from female, use the lowest number for both males to cut time for both equally
@@ -221,7 +226,7 @@ FFirstAttack <- FAttacks  %>% group_by(VideoID) %>%
     summarize(FirstAttack  =  min(FirstFAttack))
 
 ### Male attacks (from either male against either male)
-MFirstAttack <- MAttacks  %>% group_by(VideoID) %>% 
+MFirstAttack <- MAttacksReceived  %>% group_by(VideoID) %>% 
   summarize(FirstAttack  =  min(FirstMAttack))
 
 ### First attack per video: max time for any male to court
@@ -271,7 +276,7 @@ TotalIntendedFAttacks
 Cannibalism
 AllCourts
 AllMInter
-MAttacks
+MAttacksReceived
 NaiveCourts
 
 {# Combine summaries per male
@@ -291,7 +296,7 @@ MY_TABLE_Videos_perMale$VideoIDMcol <- paste(MY_TABLE_Videos_perMale$VideoID,MY_
 MY_TABLE_Videos_perMale <- merge (x=MY_TABLE_Videos_perMale, y= FAttacks[,c('FirstFAttack', 'NbFAttacks', 'VideoIDMcol')],by='VideoIDMcol', all.x=TRUE)
 MY_TABLE_Videos_perMale <- merge (x=MY_TABLE_Videos_perMale, y= TotalIntendedFAttacks[,c('NbIntendedFAttacks', 'VideoIDMcol')],by='VideoIDMcol', all.x=TRUE)
 MY_TABLE_Videos_perMale <- merge (x=MY_TABLE_Videos_perMale, y= Cannibalism[,c('ConsumTime', 'VideoIDMcol')],by='VideoIDMcol', all.x=TRUE)
-MY_TABLE_Videos_perMale <- merge (x=MY_TABLE_Videos_perMale, y= MAttacks[,c('NbMAttacks', 'NbPushPush', 'NbRollOverYN','FirstMAttack', 'VideoIDMcol')],by='VideoIDMcol', all.x=TRUE)
+MY_TABLE_Videos_perMale <- merge (x=MY_TABLE_Videos_perMale, y= MAttacksReceived[,c('NbMAttacks', 'NbPushPush', 'NbRollOverYN','FirstMAttack', 'VideoIDMcol')],by='VideoIDMcol', all.x=TRUE)
 MY_TABLE_Videos_perMale <- merge (x=MY_TABLE_Videos_perMale, y= AllCourts[,c('NBCourt','TotalCourtDur', 'FirstCourt','VideoIDMcol')],by='VideoIDMcol', all.x=TRUE)
 MY_TABLE_Videos_perMale <- merge (x=MY_TABLE_Videos_perMale, y= NaiveCourts[,c('NaiveNBCourt','NaiveTotalCourtDur', 'NaiveFirstCourt','TotalWatchNaiveCourt','VideoIDMcol')],by='VideoIDMcol', all.x=TRUE)
 
@@ -409,8 +414,8 @@ summary(modDelayCourtValidTest) # n=134 (delay not NA out of 154 valid male-vide
 
 ## Exploratory
 { 
-### are black males behaving differently than red males (I included author as I knew which male was which color, not Lauren)
-{
+### are black males behaving differently than red males 
+{ ##### (I included author as I knew which male was which color, not Lauren)
     ##### Delay to court
       ###### all courts, even if had been attacked prior to starting to court
 modDelayCourtAllVideo <- lmer(DelayFirstCourt ~ Mcol
@@ -516,7 +521,7 @@ table(MY_TABLE_Videos$Author, MY_TABLE_Videos$ReasonExclusion)
 }
 
 
-#### Female attack toward male of  specific colors, in function of their training
+#### Female attack toward male of specific colors, in function of their training
 
 modNbFAttacks <- lmer(NbFAttacks~  Mcol*GroupName 
                       #*Author - Mcol:GroupName:Author - GroupName:Author 
@@ -540,9 +545,33 @@ modNbFAttacks_ValidTests <- lmer(NbFAttacks~ Mcol* GroupName
 summary(modNbFAttacks_ValidTests)#154 . trend toward less attack against yellow males, independent of the female treatment
 
 
+      # subset of trials to test our hypothesis, in case male male competition is a counfounding factor
+      # !!! this is assuming than attack is a proxy for cannibalism which may not be the case - see below
+      FID_NoMaleMaleFight <- MY_TABLE_Videos$FID[MY_TABLE_Videos$NbMphysicalInter == 0 & MY_TABLE_Videos$ExcludeYN ==0]
+      FID_NoMaleMaleAttack <- MY_TABLE_Videos$FID[MY_TABLE_Videos$NbMAttacks == 0 & MY_TABLE_Videos$ExcludeYN ==0]
+      ### this is used in DataAnalysis script to test mod3 (spill over) in this subset
 
-
+      modNbFAttacks_ValidTests_NoMaleMaleFight <- lmer(NbFAttacks~ Mcol* GroupName 
+                                        + (1|FID)
+                                       ,data = MY_TABLE_Videos_perMale[MY_TABLE_Videos_perMale$FID %in% FID_NoMaleMaleFight,], REML =FALSE)
+      summary(modNbFAttacks_ValidTests_NoMaleMaleFight)#86 * signi toward less attack against yellow males, independent of the female treatment
+      
+      
+      plot_model(modNbFAttacks_ValidTests_NoMaleMaleFight, type = "pred", terms = c("Mcol", "GroupName"))
   
+      
+      modNbFAttacks_ValidTests_NoMaleMaleAttack <- lmer(NbFAttacks~ Mcol* GroupName 
+                                                       + (1|FID)
+                                                       ,data = MY_TABLE_Videos_perMale[MY_TABLE_Videos_perMale$FID %in% FID_NoMaleMaleAttack,], REML =FALSE)
+      summary(modNbFAttacks_ValidTests_NoMaleMaleAttack)#86 * signi toward less attack against yellow males, independent of the female treatment
+      
+      plot_model(modNbFAttacks_ValidTests_NoMaleMaleAttack, type = "pred", terms = c("Mcol", "GroupName"))
+      
+      
+      
+      
+      
+      
 #### Intended Female attack toward male of specific colors, in function of their training
 
 modNbIntendedFAttacks <- lmer(NbIntendedFAttacks~ Mcol*GroupName
@@ -560,7 +589,7 @@ summary(modNbIntendedFAttacksValidTest)# n=154 . trend less attacks towards yell
 
 
 
-#### Male attack toward other male
+#### Male attack toward other male >>> NbAttacks is attacks received
 
 modNbMAttacks <- lmer(NbMAttacks~ Mcol
                       #*Author 
@@ -602,11 +631,11 @@ anova(modFconsumValidTest1,modFconsumValidTest)
 
 
 modFconsumValidTest0 <- lmer(ConsumYN~  Mcol*GroupName+  (1|FID),data = MY_TABLE_Videos_perMale[MY_TABLE_Videos_perMale$ExcludeYN == 0,], REML =FALSE)
-anova(modFconsumValidTest,modFconsumValidTest0) # p value nbFattacks for paper
+anova(modFconsumValidTest,modFconsumValidTest0) # p value nbFattacks for paper... or not right model?
 
 modFconsumValidTest00 <- lmer(ConsumYN~  NbFAttacks+  GroupName + (1|FID),data = MY_TABLE_Videos_perMale[MY_TABLE_Videos_perMale$ExcludeYN == 0,], REML =FALSE)
 summary(modFconsumValidTest00)
-anova(modFconsumValidTest,modFconsumValidTest00) # p value Mcol for paper
+anova(modFconsumValidTest,modFconsumValidTest00) # p value Mcol for paper... or not right model?
 
 
 
@@ -649,14 +678,49 @@ modFconsumAttackRateValidTestsWithoutPseuRep2 <- lm(ConsumYN~ I(NbFAttacks/Total
 summary(modFconsumAttackRateValidTestsWithoutPseuRep2)
 
 
+### Do F attacks predict futur consumption ? 
+### should test only in valid test, as non valid test, a spider died ?
+### select a focal male per test since consumYN is the opposite for the other
+### have the difference between focal and non focal ?
+set.seed(1)
+MY_TABLE_Videos_perFocalMale <- split(MY_TABLE_Videos_perMale, MY_TABLE_Videos_perMale$FID)
+
+MY_TABLE_Videos_perFocalMale_fun <- function(x){
+  x$FocalMaleYN <- sample(c(0,1), 2,replace=FALSE) # randomly assigning YN, determining whether the male is focal or not
+  return(x)
+}
+
+MY_TABLE_Videos_perMale <- do.call(rbind,lapply(MY_TABLE_Videos_perFocalMale,MY_TABLE_Videos_perFocalMale_fun))
+rownames(MY_TABLE_Videos_perMale) <- NULL
+
+
+FocalData <- MY_TABLE_Videos_perMale[MY_TABLE_Videos_perMale$FocalMaleYN == 1 
+                        & MY_TABLE_Videos_perMale$ExcludeYN == 0
+                        , c('FID','TotalWatch',"NbFAttacks",'ConsumYN')]
+colnames(FocalData) <- c('FID','TotalWatch',"FocalNbFAttacks",'FocalConsumYN')
+
+NonFocalData <- MY_TABLE_Videos_perMale[MY_TABLE_Videos_perMale$FocalMaleYN == 0 
+                                     & MY_TABLE_Videos_perMale$ExcludeYN == 0
+                                     , c('FID',"NbFAttacks",'ConsumYN')]
+colnames(NonFocalData) <- c('FID','NonFocalNbFAttacks','NonFocalConsumYN')
+
+FocalMaleTable <- cbind(FocalData,NonFocalData)
+head(FocalMaleTable)
+FocalMaleTable$AttackRateDifference <- (FocalMaleTable$FocalNbFAttacks/FocalMaleTable$TotalWatch - FocalMaleTable$NonFocalNbFAttacks/FocalMaleTable$TotalWatch)
+
+
+modFconsumAttackRateDifference <- lm(FocalConsumYN ~ AttackRateDifference
+                                                    ,data = FocalMaleTable)
+summary(modFconsumAttackRateDifference)
+
 
 }
 
 ### Do F and M attacks predict futur death of male for reason other than consumption ?
-{
-modMaleDied <- lmer(Died~ Mcol+ I((NbFAttacks+NbMAttacks)) + (1|FID)
+{ ##### both NbF or MAttacks are attacks received
+modMaleDiedAllAttacks <- lmer(Died~ Mcol+ I((NbFAttacks+NbMAttacks)) + (1|FID)
                     ,data = MY_TABLE_Videos_perMale[MY_TABLE_Videos_perMale$ConsumYN == 0,], REML =FALSE)
-summary(modMaleDied) # n= 127, nFemale = 102; nope, but maybe attacks occured after the 2 hours video... Yellow less likely to die
+summary(modMaleDiedAllAttacks) # n= 127, nFemale = 102; nope, but maybe attacks occured after the 2 hours video... Yellow less likely to die
 
 modMaleDied <- lmer(Died~ Mcol+ NbFAttacks + (1|FID)
                     ,data = MY_TABLE_Videos_perMale[MY_TABLE_Videos_perMale$ConsumYN == 0,], REML =FALSE)
@@ -668,7 +732,7 @@ modMaleDiedrate <- lmer(Died~ Mcol+ I((NbFAttacks+NbMAttacks)/TotalWatch) + (1|F
 summary(modMaleDiedrate) # n= 127, nFemale = 102;
 
 
-### in subset of trials where male died, did the one that ended up dead receive more aggression?
+### in subset of trials where male died, did the one that ended up dead received more aggression?
 
 subsetTrialwhereMaleDied <- MY_TABLE_Videos_perMale[MY_TABLE_Videos_perMale$FID %in% MY_TABLE_Videos_perMale$FID[MY_TABLE_Videos_perMale$Died == 1],]
 subsetTrialwhereMaleDied$NbMFAttacks <- subsetTrialwhereMaleDied$NbFAttacks+subsetTrialwhereMaleDied$NbMAttacks
@@ -703,8 +767,6 @@ summary(MY_TABLE_Videos$NbMAttacks[MY_TABLE_Videos$ExcludeYN ==0])
 length(MY_TABLE_Videos$NbMAttacks[MY_TABLE_Videos$NbMAttacks > 0 & MY_TABLE_Videos$ExcludeYN ==0])/
   length(MY_TABLE_Videos$NbMAttacks[MY_TABLE_Videos$ExcludeYN ==0])*100 # 44%
 
-# subset of trials to test our hypothesis in, in case male male competition is a counfounding factor
-MY_TABLE_Videos$FID[MY_TABLE_Videos$NbMAttacks == 0 & MY_TABLE_Videos$ExcludeYN ==0]
 
 }
 
