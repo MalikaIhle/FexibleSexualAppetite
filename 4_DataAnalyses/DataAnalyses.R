@@ -28,7 +28,7 @@ MY_TABLE_MID <- read.csv(paste(here(),"3_ProcessedData/MY_TABLE_MID.csv", sep="/
 MY_TABLE_Step <- read.csv(paste(here(),"3_ProcessedData/MY_TABLE_Step.csv", sep="/")) 
 
 MY_TABLE_Videos <- read.csv(paste(here(),"3_ProcessedData/MY_TABLE_Videos.csv", sep="/")) 
-
+FID_NoMaleMaleFight <- 17000+MY_TABLE_Videos$FID[MY_TABLE_Videos$NbMphysicalInter == 0 & MY_TABLE_Videos$ExcludeYN ==0]
 
 }
 
@@ -366,7 +366,18 @@ chisq.test(table(MY_TABLE_MaleTest$CannibalizedRedYN[MY_TABLE_MaleTest$Trt == 'R
 chisq.test(table(MY_TABLE_MaleTest$CannibalizedRedYN[MY_TABLE_MaleTest$Trt == 'RedAverse']), p=c(0.5,0.5))
 
 
+chisq.test(table(MY_TABLE_MaleTest$CannibalizedRedYN[MY_TABLE_MaleTest$Trt == 'RedPreference'& MY_TABLE_MaleTest$FID %in% FID_NoMaleMaleFight]), p=c(0.5,0.5))
+chisq.test(table(MY_TABLE_MaleTest$CannibalizedRedYN[MY_TABLE_MaleTest$Trt == 'RedAverse'& MY_TABLE_MaleTest$FID %in% FID_NoMaleMaleFight]), p=c(0.5,0.5))
+
+
 ggplot(MY_TABLE_MaleTest,aes(x=CannibalizedRedYN,group=Trt,fill=Trt))+
+  geom_bar(position="dodge",aes(y = ..prop.., fill = Trt)) +
+  scale_x_discrete(NULL, c(0,1), c("Consumed black male", "Consumed red male"), c(0,1)) +
+  theme_bw()+scale_y_continuous(NULL,labels=scales::percent) +
+  scale_fill_discrete(name = "Treatment")+
+  theme(text = element_text(size=20))
+
+ggplot(MY_TABLE_MaleTest[MY_TABLE_MaleTest$FID %in% FID_NoMaleMaleFight,],aes(x=CannibalizedRedYN,group=Trt,fill=Trt))+
   geom_bar(position="dodge",aes(y = ..prop.., fill = Trt)) +
   scale_x_discrete(NULL, c(0,1), c("Consumed black male", "Consumed red male"), c(0,1)) +
   theme_bw()+scale_y_continuous(NULL,labels=scales::percent) +
@@ -397,6 +408,10 @@ chisq.test(table(MY_TABLE_TermiteTest$AttackNewRedYN), p=c(0.5,0.5))
 #step 3    
 chisq.test(table(MY_TABLE_MaleTest$CannibalizedRedYN), p=c(0.5,0.5))
 summary(glm ( MY_TABLE_MaleTest$CannibalizedRedYN~1, family = "binomial", data=MY_TABLE_Step))
+
+
+  # excluding test with male male competition
+chisq.test(table(MY_TABLE_MaleTest$CannibalizedRedYN[MY_TABLE_MaleTest$FID %in% FID_NoMaleMaleFight]), p=c(0.5,0.5))  
 
 # all 
 mod4 <- glmer (AttackRedYN ~ Trt + (1|FID), family = "binomial", data=MY_TABLE_Step)
