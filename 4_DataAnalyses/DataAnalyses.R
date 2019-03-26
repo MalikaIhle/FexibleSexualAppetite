@@ -77,7 +77,7 @@ nBugYes <- nrow(MY_TABLE_BugTest[MY_TABLE_BugTest$AttackBugYN == 1,])
   hist(MY_TABLE_BugTest$Fcondition)
   wilcox.test(MY_TABLE_BugTest$Fcondition[MY_TABLE_BugTest$Trt == "RedPreference"],
         MY_TABLE_BugTest$Fcondition[MY_TABLE_BugTest$Trt == "RedAverse"])
-  
+  nrow(MY_TABLE_BugTest)
 
 
 
@@ -446,6 +446,8 @@ figdata$lowerCI <- as.numeric(as.character(figdata$lowerCI))*100
 figdata$upperCI <- as.numeric(as.character(figdata$upperCI))*100
 }
 
+round(mod1p,2)
+
 Fig1 <- {ggplot(data=figdata[figdata$test == 'Bug',], aes(x=Treatment, y=estimate))+
     labs(x=NULL, y= "Percentage of spiders 
          consuming the red prey (95% CI)", title = "A. Bug test")+
@@ -458,7 +460,7 @@ Fig1 <- {ggplot(data=figdata[figdata$test == 'Bug',], aes(x=Treatment, y=estimat
     geom_errorbar(aes(ymin=lowerCI, ymax=upperCI), size = 2, width =1,na.rm=TRUE)+
     geom_point(size =6, stroke = 1) + 
     geom_segment(aes(x = 1, y = 90, xend = 2, yend = 90), size = 1)+
-    annotate("text", label = "p = 0.03", x = 1.5, y = 97.5, size = 7) +
+    annotate("text", label = "p = 0.01", x = 1.5, y = 97.5, size = 7) +
       theme_classic()+
     theme(
       panel.border = element_rect(colour = "black", fill=NA), 
@@ -469,6 +471,7 @@ Fig1 <- {ggplot(data=figdata[figdata$test == 'Bug',], aes(x=Treatment, y=estimat
       plot.margin = unit(c(0.2,0.2,0.3,0.3), "cm"))
 }
 
+round(mod2p,2)
 
 Fig2 <- {ggplot(data=figdata[figdata$test == 'Termite',], aes(x=Treatment, y=estimate))+
     labs(x=NULL, y= NULL, title = "B. Termite test")+
@@ -481,7 +484,7 @@ Fig2 <- {ggplot(data=figdata[figdata$test == 'Termite',], aes(x=Treatment, y=est
     geom_errorbar(aes(ymin=lowerCI, ymax=upperCI), size = 2, width =1,na.rm=TRUE)+
     geom_point(size =6, stroke = 1) +  
     geom_segment(aes(x = 1, y = 90, xend = 2, yend = 90), size = 1)+
-    annotate("text", label = "p = 0.05", x = 1.5, y = 97.5, size = 7) +
+    annotate("text", label = "p = 0.02", x = 1.5, y = 97.5, size = 7) +
     theme_classic()+
     theme(
       panel.border = element_rect(colour = "black", fill=NA), 
@@ -491,6 +494,7 @@ Fig2 <- {ggplot(data=figdata[figdata$test == 'Termite',], aes(x=Treatment, y=est
       plot.margin = unit(c(0.2,0.2,0.3,0.3), "cm"))
 }
 
+round(mod3p,2)
 
 Fig3 <- {ggplot(data=figdata[figdata$test == 'Male',], aes(x=Treatment, y=estimate))+
     labs(x=NULL, y= NULL, title = "C. Male test")+
@@ -503,7 +507,7 @@ Fig3 <- {ggplot(data=figdata[figdata$test == 'Male',], aes(x=Treatment, y=estima
     geom_errorbar(aes(ymin=lowerCI, ymax=upperCI), size = 2, width =1,na.rm=TRUE)+
     geom_point(size =6,  stroke = 1) + 
     geom_segment(aes(x = 1, y = 90, xend = 2, yend = 90), size = 1)+
-    annotate("text", label = "p = 0.38", x = 1.5, y = 97.5, size = 7) +
+    annotate("text", label = "p = 0.19", x = 1.5, y = 97.5, size = 7) +
     theme_classic()+
     theme(
       panel.border = element_rect(colour = "black", fill=NA),
