@@ -44,7 +44,7 @@ par(mfrow=c(2,2))
 plot(mod1)
 
 summary(mod1)
-
+drop1(mod1,test="Chisq")
 
 bugaverse <- invlogit(coef(summary(mod1))[1, 1]) # likelihood of eating the bug for red averse females
 
@@ -106,7 +106,7 @@ par(mfrow=c(2,2))
 plot(mod2)
 
 summary(mod2)
-
+drop1(mod2,test="Chisq")
 
 termiteaverse <- invlogit(coef(summary(mod2))[1, 1]) # likelihood of eating the red termite for red averse females
 
@@ -158,6 +158,7 @@ par(mfrow=c(2,2))
 plot(mod3)
 
 summary(mod3)
+drop1(mod3,test="Chisq")
 
   ## to get one sided test p value
  mod3p <-  coef(summary(mod3))[2, 4]/2
@@ -455,7 +456,9 @@ Fig1 <- {ggplot(data=figdata[figdata$test == 'Bug',], aes(x=Treatment, y=estimat
     annotate("text", x="Red accustomed", y = 1, label = "n = 69", size=7) +
     
     geom_errorbar(aes(ymin=lowerCI, ymax=upperCI), size = 2, width =1,na.rm=TRUE)+
-    geom_point(size =6, stroke = 1) +   
+    geom_point(size =6, stroke = 1) + 
+    geom_segment(aes(x = 1, y = 90, xend = 2, yend = 90), size = 1)+
+    annotate("text", label = "p = 0.03", x = 1.5, y = 97.5, size = 7) +
       theme_classic()+
     theme(
       panel.border = element_rect(colour = "black", fill=NA), 
@@ -476,7 +479,9 @@ Fig2 <- {ggplot(data=figdata[figdata$test == 'Termite',], aes(x=Treatment, y=est
     annotate("text", x="Red accustomed", y = 1, label = "n = 64", size=7) +
     
     geom_errorbar(aes(ymin=lowerCI, ymax=upperCI), size = 2, width =1,na.rm=TRUE)+
-    geom_point(size =6, stroke = 1) +   
+    geom_point(size =6, stroke = 1) +  
+    geom_segment(aes(x = 1, y = 90, xend = 2, yend = 90), size = 1)+
+    annotate("text", label = "p = 0.05", x = 1.5, y = 97.5, size = 7) +
     theme_classic()+
     theme(
       panel.border = element_rect(colour = "black", fill=NA), 
@@ -496,7 +501,9 @@ Fig3 <- {ggplot(data=figdata[figdata$test == 'Male',], aes(x=Treatment, y=estima
     annotate("text", x="Red accustomed", y = 1, label = "n = 37", size=7) +
     
     geom_errorbar(aes(ymin=lowerCI, ymax=upperCI), size = 2, width =1,na.rm=TRUE)+
-    geom_point(size =6,  stroke = 1) +   
+    geom_point(size =6,  stroke = 1) + 
+    geom_segment(aes(x = 1, y = 90, xend = 2, yend = 90), size = 1)+
+    annotate("text", label = "p = 0.38", x = 1.5, y = 97.5, size = 7) +
     theme_classic()+
     theme(
       panel.border = element_rect(colour = "black", fill=NA),
@@ -510,8 +517,10 @@ g1 <- ggplotGrob(Fig1)
 g2 <- ggplotGrob(Fig2)
 g3 <- ggplotGrob(Fig3)
 
+#setEPS() 
+#pdf("5_FiguresReport/Fig1.pdf", height=7, width=15)
 grid.arrange(cbind(g1, g2, g3, size = "last"))
-
+#dev.off()
 
 
 
