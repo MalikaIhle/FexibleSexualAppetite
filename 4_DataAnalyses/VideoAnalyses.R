@@ -507,14 +507,16 @@ summary(modNaiveTotalCourtDurNaiveTests)# n=154 NS (no NAs but more zeros for du
   ######## I scored signficantly more attacks
   ######## with trends or significant effect toward scoring less attacks towards the red male, but 
  
-modNbFAttacksLG <- lmer(NbFAttacks~ Mcol
+modNbFAttacksLG <- glmer(NbFAttacks~ Mcol
                         + (1|FID)
-                        ,data = MY_TABLE_Videos_perMale[MY_TABLE_Videos_perMale$Author == 'LG',])
+                        ,data = MY_TABLE_Videos_perMale[MY_TABLE_Videos_perMale$Author == 'LG',]
+                        , family = 'poisson')
 summary(modNbFAttacksLG)# n=104 NS 
 
-modNbFAttacksMI <- lmer(NbFAttacks~ Mcol
+modNbFAttacksMI <- glmer(NbFAttacks~ Mcol
                         + (1|FID)
-                        ,data = MY_TABLE_Videos_perMale[MY_TABLE_Videos_perMale$Author == 'MI',])
+                        ,data = MY_TABLE_Videos_perMale[MY_TABLE_Videos_perMale$Author == 'MI',]
+                        , family = 'poisson')
 summary(modNbFAttacksMI)# n=100 * significantly less attacks towards yellow *
 
   ######## I did watch more of those videos where the black male ended up dead
@@ -529,14 +531,19 @@ table(MY_TABLE_Videos$Author, MY_TABLE_Videos$ReasonExclusion)
 modNbFAttacks <- glmer(NbFAttacks~  Mcol*GroupName 
                       #*Author - Mcol:GroupName:Author - GroupName:Author 
                       + (1|FID)
-                          ,data = MY_TABLE_Videos_perMale, family = 'poisson')
+                      , data = MY_TABLE_Videos_perMale
+                      , family = 'poisson')
 summary(modNbFAttacks)# n=204 * signi more attacks towards black male, independent of the female treatment
 
-modNbFAttacksinter0 <- lmer(NbFAttacks~ Mcol+ GroupName  + (1|FID),data = MY_TABLE_Videos_perMale, REML =FALSE)
+modNbFAttacksinter0 <- glmer(NbFAttacks~ Mcol+ GroupName  + (1|FID)
+                            , data = MY_TABLE_Videos_perMale 
+                            , family = 'poisson')
 summary(modNbFAttacksinter0)
 anova(modNbFAttacks,modNbFAttacksinter0)# p value inter for paper
 
-modNbFAttacks00 <- lmer(NbFAttacks~  GroupName +(1|FID),data = MY_TABLE_Videos_perMale, REML =FALSE)
+modNbFAttacks00 <- glmer(NbFAttacks~  GroupName +(1|FID)
+                        , data = MY_TABLE_Videos_perMale
+                        , family = 'poisson')
 anova(modNbFAttacksinter0,modNbFAttacks00)# p value Mcol for paper
 
 
@@ -544,7 +551,8 @@ anova(modNbFAttacksinter0,modNbFAttacks00)# p value Mcol for paper
 modNbFAttacks_ValidTests <- glmer(NbFAttacks~ Mcol* GroupName 
                       #*Author - Mcol:GroupName:Author - GroupName:Author 
                       + (1|FID)
-                      ,data = MY_TABLE_Videos_perMale[MY_TABLE_Videos_perMale$ExcludeYN == 0,], family = 'poisson')
+                      , data = MY_TABLE_Videos_perMale[MY_TABLE_Videos_perMale$ExcludeYN == 0,]
+                      , family = 'poisson')
 summary(modNbFAttacks_ValidTests)#154 ** signi more attacks towards black male, independent of the female treatment
 
 
@@ -556,13 +564,15 @@ summary(modNbFAttacks_ValidTests)#154 ** signi more attacks towards black male, 
 
       modNbFAttacks_ValidTests_NoMaleMaleFight <- glmer(NbFAttacks~ Mcol* GroupName 
                                         + (1|FID)
-                                       ,data = MY_TABLE_Videos_perMale_NoMaleMaleFight, family = 'poisson')
+                                       , data = MY_TABLE_Videos_perMale_NoMaleMaleFight
+                                       , family = 'poisson')
       summary(modNbFAttacks_ValidTests_NoMaleMaleFight)#86 .trend toward less attack against yellow males, independent of the female treatment
       
       
       modNbFAttacks_ValidTests_NoMaleMaleFight_noINteraction <- glmer(NbFAttacks~ Mcol+ GroupName 
                                                                     + (1|FID)
-                                                                    ,data = MY_TABLE_Videos_perMale_NoMaleMaleFight, family = "poisson")
+                                                                    , data = MY_TABLE_Videos_perMale_NoMaleMaleFight
+                                                                    , family = "poisson")
       anova(modNbFAttacks_ValidTests_NoMaleMaleFight,modNbFAttacks_ValidTests_NoMaleMaleFight_noINteraction)
       drop1(modNbFAttacks_ValidTests_NoMaleMaleFight, test="Chisq")
       
@@ -572,7 +582,8 @@ summary(modNbFAttacks_ValidTests)#154 ** signi more attacks towards black male, 
       
       modNbFAttacks_ValidTests_NoMaleMaleFight_forplotting <- glmer(NbFAttacks~ -1+ paste(Mcol,GroupName, sep="")
                                                                   + (1|FID)
-                                                                  ,data = MY_TABLE_Videos_perMale_NoMaleMaleFight, family = "poisson" )
+                                                                  , data = MY_TABLE_Videos_perMale_NoMaleMaleFight
+                                                                  , family = "poisson" )
       
       summary(modNbFAttacks_ValidTests_NoMaleMaleFight_forplotting)
       
@@ -603,137 +614,87 @@ summary(modNbFAttacks_ValidTests)#154 ** signi more attacks towards black male, 
         guides(shape = guide_legend(override.aes = list(linetype = 0, size = 2))) # remove bar o top of symbol in legend
       
       
-      setEPS()
-      pdf(paste(here(), "5_FiguresReport/SuppFig1.pdf", sep="/"), height=5, width=3.3)
+      #setEPS()
+      #pdf(paste(here(), "5_FiguresReport/SuppFig2.pdf", sep="/"), height=5, width=3.3)
       Attack_inter_Fig
-      dev.off()
+      #dev.off()
       
 #### Intended Female attack toward male of specific colors, in function of their training
 
-modNbIntendedFAttacks <- lmer(NbIntendedFAttacks~ Mcol*GroupName
+modNbIntendedFAttacks <- glmer(NbIntendedFAttacks~ Mcol*GroupName
                               #*Author  - Mcol:GroupName:Author - GroupName:Author 
                               + (1|FID)
-                      ,data = MY_TABLE_Videos_perMale)
-summary(modNbIntendedFAttacks)# n=204 . trend less attacks towards yellow male 
+                      , data = MY_TABLE_Videos_perMale
+                      , family = "poisson")
+summary(modNbIntendedFAttacks)# n=204 * signi less attacks towards yellow male 
 
 
-modNbIntendedFAttacksValidTest <- lmer(NbIntendedFAttacks~ Mcol*GroupName
+modNbIntendedFAttacksValidTest <- glmer(NbIntendedFAttacks~ Mcol*GroupName
                               #*Author  - Mcol:GroupName:Author - GroupName:Author 
                               + (1|FID)
-                              ,data = MY_TABLE_Videos_perMale[MY_TABLE_Videos_perMale$ExcludeYN == 0,])
-summary(modNbIntendedFAttacksValidTest)# n=154 . trend less attacks towards yellow male 
+                              , data = MY_TABLE_Videos_perMale[MY_TABLE_Videos_perMale$ExcludeYN == 0,]
+                              , family = "poisson")
+summary(modNbIntendedFAttacksValidTest)# n=154 * signi less attacks towards yellow male
 
 
 
 #### Male attack toward other male >>> NbAttacks is attacks received
 
-modNbMAttacks <- lmer(NbMAttacks~ Mcol
+modNbMAttacks <- glmer(NbMphysicalInter~ Mcol
                       #*Author 
                       + (1|FID)
-                              ,data = MY_TABLE_Videos_perMale)
-summary(modNbMAttacks)# n=204 NS
+                      , data = MY_TABLE_Videos_perMale
+                      , family = "poisson")
+summary(modNbMAttacks)# n=204 signi more attacks toward black males
 
 
-modNbMAttacksValidTests <- lmer(NbMAttacks~ Mcol
+modNbMAttacks_noIntercept <- glmer(NbMphysicalInter~ -1+ Mcol
+                       #*Author 
+                       + (1|FID)
+                       , data = MY_TABLE_Videos_perMale
+                       , family = "poisson")
+summary(modNbMAttacks_noIntercept)
+
+
+table_effect_MAttack <- as.data.frame(cbind(est=exp(summary(modNbMAttacks)$coeff[,1]),
+                                                 CIhigh=exp(summary(modNbMAttacks)$coeff[,1]+summary(modNbMAttacks)$coeff[,2]*1.96),
+                                                 CIlow=exp(summary(modNbMAttacks)$coeff[,1]-summary(modNbMAttacks)$coeff[,2]*1.96)))
+table_effect_MAttack$Mcol <- c("Red",'Black')
+rownames(table_effect_MAttack) <- NULL
+table_effect_MAttack
+
+
+MAttack_received_Fig <-   ggplot(data=table_effect_MAttack, aes(x=Mcol, y=est)) + 
+  scale_y_continuous(name="Number of male attacks received")+
+  scale_x_discrete(name = "Male facial color",limits = c("Red","Black") ) +
+  theme_classic() + # white backgroun, x and y axis (no box)
+  geom_errorbar(aes(ymin=CIlow, ymax=CIhigh), width =0.4,na.rm=TRUE, position = position_dodge(width=0.5))+ # don't plot bor bars on x axis tick, but separate them (dodge)
+  geom_point(size =4, stroke = 1, position = position_dodge(width=0.5)) +
+   theme(panel.border = element_rect(colour = "black", fill=NA), # ad square box around graph 
+        legend.position='none',
+        axis.title.x=element_text(size=10),
+        axis.title.y=element_text(size=10),
+        plot.title = element_text(hjust = 0.5, size = 10))
+ 
+#setEPS()
+#pdf(paste(here(), "5_FiguresReport/SuppFig1.pdf", sep="/"), height=5, width=3.3)
+MAttack_received_Fig
+#dev.off()
+
+
+
+modNbMAttacksValidTests <- glmer(NbMphysicalInter~ Mcol
                       #*Author 
                       + (1|FID)
-                      ,data = MY_TABLE_Videos_perMale[MY_TABLE_Videos_perMale$ExcludeYN == 0,])
+                      , data = MY_TABLE_Videos_perMale[MY_TABLE_Videos_perMale$ExcludeYN == 0,]
+                      , family = "poisson")
 summary(modNbMAttacksValidTests)# n=154 NS
-
-
-
-
-modNbMFight <- lmer(NbMphysicalInter ~ Mcol
-                      #*Author 
-                      + (1|FID)
-                      ,data = MY_TABLE_Videos_perMale)
-summary(modNbMFight)# n=204 NS
-
-
-modNbMFightValidTests <- lmer(NbMphysicalInter~ Mcol
-                                #*Author 
-                                + (1|FID)
-                                ,data = MY_TABLE_Videos_perMale[MY_TABLE_Videos_perMale$ExcludeYN == 0,])
-summary(modNbMFightValidTests)# n=154 NS
-
-
-
 
 }
 
 ### Do F attacks predict futur consumption ? should test only in valid test, as non valid test, a spider died ?
-{  
-              # modFconsum <- lmer(ConsumYN~ Mcol
-              #                    *GroupName
-              #                    +NbFAttacks + (1|FID)
-              #                       ,data = MY_TABLE_Videos_perMale, REML =FALSE)
-              # summary(modFconsum) # N=204 ** Nb attack predicts furtur consumption, Yellow less consumed, therefore it is expected to have yellow less attacked
-              # 
-              # 
-              # 
-              # modFconsumValidTest <- lmer(ConsumYN~ NbFAttacks +Mcol
-              #                             *GroupName
-              #                     + (1|FID)
-              #                    ,data = MY_TABLE_Videos_perMale[MY_TABLE_Videos_perMale$ExcludeYN == 0,], REML =FALSE)
-              # summary(modFconsumValidTest) # N=154  Nb attack almost predicts furtur consumption, Yellow less consumed, therefore it is expected to have yellow less attacked
-              # 
-              # 
-              # 
-              # modFconsumValidTest1 <- lmer(ConsumYN~ NbFAttacks +Mcol + GroupName + (1|FID)
-              #                             ,data = MY_TABLE_Videos_perMale[MY_TABLE_Videos_perMale$ExcludeYN == 0,], REML =FALSE)
-              # summary(modFconsumValidTest1) # N=154  Nb attack almost predicts furtur consumption, Yellow less consumed, therefore it is expected to have yellow less attacked
-              # anova(modFconsumValidTest1,modFconsumValidTest)
-              # 
-              # 
-              # modFconsumValidTest0 <- lmer(ConsumYN~  Mcol*GroupName+  (1|FID),data = MY_TABLE_Videos_perMale[MY_TABLE_Videos_perMale$ExcludeYN == 0,], REML =FALSE)
-              # anova(modFconsumValidTest,modFconsumValidTest0) # p value nbFattacks for paper... or not right model?
-              # 
-              # modFconsumValidTest00 <- lmer(ConsumYN~  NbFAttacks+  GroupName + (1|FID),data = MY_TABLE_Videos_perMale[MY_TABLE_Videos_perMale$ExcludeYN == 0,], REML =FALSE)
-              # summary(modFconsumValidTest00)
-              # anova(modFconsumValidTest,modFconsumValidTest00) # p value Mcol for paper... or not right model?
-              # 
-              # 
-              # 
-              # 
-              # modFconsumAttackRate <- lmer(ConsumYN~ Mcol
-              #                              #*GroupName
-              #                              +I(NbFAttacks/TotalWatch) + (1|FID)
-              #                    ,data = MY_TABLE_Videos_perMale, REML =FALSE)
-              # summary(modFconsumAttackRate) # N=204, only trendy if consider attack rate
-              # 
-              # 
-              # ##
-              # ## the correct version??
-              # ##
-              # 
-              # modFconsumAttackRateValidTests <- lmer(ConsumYN~ 
-              #                              #Mcol
-              #                              #*GroupName
-              #                              +I(NbFAttacks/TotalWatch) + (1|FID)
-              #                              ,data = MY_TABLE_Videos_perMale[MY_TABLE_Videos_perMale$ExcludeYN == 0,], REML =FALSE)
-              # summary(modFconsumAttackRateValidTests) # n= 154  Nb attack almost predicts furtur consumption, Yellow less consumed, therefore it is expected to have yellow less attacked
-              # 
-              # 
-              # 
-              # ### Do F attacks predict futur consumption ? 
-              # ### should test only in valid test, as non valid test, a spider died ?
-              # ### select a focal male per test since consumYN is the opposite for the other
-              # 
-              #   ##### sample one male per test
-              # #MY_TABLE_Videos_perFocalMale <- data.frame(MY_TABLE_Videos_perMale %>% group_by(FID) %>% sample_n(1))
-              # MY_TABLE_Videos_perFocalMale1 <- data.frame(MY_TABLE_Videos_perMale %>% group_by(FID) %>% filter(row_number()==1))
-              # MY_TABLE_Videos_perFocalMale2 <- data.frame(MY_TABLE_Videos_perMale %>% group_by(FID) %>% filter(row_number()==2))
-              # 
-              # modFconsumAttackRateValidTestsWithoutPseuRep <- lm(ConsumYN~ I(NbFAttacks/TotalWatch)
-              #                                        ,data = MY_TABLE_Videos_perFocalMale1[MY_TABLE_Videos_perFocalMale1$ExcludeYN == 0,])
-              # summary(modFconsumAttackRateValidTestsWithoutPseuRep)
-              # 
-              # modFconsumAttackRateValidTestsWithoutPseuRep2 <- lm(ConsumYN~ I(NbFAttacks/TotalWatch)
-              #                                                    ,data = MY_TABLE_Videos_perFocalMale2[MY_TABLE_Videos_perFocalMale2$ExcludeYN == 0,])
-              # summary(modFconsumAttackRateValidTestsWithoutPseuRep2)
+{
 
-############################ this is the correct version!?
-### Do F attacks predict futur consumption ? 
 ### should test only in valid test, as non valid test, a spider died ?
 ### select a focal male per test since consumYN is the opposite for the other
 ### have the difference between focal and non focal ?
@@ -765,7 +726,8 @@ FocalMaleTable$AttackRateDifference <- (FocalMaleTable$FocalNbFAttacks/FocalMale
 
 
 modFconsumAttackRateDifference <- glm(FocalConsumYN ~ AttackRateDifference
-                                                    ,data = FocalMaleTable, family = 'binomial')
+                                                    , data = FocalMaleTable
+                                                    , family = 'binomial')
 summary(modFconsumAttackRateDifference)
 
 invlogit(coef(summary(modFconsumAttackRateDifference))[2, 1]) # likelihood 
@@ -777,25 +739,19 @@ invlogit(coef(summary(modFconsumAttackRateDifference))[2, 2])
 
 ### Do F and M attacks predict futur death of male for reason other than consumption ?
 { ##### both NbF or MAttacks are attacks received
-          # modMaleDiedAllAttacks <- lmer(Died~ Mcol+ I((NbFAttacks+NbMAttacks)) + (1|FID)
-          #                     ,data = MY_TABLE_Videos_perMale[MY_TABLE_Videos_perMale$ConsumYN == 0,], REML =FALSE)
-          # summary(modMaleDiedAllAttacks) # n= 127, nFemale = 102; nope, but maybe attacks occured after the 2 hours video... Yellow less likely to die
-          # 
-          # modMaleDied <- lmer(Died~ Mcol+ NbFAttacks + (1|FID)
-          #                     ,data = MY_TABLE_Videos_perMale[MY_TABLE_Videos_perMale$ConsumYN == 0,], REML =FALSE)
-          # summary(modMaleDied) # n= 127, nFemale = 102; nope, but maybe attacks occured after the 2 hours video... Yellow less likely to die
-          # 
-          # 
-          # modMaleDiedrate <- lmer(Died~ Mcol+ I((NbFAttacks+NbMAttacks)/TotalWatch) + (1|FID)
-          #                     ,data = MY_TABLE_Videos_perMale[MY_TABLE_Videos_perMale$ConsumYN == 0,], REML =FALSE)
-          # summary(modMaleDiedrate) # n= 127, nFemale = 102;
-
 
 ### in subset of trials where male died, did the one that ended up dead received more aggression from the female?
+  ### these are poisson distributed data so t.test not quite appropriate....
 
 subsetTrialwhereMaleDied <- MY_TABLE_Videos_perMale[MY_TABLE_Videos_perMale$FID %in% MY_TABLE_Videos_perMale$FID[MY_TABLE_Videos_perMale$Died == 1],]
+subsetTrialwhereMaleDied$NbFMAttacks <- subsetTrialwhereMaleDied$NbFAttacks+ subsetTrialwhereMaleDied$NbMphysicalInter
+  
   #subsetTrialwhereMaleDied$NbMFAttacks <- subsetTrialwhereMaleDied$NbFAttacks+subsetTrialwhereMaleDied$NbMAttacks
 t.test(subsetTrialwhereMaleDied$NbFAttacks[subsetTrialwhereMaleDied$Died == 1],
+       subsetTrialwhereMaleDied$NbFAttacks[subsetTrialwhereMaleDied$Died == 0],
+       paired = TRUE)
+
+t.test(subsetTrialwhereMaleDied$NbFMAttacks[subsetTrialwhereMaleDied$Died == 1] ,
        subsetTrialwhereMaleDied$NbFAttacks[subsetTrialwhereMaleDied$Died == 0],
        paired = TRUE)
 
@@ -804,11 +760,13 @@ t.test(subsetTrialwhereMaleDied$NbFAttacks[subsetTrialwhereMaleDied$Died == 1],
 ### Do F and M attacks predict consumed or died
 {  
   MY_TABLE_Videos_perMale$Kaput <- MY_TABLE_Videos_perMale$ConsumYN+ MY_TABLE_Videos_perMale$Died
-  modMaleKaput <- lmer(Kaput~ Mcol+ 
+  summary(MY_TABLE_Videos_perMale$Kaput)
+  modMaleKaput <- glmer(Kaput~ Mcol+ 
                          #I((NbFAttacks+NbMAttacks))
                          NbFAttacks
                          + (1|FID)
-                       ,data = MY_TABLE_Videos_perMale, REML =FALSE)
+                       ,data = MY_TABLE_Videos_perMale
+                       , family = 'binomial')
   summary(modMaleKaput)
 }  
 
