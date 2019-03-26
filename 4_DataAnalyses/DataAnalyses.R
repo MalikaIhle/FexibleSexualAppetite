@@ -232,8 +232,7 @@ invlogit(coef(summary(mod3))[4, 1]) # 3.141732e-12 back transformed estimate for
  
  # exploration: male tests where no male male competition to exclude it entirely as a possible confounding factor
  ## subset of valid trials (no spider died from other reason than cannibalism) and where no male male competition
- FID_NoMaleMaleFight <- 17000+ MY_TABLE_Videos$FID[MY_TABLE_Videos$NbMphysicalInter == 0 & MY_TABLE_Videos$ExcludeYN ==0]
- MY_TABLE_MaleTest_NoMaleMaleFight <- MY_TABLE_MaleTest[MY_TABLE_MaleTest$FID %in% FID_NoMaleMaleFight,]
+  MY_TABLE_MaleTest_NoMaleMaleFight <- MY_TABLE_MaleTest[MY_TABLE_MaleTest$FID %in% FID_NoMaleMaleFight,]
  nrow(MY_TABLE_MaleTest_NoMaleMaleFight)
  
  mod3_NoMaleMaleFight <- glm (CannibalizedRedYN ~ Trt+ DeltaMsize + DeltaMcondition
