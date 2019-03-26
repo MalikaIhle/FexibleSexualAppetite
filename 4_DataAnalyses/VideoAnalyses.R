@@ -657,8 +657,10 @@ summary(modNbMAttacks_noIntercept)
 
 
 table_effect_MAttack <- as.data.frame(cbind(est=exp(summary(modNbMAttacks)$coeff[,1]),
-                                                 CIhigh=exp(summary(modNbMAttacks)$coeff[,1]+summary(modNbMAttacks)$coeff[,2]*1.96),
-                                                 CIlow=exp(summary(modNbMAttacks)$coeff[,1]-summary(modNbMAttacks)$coeff[,2]*1.96)))
+                                            CIhigh=exp(summary(modNbMAttacks)$coeff[,1]+summary(modNbMAttacks)$coeff[,2]*1.96),
+                                            CIlow=exp(summary(modNbMAttacks)$coeff[,1]-summary(modNbMAttacks)$coeff[,2]*1.96),
+                                             avSE = exp(((summary(modNbMAttacks)$coeff[,1]+summary(modNbMAttacks)$coeff[,2]) 
+                                                 - (summary(modNbMAttacks)$coeff[,1]-summary(modNbMAttacks)$coeff[,2]))/2)))
 table_effect_MAttack$Mcol <- c("Red",'Black')
 rownames(table_effect_MAttack) <- NULL
 table_effect_MAttack
