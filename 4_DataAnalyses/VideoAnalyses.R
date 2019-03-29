@@ -811,9 +811,12 @@ colnames(NonFocalData) <- c('FID','NonFocalNbFAttacks','NonFocalConsumYN')
 FocalMaleTable <- cbind(FocalData,NonFocalData)
 head(FocalMaleTable)
 FocalMaleTable$AttackRateDifference <- (FocalMaleTable$FocalNbFAttacks/FocalMaleTable$TotalWatch - FocalMaleTable$NonFocalNbFAttacks/FocalMaleTable$TotalWatch)
-FocalMaleTable$AttackRateDifferenceCat[FocalMaleTable$AttackRateDifference < 0] <- "negtative"
-FocalMaleTable$AttackRateDifferenceCat[FocalMaleTable$AttackRateDifference == 0] <- "a_null"
+FocalMaleTable$AttackRateDifferenceCat[FocalMaleTable$AttackRateDifference < 0] <- "negative"
+FocalMaleTable$AttackRateDifferenceCat[FocalMaleTable$AttackRateDifference == 0] <- "null"
 FocalMaleTable$AttackRateDifferenceCat[FocalMaleTable$AttackRateDifference > 0] <- "positive"
+table(FocalMaleTable$AttackRateDifference)
+hist(FocalMaleTable$AttackRateDifference, breaks = 50)
+table(FocalMaleTable$AttackRateDifferenceCat)
 
 modFconsumAttackRateDifference <- glm(FocalConsumYN ~ AttackRateDifferenceCat
                                                     , data = FocalMaleTable[FocalMaleTable$AttackRateDifference != 0,] ## not so sure what to do <<<<<<<<<
@@ -843,9 +846,23 @@ t.test(subsetTrialwhereMaleDied$NbFAttacks[subsetTrialwhereMaleDied$Died == 1],
        subsetTrialwhereMaleDied$NbFAttacks[subsetTrialwhereMaleDied$Died == 0],
        paired = TRUE)
 
+
 t.test(subsetTrialwhereMaleDied$NbFMAttacks[subsetTrialwhereMaleDied$Died == 1] ,
        subsetTrialwhereMaleDied$NbFAttacks[subsetTrialwhereMaleDied$Died == 0],
        paired = TRUE)
+
+
+# in fact Nb of attacks are poisson distributed, not gaussian so can't do t test?
+
+wilcox.test(subsetTrialwhereMaleDied$NbFAttacks[subsetTrialwhereMaleDied$Died == 1],
+            subsetTrialwhereMaleDied$NbFAttacks[subsetTrialwhereMaleDied$Died == 0],
+            paired = TRUE)
+
+wilcox.test(subsetTrialwhereMaleDied$NbFMAttacks[subsetTrialwhereMaleDied$Died == 1],
+            subsetTrialwhereMaleDied$NbFMAttacks[subsetTrialwhereMaleDied$Died == 0],
+            paired = TRUE)
+
+
 
 }
   
