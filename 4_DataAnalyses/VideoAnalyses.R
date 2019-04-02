@@ -24,6 +24,7 @@
   # video from the second test of female 193 (test 317), video ID 36, was watched but need to be excluded here.
   # video recording failed for female 210 and 254
   # video recording was shorter (due to technical difficulties) for females 224 and 207
+  # male male interactions were initialy scored as attack / push push, rollover ect, all physical aggressive interactions are now pulled into the variable NbMphysicalInter
 }
 
 rm(list = ls(all = TRUE))
@@ -35,6 +36,7 @@ rm(list = ls(all = TRUE))
   library(dplyr)
   library(here)
   require(sjPlot) # for model automatic interaction plot
+  library(gridExtra) # for function gridarrange
 }
 
 {# functions
@@ -500,7 +502,7 @@ summary(modNaiveTotalCourtDurNaiveTests)# n=154 NS (no NAs but more zeros for du
 
 }
 
-### are black males receiving more attacks from the other male and/or the female ?
+### are black males receiving more attacks from the female ?
 { 
 #### exploration of the potential author bias in attack observed
 {  ######## attacks are binary and less subject to observation bias but
@@ -527,8 +529,8 @@ table(MY_TABLE_Videos$Author, MY_TABLE_Videos$ReasonExclusion)
 
 
 #### Female attack toward male of specific colors, in function of their training
-
-modNbFAttacks <- glmer(NbFAttacks~  Mcol*GroupName 
+{
+modNbFAttacks <- glmer(NbFAttacks ~  Mcol*GroupName + scale(TotalWatch) 
                       #*Author - Mcol:GroupName:Author - GroupName:Author 
                       + (1|FID)
                       , data = MY_TABLE_Videos_perMale
@@ -536,27 +538,28 @@ modNbFAttacks <- glmer(NbFAttacks~  Mcol*GroupName
 summary(modNbFAttacks)# n=204 * signi more attacks towards black male, independent of the female treatment
 drop1(modNbFAttacks, test= "Chisq")
 
-modNbFAttacks_effects <- data.frame(
-est = exp(summary(modNbFAttacks)$coeff[,1]),
-SEhigh = exp(summary(modNbFAttacks)$coeff[,1] + summary(modNbFAttacks)$coeff[,2]),
-SElow = exp(summary(modNbFAttacks)$coeff[,1] - summary(modNbFAttacks)$coeff[,2])
-)
-modNbFAttacks_effects$avSE <- (modNbFAttacks_effects$SEhigh-modNbFAttacks_effects$SElow)/2
+
+modNbFAttacks_forplotting <- glmer(NbFAttacks~ -1+ paste(Mcol,GroupName, sep="") + scale(TotalWatch) 
+                                                              + (1|FID)
+                                                              , data = MY_TABLE_Videos_perMale
+                                                              , family = "poisson" )
 
 
-modNbFAttacksinter0 <- glmer(NbFAttacks~ Mcol+ GroupName  + (1|FID)
-                            , data = MY_TABLE_Videos_perMale 
-                            , family = 'poisson')
+
+
+modNbFAttacksinter0 <- glmer(NbFAttacks~ Mcol+ GroupName   + scale(TotalWatch) + (1|FID)
+                             , data = MY_TABLE_Videos_perMale 
+                             , family = 'poisson')
 summary(modNbFAttacksinter0)
 anova(modNbFAttacks,modNbFAttacksinter0)# p value inter for paper
 
-modNbFAttacks00 <- glmer(NbFAttacks~  GroupName +(1|FID)
+modNbFAttacks00 <- glmer(NbFAttacks~  GroupName + scale(TotalWatch) + (1|FID)
                         , data = MY_TABLE_Videos_perMale
                         , family = 'poisson')
 anova(modNbFAttacksinter0,modNbFAttacks00)# p value Mcol for paper
 
 
-modNbFAttacks000 <- glmer(NbFAttacks~  Mcol +(1|FID)
+modNbFAttacks000 <- glmer(NbFAttacks~  Mcol + scale(TotalWatch) + (1|FID)
                          , data = MY_TABLE_Videos_perMale
                          , family = 'poisson')
 anova(modNbFAttacksinter0,modNbFAttacks000)# p value GroupName for paper
@@ -564,163 +567,116 @@ anova(modNbFAttacksinter0,modNbFAttacks000)# p value GroupName for paper
 
 
 
-modNbFAttacks_ValidTests <- glmer(NbFAttacks~ Mcol* GroupName 
+modNbFAttacks_ValidTests <- glmer(NbFAttacks~ Mcol* GroupName  + scale(TotalWatch)
                       #*Author - Mcol:GroupName:Author - GroupName:Author 
                       + (1|FID)
                       , data = MY_TABLE_Videos_perMale[MY_TABLE_Videos_perMale$ExcludeYN == 0,]
                       , family = 'poisson')
 summary(modNbFAttacks_ValidTests)#154 ** signi more attacks towards black male, independent of the female treatment
+}
+
+#### subset of trials without male male competition
+{# !!! this is assuming than attack is a proxy for cannibalism which may not be the case - see below
+All_FID_NoMaleMaleFight <- MY_TABLE_Videos$FID[MY_TABLE_Videos$NbMphysicalInter == 0]
+All_MY_TABLE_Videos_perMale_NoMaleMaleFight <- MY_TABLE_Videos_perMale[MY_TABLE_Videos_perMale$FID %in% All_FID_NoMaleMaleFight,]
+### this is used in DataAnalysis script to test mod3 (spill over) in this subset
+
+modNbFAttacks_NoMaleMaleFight <- glmer(NbFAttacks~ Mcol* GroupName + scale(TotalWatch)
+                                                  + (1|FID)
+                                                  , data = All_MY_TABLE_Videos_perMale_NoMaleMaleFight
+                                                  , family = 'poisson')
+summary(modNbFAttacks_NoMaleMaleFight)#106 .trend toward less attack against yellow males, independent of the female treatment
 
 
-      # subset of trials to test our hypothesis, in case male male competition is a counfounding factor
-      # !!! this is assuming than attack is a proxy for cannibalism which may not be the case - see below
-      FID_NoMaleMaleFight <- MY_TABLE_Videos$FID[MY_TABLE_Videos$NbMphysicalInter == 0 & MY_TABLE_Videos$ExcludeYN ==0]
-       MY_TABLE_Videos_perMale_NoMaleMaleFight <- MY_TABLE_Videos_perMale[MY_TABLE_Videos_perMale$FID %in% FID_NoMaleMaleFight,]
-      ### this is used in DataAnalysis script to test mod3 (spill over) in this subset
+modNbFAttacks_NoMaleMaleFight_noINteraction <- glmer(NbFAttacks~ Mcol+ GroupName  + scale(TotalWatch)
+                                                                + (1|FID)
+                                                                , data = All_MY_TABLE_Videos_perMale_NoMaleMaleFight
+                                                                , family = "poisson")
+anova(modNbFAttacks_NoMaleMaleFight,modNbFAttacks_NoMaleMaleFight_noINteraction)
+drop1(modNbFAttacks_NoMaleMaleFight, test="Chisq")
 
-      modNbFAttacks_ValidTests_NoMaleMaleFight <- glmer(NbFAttacks~ Mcol* GroupName 
-                                        + (1|FID)
-                                       , data = MY_TABLE_Videos_perMale_NoMaleMaleFight
-                                       , family = 'poisson')
-      summary(modNbFAttacks_ValidTests_NoMaleMaleFight)#76 .trend toward less attack against yellow males, independent of the female treatment
+#plot_model(modNbFAttacks_NoMaleMaleFight, type = "pred", terms = c("Mcol", "GroupName"))
+}      
       
-      
-      modNbFAttacks_ValidTests_NoMaleMaleFight_noINteraction <- glmer(NbFAttacks~ Mcol+ GroupName 
-                                                                    + (1|FID)
-                                                                    , data = MY_TABLE_Videos_perMale_NoMaleMaleFight
-                                                                    , family = "poisson")
-      anova(modNbFAttacks_ValidTests_NoMaleMaleFight,modNbFAttacks_ValidTests_NoMaleMaleFight_noINteraction)
-      drop1(modNbFAttacks_ValidTests_NoMaleMaleFight, test="Chisq")
-      
-      plot_model(modNbFAttacks_ValidTests_NoMaleMaleFight, type = "pred", terms = c("Mcol", "GroupName"))
+#### figures NbF attacks ~ Ftrt*Mcol in all vids and all vids without male male interactions 
+{      
+modNbFAttacks_NoMaleMaleFight_forplotting <- glmer(NbFAttacks~ -1+ paste(Mcol,GroupName, sep="")  + scale(TotalWatch)
+                                                            + (1|FID)
+                                                            , data = All_MY_TABLE_Videos_perMale_NoMaleMaleFight
+                                                            , family = "poisson" )
+
+summary(modNbFAttacks_forplotting)
+
+table_effect_FAttack_all <- as.data.frame(cbind(est=exp(summary(modNbFAttacks_forplotting)$coeff[,1]),
+                                              CIhigh=exp(summary(modNbFAttacks_forplotting)$coeff[,1]+summary(modNbFAttacks_forplotting)$coeff[,2]*1.96),
+                                              CIlow=exp(summary(modNbFAttacks_forplotting)$coeff[,1]-summary(modNbFAttacks_forplotting)$coeff[,2]*1.96)))
+table_effect_FAttack_all <- table_effect_FAttack_all[-nrow(table_effect_FAttack_all),]
+table_effect_FAttack_all$Mcol <- c("Red","Red", "Black", 'Black')
+table_effect_FAttack_all$FTrt <- c("Red averse","Red preference", "Red averse", 'Red preference')
+rownames(table_effect_FAttack_all) <- NULL
+table_effect_FAttack_all
+
+Attack_all_Fig <-   ggplot(data=table_effect_FAttack_all, aes(x=Mcol, y=est,colour=FTrt, shape = FTrt)) + 
+scale_y_continuous(name="Number of female attacks", limits=c(0,0.8))+
+scale_x_discrete(name = "Male facial color",limits = c("Red","Black") ) +
+theme_classic() + # white backgroun, x and y axis (no box)
+geom_errorbar(aes(ymin=CIlow, ymax=CIhigh, col=FTrt), width =0.4,na.rm=TRUE, position = position_dodge(width=0.5))+ # don't plot bor bars on x axis tick, but separate them (dodge)
+geom_point(size =4, aes(shape=FTrt, col=FTrt), stroke = 1, position = position_dodge(width=0.5)) +
+scale_colour_manual(name= "Female treatment group", values=c("Black","Grey")) +
+scale_shape_manual(name= "Female treatment group", values=c(16,17))+ # duplicate title to combine legend
+theme(panel.border = element_rect(colour = "black", fill=NA), # ad square box around graph 
+      legend.position=c(0.3,0.85),
+      legend.title = element_text(size=rel(0.8)),
+      legend.text = element_text(size=rel(0.7)),
+      legend.key.size = unit(0.8, 'lines'),
+      axis.title.x=element_text(size=10),
+      axis.title.y=element_text(size=10),
+      plot.title = element_text(hjust = 0.5, size = 10)) +
+guides(shape = guide_legend(override.aes = list(linetype = 0, size = 2))) # remove bar o top of symbol in legend
+
+
+
+summary(modNbFAttacks_NoMaleMaleFight_forplotting)
+
+table_effect_Attack_inter_all <- as.data.frame(cbind(est=exp(summary(modNbFAttacks_NoMaleMaleFight_forplotting)$coeff[,1]),
+                                               CIhigh=exp(summary(modNbFAttacks_NoMaleMaleFight_forplotting)$coeff[,1]+summary(modNbFAttacks_NoMaleMaleFight_forplotting)$coeff[,2]*1.96),
+                                               CIlow=exp(summary(modNbFAttacks_NoMaleMaleFight_forplotting)$coeff[,1]-summary(modNbFAttacks_NoMaleMaleFight_forplotting)$coeff[,2]*1.96)))
+table_effect_Attack_inter_all <- table_effect_Attack_inter_all[-nrow(table_effect_Attack_inter_all),]
+table_effect_Attack_inter_all$Mcol <- c("Red","Red", "Black", 'Black')
+table_effect_Attack_inter_all$FTrt <- c("Red averse","Red preference", "Red averse", 'Red preference')
+rownames(table_effect_Attack_inter_all) <- NULL
+table_effect_Attack_inter_all
+
+Attack_inter_all_Fig <-   ggplot(data=table_effect_Attack_inter_all, aes(x=Mcol, y=est,colour=FTrt, shape = FTrt)) + 
+scale_y_continuous(name="Number of female attacks", limits=c(0,0.8))+
+scale_x_discrete(name = "Male facial color",limits = c("Red","Black") ) +
+theme_classic() + # white backgroun, x and y axis (no box)
+geom_errorbar(aes(ymin=CIlow, ymax=CIhigh, col=FTrt), width =0.4,na.rm=TRUE, position = position_dodge(width=0.5))+ # don't plot bor bars on x axis tick, but separate them (dodge)
+geom_point(size =4, aes(shape=FTrt, col=FTrt), stroke = 1, position = position_dodge(width=0.5)) +
+scale_colour_manual(name= "Female treatment group", values=c("Black","Grey")) +
+scale_shape_manual(name= "Female treatment group", values=c(16,17))+ # duplicate title to combine legend
+theme(panel.border = element_rect(colour = "black", fill=NA), # ad square box around graph 
+      legend.position=c(0.3,0.85),
+      legend.title = element_text(size=rel(0.8)),
+      legend.text = element_text(size=rel(0.7)),
+      legend.key.size = unit(0.8, 'lines'),
+      axis.title.x=element_text(size=10),
+      axis.title.y=element_text(size=10),
+      plot.title = element_text(hjust = 0.5, size = 10)) +
+guides(shape = guide_legend(override.aes = list(linetype = 0, size = 2))) # remove bar o top of symbol in legend
+
+
+#setEPS()
+#pdf(paste(here(), "5_FiguresReport/SuppFig2b.pdf", sep="/"), height=5, width=3.3)
+#Attack_inter_all_Fig
+grid.arrange (cbind(ggplotGrob(Attack_all_Fig), ggplotGrob(Attack_inter_all_Fig), size="last"))
+#dev.off()
+}
+
+}
   
-
-      
-      modNbFAttacks_ValidTests_NoMaleMaleFight_forplotting <- glmer(NbFAttacks~ -1+ paste(Mcol,GroupName, sep="")
-                                                                  + (1|FID)
-                                                                  , data = MY_TABLE_Videos_perMale_NoMaleMaleFight
-                                                                  , family = "poisson" )
-      
-      summary(modNbFAttacks_ValidTests_NoMaleMaleFight_forplotting)
-      
-      table_effect_Attack_inter <- as.data.frame(cbind(est=exp(summary(modNbFAttacks_ValidTests_NoMaleMaleFight_forplotting)$coeff[,1]),
-                                           CIhigh=exp(summary(modNbFAttacks_ValidTests_NoMaleMaleFight_forplotting)$coeff[,1]+summary(modNbFAttacks_ValidTests_NoMaleMaleFight_forplotting)$coeff[,2]*1.96),
-                                           CIlow=exp(summary(modNbFAttacks_ValidTests_NoMaleMaleFight_forplotting)$coeff[,1]-summary(modNbFAttacks_ValidTests_NoMaleMaleFight_forplotting)$coeff[,2]*1.96)))
-      table_effect_Attack_inter$Mcol <- c("Red","Red", "Black", 'Black')
-      table_effect_Attack_inter$FTrt <- c("Red averse","Red preference", "Red averse", 'Red preference')
-      rownames(table_effect_Attack_inter) <- NULL
-      table_effect_Attack_inter
-      
-      Attack_inter_Fig <-   ggplot(data=table_effect_Attack_inter, aes(x=Mcol, y=est,colour=FTrt, shape = FTrt)) + 
-        scale_y_continuous(name="Number of female attacks")+
-        scale_x_discrete(name = "Male facial color",limits = c("Red","Black") ) +
-        theme_classic() + # white backgroun, x and y axis (no box)
-        geom_errorbar(aes(ymin=CIlow, ymax=CIhigh, col=FTrt), width =0.4,na.rm=TRUE, position = position_dodge(width=0.5))+ # don't plot bor bars on x axis tick, but separate them (dodge)
-        geom_point(size =4, aes(shape=FTrt, col=FTrt), stroke = 1, position = position_dodge(width=0.5)) +
-        scale_colour_manual(name= "Female treatment group", values=c("Black","Grey")) +
-        scale_shape_manual(name= "Female treatment group", values=c(16,17))+ # duplicate title to combine legend
-        theme(panel.border = element_rect(colour = "black", fill=NA), # ad square box around graph 
-              legend.position=c(0.3,0.85),
-              legend.title = element_text(size=rel(0.8)),
-              legend.text = element_text(size=rel(0.7)),
-              legend.key.size = unit(0.8, 'lines'),
-              axis.title.x=element_text(size=10),
-              axis.title.y=element_text(size=10),
-              plot.title = element_text(hjust = 0.5, size = 10)) +
-        guides(shape = guide_legend(override.aes = list(linetype = 0, size = 2))) # remove bar o top of symbol in legend
-      
-      
-      #setEPS()
-      #pdf(paste(here(), "5_FiguresReport/SuppFig2.pdf", sep="/"), height=5, width=3.3)
-      Attack_inter_Fig
-      #dev.off()
- 
-      
-      # subset of trials to test our hypothesis in OTHERWISE ALL VIDEOS, in case male male competition is a counfounding factor
-      # !!! this is assuming than attack is a proxy for cannibalism which may not be the case - see below
-      All_FID_NoMaleMaleFight <- MY_TABLE_Videos$FID[MY_TABLE_Videos$NbMphysicalInter == 0]
-      All_MY_TABLE_Videos_perMale_NoMaleMaleFight <- MY_TABLE_Videos_perMale[MY_TABLE_Videos_perMale$FID %in% All_FID_NoMaleMaleFight,]
-      ### this is used in DataAnalysis script to test mod3 (spill over) in this subset
-      
-      modNbFAttacks_NoMaleMaleFight <- glmer(NbFAttacks~ Mcol* GroupName 
-                                                        + (1|FID)
-                                                        , data = All_MY_TABLE_Videos_perMale_NoMaleMaleFight
-                                                        , family = 'poisson')
-      summary(modNbFAttacks_NoMaleMaleFight)#106 .trend toward less attack against yellow males, independent of the female treatment
-      
-      
-      modNbFAttacks_NoMaleMaleFight_noINteraction <- glmer(NbFAttacks~ Mcol+ GroupName 
-                                                                      + (1|FID)
-                                                                      , data = All_MY_TABLE_Videos_perMale_NoMaleMaleFight
-                                                                      , family = "poisson")
-      anova(modNbFAttacks_NoMaleMaleFight,modNbFAttacks_NoMaleMaleFight_noINteraction)
-      drop1(modNbFAttacks_NoMaleMaleFight, test="Chisq")
-      
-      plot_model(modNbFAttacks_NoMaleMaleFight, type = "pred", terms = c("Mcol", "GroupName"))
-      
-      
-      
-      modNbFAttacks_NoMaleMaleFight_forplotting <- glmer(NbFAttacks~ -1+ paste(Mcol,GroupName, sep="")
-                                                                    + (1|FID)
-                                                                    , data = All_MY_TABLE_Videos_perMale_NoMaleMaleFight
-                                                                    , family = "poisson" )
-      
-      summary(modNbFAttacks_NoMaleMaleFight_forplotting)
-      
-      table_effect_Attack_inter_all <- as.data.frame(cbind(est=exp(summary(modNbFAttacks_NoMaleMaleFight_forplotting)$coeff[,1]),
-                                                       CIhigh=exp(summary(modNbFAttacks_NoMaleMaleFight_forplotting)$coeff[,1]+summary(modNbFAttacks_NoMaleMaleFight_forplotting)$coeff[,2]*1.96),
-                                                       CIlow=exp(summary(modNbFAttacks_NoMaleMaleFight_forplotting)$coeff[,1]-summary(modNbFAttacks_NoMaleMaleFight_forplotting)$coeff[,2]*1.96)))
-      table_effect_Attack_inter_all$Mcol <- c("Red","Red", "Black", 'Black')
-      table_effect_Attack_inter_all$FTrt <- c("Red averse","Red preference", "Red averse", 'Red preference')
-      rownames(table_effect_Attack_inter_all) <- NULL
-      table_effect_Attack_inter_all
-      
-      Attack_inter_all_Fig <-   ggplot(data=table_effect_Attack_inter_all, aes(x=Mcol, y=est,colour=FTrt, shape = FTrt)) + 
-        scale_y_continuous(name="Number of female attacks")+
-        scale_x_discrete(name = "Male facial color",limits = c("Red","Black") ) +
-        theme_classic() + # white backgroun, x and y axis (no box)
-        geom_errorbar(aes(ymin=CIlow, ymax=CIhigh, col=FTrt), width =0.4,na.rm=TRUE, position = position_dodge(width=0.5))+ # don't plot bor bars on x axis tick, but separate them (dodge)
-        geom_point(size =4, aes(shape=FTrt, col=FTrt), stroke = 1, position = position_dodge(width=0.5)) +
-        scale_colour_manual(name= "Female treatment group", values=c("Black","Grey")) +
-        scale_shape_manual(name= "Female treatment group", values=c(16,17))+ # duplicate title to combine legend
-        theme(panel.border = element_rect(colour = "black", fill=NA), # ad square box around graph 
-              legend.position=c(0.3,0.85),
-              legend.title = element_text(size=rel(0.8)),
-              legend.text = element_text(size=rel(0.7)),
-              legend.key.size = unit(0.8, 'lines'),
-              axis.title.x=element_text(size=10),
-              axis.title.y=element_text(size=10),
-              plot.title = element_text(hjust = 0.5, size = 10)) +
-        guides(shape = guide_legend(override.aes = list(linetype = 0, size = 2))) # remove bar o top of symbol in legend
-      
-      
-      #setEPS()
-      #pdf(paste(here(), "5_FiguresReport/SuppFig2b.pdf", sep="/"), height=5, width=3.3)
-      Attack_inter_all_Fig
-      #dev.off()
-      
-      
-           
-#### Intended Female attack toward male of specific colors, in function of their training
-
-modNbIntendedFAttacks <- glmer(NbIntendedFAttacks~ Mcol*GroupName
-                              #*Author  - Mcol:GroupName:Author - GroupName:Author 
-                              + (1|FID)
-                      , data = MY_TABLE_Videos_perMale
-                      , family = "poisson")
-summary(modNbIntendedFAttacks)# n=204 * signi less attacks towards yellow male 
-
-
-modNbIntendedFAttacksValidTest <- glmer(NbIntendedFAttacks~ Mcol*GroupName
-                              #*Author  - Mcol:GroupName:Author - GroupName:Author 
-                              + (1|FID)
-                              , data = MY_TABLE_Videos_perMale[MY_TABLE_Videos_perMale$ExcludeYN == 0,]
-                              , family = "poisson")
-summary(modNbIntendedFAttacksValidTest)# n=154 * signi less attacks towards yellow male
-
-
-
-#### Male attack toward other male >>> NbAttacks is attacks received
+#### are black males receiving more attacks from the other male?
+{#####Male attack toward other male >>> NbAttacks is attacks received
 
 modNbMAttacks <- glmer(NbMphysicalInter~ Mcol
                       #*Author 
@@ -782,53 +738,17 @@ summary(modNbMAttacksValidTests)# n=154 NS
 
 ### Do F attacks predict futur consumption ? should test only in valid test, as non valid test, a spider died ?
 {
+head(MY_TABLE_Videos_perMale)
+ # MY_TABLE_Videos_perMale$FID[MY_TABLE_Videos_perMale$ConsumYN == 1 & MY_TABLE_Videos_perMale$ExcludeYN == 0]
+ # MY_TABLE_Videos_perMale$FID[MY_TABLE_Videos_perMale$ConsumYN == 0 & MY_TABLE_Videos_perMale$ExcludeYN == 0]
+  
+wilcox.test(
+MY_TABLE_Videos_perMale$NbFAttacks[MY_TABLE_Videos_perMale$ConsumYN == 1 & MY_TABLE_Videos_perMale$ExcludeYN == 0],
+MY_TABLE_Videos_perMale$NbFAttacks[MY_TABLE_Videos_perMale$ConsumYN == 0 & MY_TABLE_Videos_perMale$ExcludeYN == 0],
+paired = TRUE)
 
-### should test only in valid test, as non valid test, a spider died ?
-### select a focal male per test since consumYN is the opposite for the other
-### have the difference between focal and non focal ?
-set.seed(1)
-MY_TABLE_Videos_perFocalMale <- split(MY_TABLE_Videos_perMale, MY_TABLE_Videos_perMale$FID)
-
-MY_TABLE_Videos_perFocalMale_fun <- function(x){
-  x$FocalMaleYN <- sample(c(0,1), 2,replace=FALSE) # randomly assigning YN, determining whether the male is focal or not
-  return(x)
-}
-
-MY_TABLE_Videos_perMale <- do.call(rbind,lapply(MY_TABLE_Videos_perFocalMale,MY_TABLE_Videos_perFocalMale_fun))
-rownames(MY_TABLE_Videos_perMale) <- NULL
-
-
-FocalData <- MY_TABLE_Videos_perMale[MY_TABLE_Videos_perMale$FocalMaleYN == 1 
-                        & MY_TABLE_Videos_perMale$ExcludeYN == 0
-                        , c('FID','TotalWatch',"NbFAttacks",'ConsumYN')]
-colnames(FocalData) <- c('FID','TotalWatch',"FocalNbFAttacks",'FocalConsumYN')
-
-NonFocalData <- MY_TABLE_Videos_perMale[MY_TABLE_Videos_perMale$FocalMaleYN == 0 
-                                     & MY_TABLE_Videos_perMale$ExcludeYN == 0
-                                     , c('FID',"NbFAttacks",'ConsumYN')]
-colnames(NonFocalData) <- c('FID','NonFocalNbFAttacks','NonFocalConsumYN')
-
-FocalMaleTable <- cbind(FocalData,NonFocalData)
-head(FocalMaleTable)
-FocalMaleTable$AttackRateDifference <- (FocalMaleTable$FocalNbFAttacks/FocalMaleTable$TotalWatch - FocalMaleTable$NonFocalNbFAttacks/FocalMaleTable$TotalWatch)
-FocalMaleTable$AttackRateDifferenceCat[FocalMaleTable$AttackRateDifference < 0] <- "negative"
-FocalMaleTable$AttackRateDifferenceCat[FocalMaleTable$AttackRateDifference == 0] <- "null"
-FocalMaleTable$AttackRateDifferenceCat[FocalMaleTable$AttackRateDifference > 0] <- "positive"
-table(FocalMaleTable$AttackRateDifference)
-hist(FocalMaleTable$AttackRateDifference, breaks = 50)
-table(FocalMaleTable$AttackRateDifferenceCat)
-
-modFconsumAttackRateDifference <- glm(FocalConsumYN ~ AttackRateDifferenceCat
-                                                    , data = FocalMaleTable[FocalMaleTable$AttackRateDifference != 0,] ## not so sure what to do <<<<<<<<<
-                                                    , family = 'binomial')
-summary(modFconsumAttackRateDifference)
-plot(modFconsumAttackRateDifference)
-
-invlogit(coef(summary(modFconsumAttackRateDifference))[2, 1]) # likelihood 
-
-(invlogit(coef(summary(modFconsumAttackRateDifference))[2, 1] + coef(summary(modFconsumAttackRateDifference))[2, 2]) -
-  invlogit(coef(summary(modFconsumAttackRateDifference))[2, 1] - coef(summary(modFconsumAttackRateDifference))[2, 2]))/2
-
+mean(MY_TABLE_Videos_perMale$NbFAttacks[MY_TABLE_Videos_perMale$ConsumYN == 1 & MY_TABLE_Videos_perMale$ExcludeYN == 0])
+mean(MY_TABLE_Videos_perMale$NbFAttacks[MY_TABLE_Videos_perMale$ConsumYN == 0 & MY_TABLE_Videos_perMale$ExcludeYN == 0])
 
 }
 
@@ -840,19 +760,7 @@ invlogit(coef(summary(modFconsumAttackRateDifference))[2, 1]) # likelihood
 
 subsetTrialwhereMaleDied <- MY_TABLE_Videos_perMale[MY_TABLE_Videos_perMale$FID %in% MY_TABLE_Videos_perMale$FID[MY_TABLE_Videos_perMale$Died == 1],]
 subsetTrialwhereMaleDied$NbFMAttacks <- subsetTrialwhereMaleDied$NbFAttacks+ subsetTrialwhereMaleDied$NbMphysicalInter
-  
-  #subsetTrialwhereMaleDied$NbMFAttacks <- subsetTrialwhereMaleDied$NbFAttacks+subsetTrialwhereMaleDied$NbMAttacks
-t.test(subsetTrialwhereMaleDied$NbFAttacks[subsetTrialwhereMaleDied$Died == 1],
-       subsetTrialwhereMaleDied$NbFAttacks[subsetTrialwhereMaleDied$Died == 0],
-       paired = TRUE)
 
-
-t.test(subsetTrialwhereMaleDied$NbFMAttacks[subsetTrialwhereMaleDied$Died == 1] ,
-       subsetTrialwhereMaleDied$NbFAttacks[subsetTrialwhereMaleDied$Died == 0],
-       paired = TRUE)
-
-
-# in fact Nb of attacks are poisson distributed, not gaussian so can't do t test?
 
 wilcox.test(subsetTrialwhereMaleDied$NbFAttacks[subsetTrialwhereMaleDied$Died == 1],
             subsetTrialwhereMaleDied$NbFAttacks[subsetTrialwhereMaleDied$Died == 0],
@@ -866,35 +774,10 @@ wilcox.test(subsetTrialwhereMaleDied$NbFMAttacks[subsetTrialwhereMaleDied$Died =
 
 }
   
-### Do F and M attacks predict consumed or died
-{  
-  MY_TABLE_Videos_perMale$Kaput <- MY_TABLE_Videos_perMale$ConsumYN+ MY_TABLE_Videos_perMale$Died
-  summary(MY_TABLE_Videos_perMale$Kaput)
-  modMaleKaput <- glmer(Kaput~ Mcol+ 
-                         #I((NbFAttacks+NbMAttacks))
-                         NbFAttacks
-                         + (1|FID)
-                       ,data = MY_TABLE_Videos_perMale
-                       , family = 'binomial')
-  summary(modMaleKaput)
-}  
-
 }
 
 ## Descriptive
 {
-{### Nb of videos with male male fight
-#### All videos
-summary(MY_TABLE_Videos$NbMAttacks)
-length(MY_TABLE_Videos$NbMAttacks[MY_TABLE_Videos$NbMAttacks > 0])/
-  length(MY_TABLE_Videos$NbMAttacks)*100 # 42%
-#### valid tests
-summary(MY_TABLE_Videos$NbMAttacks[MY_TABLE_Videos$ExcludeYN ==0])
-length(MY_TABLE_Videos$NbMAttacks[MY_TABLE_Videos$NbMAttacks > 0 & MY_TABLE_Videos$ExcludeYN ==0])/
-  length(MY_TABLE_Videos$NbMAttacks[MY_TABLE_Videos$ExcludeYN ==0])*100 # 44%
-
-
-}
 
 {### Nb of videos with male male physical interaction
 #### All videos
@@ -905,17 +788,6 @@ length(MY_TABLE_Videos$NbMphysicalInter[MY_TABLE_Videos$NbMphysicalInter > 0])/
 summary(MY_TABLE_Videos$NbMphysicalInter[MY_TABLE_Videos$ExcludeYN ==0])
 length(MY_TABLE_Videos$NbMphysicalInter[MY_TABLE_Videos$NbMphysicalInter > 0 & MY_TABLE_Videos$ExcludeYN ==0])/
   length(MY_TABLE_Videos$NbMphysicalInter[MY_TABLE_Videos$ExcludeYN ==0])*100 # 50.6%
-}
-
-{### Nb of videos with male male any interaction (include display)
-#### All videos
-summary(MY_TABLE_Videos$NbMInter)
-length(MY_TABLE_Videos$NbMInter[MY_TABLE_Videos$NbMInter > 0])/
-  length(MY_TABLE_Videos$NbMInter)*100 # 73.5%
-#### valid tests
-summary(MY_TABLE_Videos$NbMInter[MY_TABLE_Videos$ExcludeYN ==0])
-length(MY_TABLE_Videos$NbMInter[MY_TABLE_Videos$NbMInter > 0 & MY_TABLE_Videos$ExcludeYN ==0])/
-  length(MY_TABLE_Videos$NbMInter[MY_TABLE_Videos$ExcludeYN ==0])*100 # 80.5%
 }
 
 {### Nb of males who didn't court
