@@ -458,7 +458,7 @@ Fig1 <- {ggplot(data=figdata[figdata$test == 'Bug',], aes(x=Treatment, y=estimat
     annotate("text", x="Red averse", y = 1, label = "n = 56", size=7) +
     annotate("text", x="Red accustomed", y = 1, label = "n = 69", size=7) +
     
-    geom_errorbar(aes(ymin=lowerCI, ymax=upperCI), size = 2, width =1,na.rm=TRUE)+
+    geom_errorbar(aes(ymin=lowerCI, ymax=upperCI), size = 2, width =0.5,na.rm=TRUE)+
     geom_point(size =6, stroke = 1) + 
     geom_segment(aes(x = 1, y = 90, xend = 2, yend = 90), size = 1)+
     annotate("text", label = "p = 0.01", x = 1.5, y = 97.5, size = 7) +
@@ -482,7 +482,7 @@ Fig2 <- {ggplot(data=figdata[figdata$test == 'Termite',], aes(x=Treatment, y=est
     annotate("text", x="Red averse", y = 1, label = "n = 53", size=7) +
     annotate("text", x="Red accustomed", y = 1, label = "n = 64", size=7) +
     
-    geom_errorbar(aes(ymin=lowerCI, ymax=upperCI), size = 2, width =1,na.rm=TRUE)+
+    geom_errorbar(aes(ymin=lowerCI, ymax=upperCI), size = 2, width =0.5,na.rm=TRUE)+
     geom_point(size =6, stroke = 1) +  
     geom_segment(aes(x = 1, y = 90, xend = 2, yend = 90), size = 1)+
     annotate("text", label = "p = 0.02", x = 1.5, y = 97.5, size = 7) +
@@ -505,7 +505,7 @@ Fig3 <- {ggplot(data=figdata[figdata$test == 'Male',], aes(x=Treatment, y=estima
     annotate("text", x="Red averse", y = 1, label = "n = 42", size=7) +
     annotate("text", x="Red accustomed", y = 1, label = "n = 37", size=7) +
     
-    geom_errorbar(aes(ymin=lowerCI, ymax=upperCI), size = 2, width =1,na.rm=TRUE)+
+    geom_errorbar(aes(ymin=lowerCI, ymax=upperCI), size = 2, width =0.5,na.rm=TRUE)+
     geom_point(size =6,  stroke = 1) + 
     geom_segment(aes(x = 1, y = 90, xend = 2, yend = 90), size = 1)+
     annotate("text", label = "p = 0.19", x = 1.5, y = 97.5, size = 7) +
