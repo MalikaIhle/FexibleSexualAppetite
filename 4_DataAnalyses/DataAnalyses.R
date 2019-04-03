@@ -486,6 +486,7 @@ Fig2 <- {ggplot(data=figdata[figdata$test == 'Termite',], aes(x=Treatment, y=est
     annotate("text", x="Red averse", y = 1, label = "n = 53", size=7) +
     annotate("text", x="Red accustomed", y = 1, label = "n = 64", size=7) +
     
+    geom_hline(yintercept=50, linetype="dashed", color = "grey48") +
     geom_errorbar(aes(ymin=lowerCI, ymax=upperCI), size = 2, width =0.5,na.rm=TRUE)+
     geom_point(size =6, stroke = 1) +  
     geom_segment(aes(x = 1, y = 90, xend = 2, yend = 90), size = 1)+
@@ -509,6 +510,7 @@ Fig3 <- {ggplot(data=figdata[figdata$test == 'Male',], aes(x=Treatment, y=estima
     annotate("text", x="Red averse", y = 1, label = "n = 42", size=7) +
     annotate("text", x="Red accustomed", y = 1, label = "n = 37", size=7) +
     
+    geom_hline(yintercept=50, linetype="dashed", color = "grey48") +
     geom_errorbar(aes(ymin=lowerCI, ymax=upperCI), size = 2, width =0.5,na.rm=TRUE)+
     geom_point(size =6,  stroke = 1) + 
     geom_segment(aes(x = 1, y = 90, xend = 2, yend = 90), size = 1)+
@@ -526,10 +528,10 @@ g1 <- ggplotGrob(Fig1)
 g2 <- ggplotGrob(Fig2)
 g3 <- ggplotGrob(Fig3)
 
-#setEPS() 
-#pdf("5_FiguresReport/Fig1.pdf", height=7, width=15)
+setEPS() 
+pdf("5_FiguresReport/Fig1.pdf", height=7, width=15)
 grid.arrange(cbind(g1, g2, g3, size = "last"))
-#dev.off()
+dev.off()
 
 
 
