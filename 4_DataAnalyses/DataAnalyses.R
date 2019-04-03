@@ -207,6 +207,10 @@ invlogit(coef(summary(mod3))[4, 1]) # 3.141732e-12 back transformed estimate for
  MY_TABLE_MaleTest$TrialDate <-  as.POSIXct(MY_TABLE_MaleTest$TrialDate)
  MY_TABLE_MaleTest$TrialDateEnd <-  as.POSIXct(MY_TABLE_MaleTest$TrialDateEnd)
  
+ table(MY_TABLE_MaleTest$Trt[MY_TABLE_MaleTest$TrialDateEnd == MY_TABLE_MaleTest$TrialDate 
+                   & !is.na(MY_TABLE_MaleTest$TrialDateEnd)])
+ 
+ 
  mod3_firstDay <- glm (CannibalizedRedYN ~ Trt+ DeltaMsize + DeltaMcondition
                     , family = "binomial" 
                     , data = MY_TABLE_MaleTest[MY_TABLE_MaleTest$TrialDateEnd == MY_TABLE_MaleTest$TrialDate 

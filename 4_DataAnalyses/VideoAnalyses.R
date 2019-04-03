@@ -366,8 +366,7 @@ MY_TABLE_Videos_perVideo <-  MY_TABLE_Videos_perMale %>%
     group_by(VideoID) %>% 
     summarize(NbFAttacks = sum(NbFAttacks),
               NbIntendedFAttacks = sum(NbIntendedFAttacks),
-              NbMAttacks = sum(NbMAttacks),
-              NbMphysicalInter = sum(NbMAttacks,NbPushPush, NbRollOverYN), 
+              NbMphysicalInter = sum(NbMphysicalInter), 
               NBCourt = sum(NBCourt),
               NaiveNBCourt = sum (NaiveNBCourt))
                
@@ -578,6 +577,11 @@ summary(modNbFAttacks_ValidTests)#154 ** signi more attacks towards black male, 
 {# !!! this is assuming than attack is a proxy for cannibalism which may not be the case - see below
 All_FID_NoMaleMaleFight <- MY_TABLE_Videos$FID[MY_TABLE_Videos$NbMphysicalInter == 0]
 All_MY_TABLE_Videos_perMale_NoMaleMaleFight <- MY_TABLE_Videos_perMale[MY_TABLE_Videos_perMale$FID %in% All_FID_NoMaleMaleFight,]
+
+table(MY_TABLE_Videos$GroupName)
+table(MY_TABLE_Videos$GroupName[MY_TABLE_Videos$NbMphysicalInter == 0])
+
+
 ### this is used in DataAnalysis script to test mod3 (spill over) in this subset
 
 modNbFAttacks_NoMaleMaleFight <- glmer(NbFAttacks~ Mcol* GroupName + scale(TotalWatch)
@@ -625,14 +629,15 @@ table_effect_FAttack_all
 Attack_all_Fig <-   ggplot(data=table_effect_FAttack_all, aes(x=Mcol, y=est,colour=FTrt, shape = FTrt)) + 
 scale_y_continuous(name="Number of female attacks", limits=c(0,0.8))+
 scale_x_discrete(name = "Male facial color",limits = c("Red","Black") ) +
-  labs(title = "All recorded male tests (N = 204 males)") +
+  labs(title = "All recorded male tests
+       (N = 204 males)") +
 theme_classic() + # white backgroun, x and y axis (no box)
 geom_errorbar(aes(ymin=CIlow, ymax=CIhigh, col=FTrt), width =0.4,na.rm=TRUE, position = position_dodge(width=0.5))+ # don't plot bor bars on x axis tick, but separate them (dodge)
 geom_point(size =4, aes(shape=FTrt, col=FTrt), stroke = 1, position = position_dodge(width=0.5)) +
 scale_colour_manual(name= "Female treatment group", values=c("Black","Grey")) +
 scale_shape_manual(name= "Female treatment group", values=c(16,17))+ # duplicate title to combine legend
 theme(panel.border = element_rect(colour = "black", fill=NA), # ad square box around graph 
-      legend.position=c(0.3,0.85),
+      legend.position=c(0.5,0.85),
       legend.title = element_text(size=rel(0.8)),
       legend.text = element_text(size=rel(0.7)),
       legend.key.size = unit(0.8, 'lines'),
@@ -662,7 +667,8 @@ table_effect_Attack_inter_all
 Attack_inter_all_Fig <-   ggplot(data=table_effect_Attack_inter_all, aes(x=Mcol, y=est,colour=FTrt, shape = FTrt)) + 
 scale_y_continuous(name="Number of female attacks", limits=c(0,0.8))+
 scale_x_discrete(name = "Male facial color",limits = c("Red","Black") ) +
-  labs(title = "Male tests without male-male competition (N = 53 males)") +
+  labs(title = "No male-male competition
+       (N = 106 males)") +
 theme_classic() + # white backgroun, x and y axis (no box)
 geom_errorbar(aes(ymin=CIlow, ymax=CIhigh, col=FTrt), width =0.4,na.rm=TRUE, position = position_dodge(width=0.5))+ # don't plot bor bars on x axis tick, but separate them (dodge)
 geom_point(size =4, aes(shape=FTrt, col=FTrt), stroke = 1, position = position_dodge(width=0.5)) +
@@ -681,7 +687,7 @@ guides(shape = guide_legend(override.aes = list(linetype = 0, size = 2))) # remo
     scale_y_continuous(name="PPP",limits = c(0, 0.8))+
     scale_x_continuous(limits = c(0,10))+
     
-    annotate("text", x = 5, y = 0.65, label = "Male facial coloration",  hjust = 0.5, angle=0)+
+    annotate("text", x = 5, y = 0.5, label = "Male facial coloration",  hjust = 0.5, angle=0)+
     theme_classic()+
     
     theme(
@@ -699,7 +705,7 @@ guides(shape = guide_legend(override.aes = list(linetype = 0, size = 2))) # remo
 plotblank <- ggplotGrob(blank)
 
 #setEPS()
-#pdf(paste(here(), "5_FiguresReport/SuppFig2b.pdf", sep="/"), height=5, width=5)
+#pdf(paste(here(), "5_FiguresReport/Fig4.pdf", sep="/"), height=5, width=5)
 grid.arrange (grobs = list(cbind(ggplotGrob(Attack_all_Fig), 
                                  ggplotGrob(Attack_inter_all_Fig), 
                                  size="last"),plotblank), 
