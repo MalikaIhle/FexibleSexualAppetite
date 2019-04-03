@@ -32,7 +32,6 @@ FID_NoMaleMaleFight <- 17000+MY_TABLE_Videos$FID[MY_TABLE_Videos$NbMphysicalInte
 
 }
 
-
 ## Trt Red Averse is the reference (intercept)
 
 
@@ -261,6 +260,13 @@ invlogit(coef(summary(mod3))[4, 1]) # 3.141732e-12 back transformed estimate for
    -invlogit(coef(summary(mod3_NoMaleMaleFight))[1, 1]+ coef(summary(mod3_NoMaleMaleFight))[2, 1]-coef(summary(mod3_NoMaleMaleFight))[2, 2]))/2	#  average SE for red preference
  
 
+ 
+ # is M size correlated to M condition
+ head(MY_TABLE_MID) 
+ size <- c(MY_TABLE_MID$CarapaceWidth.x,MY_TABLE_MID$CarapaceWidth.y)
+ condition <- c(MY_TABLE_MID$Mcondition.x,MY_TABLE_MID$Mcondition.y)
+ 
+ cor.test(size,condition)
  
 }  
  
