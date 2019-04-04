@@ -324,8 +324,9 @@ oddsTermite <- exp(cbind(OR=coef(mod2), confint(mod2)))[2,]
 
 ## Male test: odds ratio ?
 table(MY_TABLE_MaleTestValid$Trt, MY_TABLE_MaleTestValid$CannibalizedRedYN)
-oddsMales <- exp(cbind(OR=coef(mod3_firstDay), confint(mod3_firstDay)))[2,]  
-oddsMales1stDay <- exp(cbind(OR=coef(mod3_firstDay_firstDay), confint(mod3_firstDay_firstDay)))[2,]
+oddsMales <- exp(cbind(OR=coef(mod3), confint(mod3)))[2,]  
+oddsMales1stDay <- exp(cbind(OR=coef(mod3_firstDay), confint(mod3_firstDay)))[2,]
+oddsMalesNoMaleMaleComeptition <- exp(cbind(OR=coef(mod3_NoMaleMaleFight), confint(mod3_NoMaleMaleFight)))[2,]
 
 
 odds <- data.frame(rbind(oddsBug,oddsTermite,oddsMales1stDay,oddsMales))
@@ -416,11 +417,17 @@ chisq.test(table(MY_TABLE_TermiteTest$AttackNewRedYN), p=c(0.5,0.5))
 
 ## Male test  
 chisq.test(table(MY_TABLE_MaleTest$CannibalizedRedYN), p=c(0.5,0.5))
-summary(glm ( MY_TABLE_MaleTest$CannibalizedRedYN~1, family = "binomial", data=MY_TABLE_Step))
-
+mod_Male_5050 <- glm (CannibalizedRedYN~1, family = "binomial", data=MY_TABLE_MaleTest)
+summary(mod_Male_5050)
+oddsMales5050 <- exp(c(OR=coef(mod_Male_5050), confint(mod_Male_5050)))
 
 ### excluding test with male male competition
 chisq.test(table(MY_TABLE_MaleTest$CannibalizedRedYN[MY_TABLE_MaleTest$FID %in% FID_NoMaleMaleFight]), p=c(0.5,0.5))  
+mod_Male_5050_noMaleMaleCompetition <- glm (CannibalizedRedYN~1, family = "binomial", data=MY_TABLE_MaleTest[MY_TABLE_MaleTest$FID %in% FID_NoMaleMaleFight,])
+summary(mod_Male_5050_noMaleMaleCompetition)
+oddsMales5050_noMaleMaleCompetition <- exp(c(OR=coef(mod_Male_5050_noMaleMaleCompetition), confint(mod_Male_5050_noMaleMaleCompetition)))
+
+
 
 ### all tests
 mod4 <- glmer (AttackRedYN ~ Trt + (1|FID), family = "binomial", data=MY_TABLE_Step)
