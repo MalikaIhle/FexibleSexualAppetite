@@ -2,14 +2,17 @@
 #	 Malika IHLE      malika_ihle@hotmail.fr
 #	 Data analyses FlexibleSexualAppetite part 1
 #	 Start : 11/8/2017
-#	 last modif : 3/15/2018
-#	 commit: separate data handling from data analyses
+#	 last modif : 4/4/2019
+#	 commit: clean up structure
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+# remarks
+## Trt Red Averse is the reference (intercept)
 
 rm(list = ls(all = TRUE))
 
-{# packages
-library(lme4)
+# packages
+{library(lme4)
 library(arm)
 library(rptR)
 library(pbapply)
@@ -19,8 +22,8 @@ require(grid)
 library(here)
 }
 
-{# load data
-
+# load data
+{
 MY_TABLE_BugTest <- read.csv(paste(here(),"3_ProcessedData/MY_TABLE_BugTest.csv", sep="/")) 
 MY_TABLE_TermiteTest <- read.csv(paste(here(),"3_ProcessedData/MY_TABLE_TermiteTest.csv", sep="/")) 
 MY_TABLE_MaleTest <- read.csv(paste(here(),"3_ProcessedData/MY_TABLE_MaleTest.csv", sep="/")) 
@@ -29,14 +32,12 @@ MY_TABLE_Step <- read.csv(paste(here(),"3_ProcessedData/MY_TABLE_Step.csv", sep=
 
 MY_TABLE_Videos <- read.csv(paste(here(),"3_ProcessedData/MY_TABLE_Videos.csv", sep="/")) 
 FID_NoMaleMaleFight <- 17000+MY_TABLE_Videos$FID[MY_TABLE_Videos$NbMphysicalInter == 0 & MY_TABLE_Videos$ExcludeYN ==0]
-
 }
 
-## Trt Red Averse is the reference (intercept)
 
 
-{# step 1
-
+# Bug Test
+{
 mod1 <- glm (AttackBugYN ~ Trt + Fcondition , "binomial", data = MY_TABLE_BugTest)
 
 par(mfrow=c(2,2))
@@ -44,34 +45,37 @@ plot(mod1)
 
 summary(mod1)
 drop1(mod1,test="Chisq")
+    
+  ## for table and figure
 
-bugaverse <- invlogit(coef(summary(mod1))[1, 1]) # likelihood of eating the bug for red averse females
-
-bugpref <- invlogit(coef(summary(mod1))[1, 1] + coef(summary(mod1))[2, 1]) # likelihood of eating the bug for red preference females
-
-buglowerCIaverse <-  invlogit(coef(summary(mod1))[1, 1]-coef(summary(mod1))[1, 2]*1.96)
-bugupperCIaverse <-invlogit(coef(summary(mod1))[1, 1]+coef(summary(mod1))[1, 2]*1.96)
+  bugaverse <- invlogit(coef(summary(mod1))[1, 1]) # likelihood of eating the bug for red averse females
   
-  (invlogit(coef(summary(mod1))[1, 1]+coef(summary(mod1))[1, 2])
-  -invlogit(coef(summary(mod1))[1, 1]-coef(summary(mod1))[1, 2]))/2	# 0.06510539 average SE for red averse
+  bugpref <- invlogit(coef(summary(mod1))[1, 1] + coef(summary(mod1))[2, 1]) # likelihood of eating the bug for red preference females
+  
+  buglowerCIaverse <-  invlogit(coef(summary(mod1))[1, 1]-coef(summary(mod1))[1, 2]*1.96)
+  bugupperCIaverse <-invlogit(coef(summary(mod1))[1, 1]+coef(summary(mod1))[1, 2]*1.96)
+    
+    (invlogit(coef(summary(mod1))[1, 1]+coef(summary(mod1))[1, 2])
+    -invlogit(coef(summary(mod1))[1, 1]-coef(summary(mod1))[1, 2]))/2	# 0.06510539 average SE for red averse
+  
+   (invlogit(coef(summary(mod1))[1, 1]+ coef(summary(mod1))[2, 1]+coef(summary(mod1))[2, 2])
+    -invlogit(coef(summary(mod1))[1, 1]+ coef(summary(mod1))[2, 1]-coef(summary(mod1))[2, 2]))/2	# 0.08832562 average SE for red preference
+  
+  bugupperCIpref <-invlogit(coef(summary(mod1))[1, 1]+ coef(summary(mod1))[2, 1]+coef(summary(mod1))[2, 2]*1.96)
+  buglowerCIpref <-invlogit(coef(summary(mod1))[1, 1]+ coef(summary(mod1))[2, 1]-coef(summary(mod1))[2, 2]*1.96)
+  
+  
+  invlogit(coef(summary(mod1))[3, 1]) # 0.0001578938 back trasnformed estimate for body condition
+  (invlogit(coef(summary(mod1))[3, 1]+coef(summary(mod1))[3, 2]) 
+  - invlogit(coef(summary(mod1))[3, 1]-coef(summary(mod1))[3, 2]) ) /2# 0.5 back trasnformed estimate for body condition SE
+  
+  nBugYes <- nrow(MY_TABLE_BugTest[MY_TABLE_BugTest$AttackBugYN == 1,])
 
- (invlogit(coef(summary(mod1))[1, 1]+ coef(summary(mod1))[2, 1]+coef(summary(mod1))[2, 2])
-  -invlogit(coef(summary(mod1))[1, 1]+ coef(summary(mod1))[2, 1]-coef(summary(mod1))[2, 2]))/2	# 0.08832562 average SE for red preference
-
-bugupperCIpref <-invlogit(coef(summary(mod1))[1, 1]+ coef(summary(mod1))[2, 1]+coef(summary(mod1))[2, 2]*1.96)
-buglowerCIpref <-invlogit(coef(summary(mod1))[1, 1]+ coef(summary(mod1))[2, 1]-coef(summary(mod1))[2, 2]*1.96)
-
-
-invlogit(coef(summary(mod1))[3, 1]) # 0.0001578938 back trasnformed estimate for body condition
-(invlogit(coef(summary(mod1))[3, 1]+coef(summary(mod1))[3, 2]) 
-- invlogit(coef(summary(mod1))[3, 1]-coef(summary(mod1))[3, 2]) ) /2# 0.5 back trasnformed estimate for body condition SE
-
-nBugYes <- nrow(MY_TABLE_BugTest[MY_TABLE_BugTest$AttackBugYN == 1,])
-
+ 
   ## to get one sided test p value
-  mod1p <- coef(summary(mod1))[2, 4]/2
-  
-  
+  mod1p <- drop1(mod1,test="Chisq")[3,5]/2
+
+  ## testing for confounding factor Fcondition
   shapiro.test(MY_TABLE_BugTest$Fcondition)
   hist(MY_TABLE_BugTest$Fcondition)
   wilcox.test(MY_TABLE_BugTest$Fcondition[MY_TABLE_BugTest$Trt == "RedPreference"],
@@ -80,7 +84,7 @@ nBugYes <- nrow(MY_TABLE_BugTest[MY_TABLE_BugTest$AttackBugYN == 1,])
 
 
 
-# exploration: among those tat did attack, red averse took longer time ?
+  ## exploration: among those tat did attack, did red averse took longer time ?
   shapiro.test(log(MY_TABLE_BugTest$LatencyAttack,10))
   hist(log(MY_TABLE_BugTest$LatencyAttack,10))
   wilcox.test(MY_TABLE_BugTest$LatencyAttack[MY_TABLE_BugTest$Trt == "RedPreference"],
@@ -97,8 +101,8 @@ nBugYes <- nrow(MY_TABLE_BugTest[MY_TABLE_BugTest$AttackBugYN == 1,])
 
 }
 
-{# step 2
-
+# Termite test
+{
 mod2 <- glm (AttackNewRedYN ~ Trt, family = "binomial",  data = MY_TABLE_TermiteTest)
 
 par(mfrow=c(2,2))
@@ -107,28 +111,28 @@ plot(mod2)
 summary(mod2)
 drop1(mod2,test="Chisq")
 
-termiteaverse <- invlogit(coef(summary(mod2))[1, 1]) # likelihood of eating the red termite for red averse females
-
-termitepref <- invlogit(coef(summary(mod2))[1, 1] + coef(summary(mod2))[2, 1]) # likelihood of eating the red termite for red preference females
-
-(invlogit(coef(summary(mod2))[1, 1]+coef(summary(mod2))[1, 2])
-  -invlogit(coef(summary(mod2))[1, 1]-coef(summary(mod2))[1, 2]))/2	# 0.06621911 average SE for red averse
-
-termitelowerseaverse <- invlogit(coef(summary(mod2))[1, 1]-coef(summary(mod2))[1, 2]*1.96)
-termiteupperseaverse <- invlogit(coef(summary(mod2))[1, 1]+coef(summary(mod2))[1, 2]*1.96)
-
-(invlogit(coef(summary(mod2))[1, 1]+ coef(summary(mod2))[2, 1]+coef(summary(mod2))[2, 2])
-  -invlogit(coef(summary(mod2))[1, 1]+ coef(summary(mod2))[2, 1]-coef(summary(mod2))[2, 2]))/2	# 0.09226776 average SE for red preference
-
-termiteuppersepref <- invlogit(coef(summary(mod2))[1, 1]+ coef(summary(mod2))[2, 1]+coef(summary(mod2))[2, 2]*1.96)
-termitelowersepref <- invlogit(coef(summary(mod2))[1, 1]+ coef(summary(mod2))[2, 1]-coef(summary(mod2))[2, 2]*1.96)
-
-
-nTermiteYes <- nrow(MY_TABLE_TermiteTest[MY_TABLE_TermiteTest$AttackNewRedYN == 1,])
+  ## for table and figure
+  termiteaverse <- invlogit(coef(summary(mod2))[1, 1]) # likelihood of eating the red termite for red averse females
+  
+  termitepref <- invlogit(coef(summary(mod2))[1, 1] + coef(summary(mod2))[2, 1]) # likelihood of eating the red termite for red preference females
+  
+  (invlogit(coef(summary(mod2))[1, 1]+coef(summary(mod2))[1, 2])
+    -invlogit(coef(summary(mod2))[1, 1]-coef(summary(mod2))[1, 2]))/2	# 0.06621911 average SE for red averse
+  
+  termitelowerseaverse <- invlogit(coef(summary(mod2))[1, 1]-coef(summary(mod2))[1, 2]*1.96)
+  termiteupperseaverse <- invlogit(coef(summary(mod2))[1, 1]+coef(summary(mod2))[1, 2]*1.96)
+  
+  (invlogit(coef(summary(mod2))[1, 1]+ coef(summary(mod2))[2, 1]+coef(summary(mod2))[2, 2])
+    -invlogit(coef(summary(mod2))[1, 1]+ coef(summary(mod2))[2, 1]-coef(summary(mod2))[2, 2]))/2	# 0.09226776 average SE for red preference
+  
+  termiteuppersepref <- invlogit(coef(summary(mod2))[1, 1]+ coef(summary(mod2))[2, 1]+coef(summary(mod2))[2, 2]*1.96)
+  termitelowersepref <- invlogit(coef(summary(mod2))[1, 1]+ coef(summary(mod2))[2, 1]-coef(summary(mod2))[2, 2]*1.96)
+  
+  nTermiteYes <- nrow(MY_TABLE_TermiteTest[MY_TABLE_TermiteTest$AttackNewRedYN == 1,])
 
 
   ## to get one sided test p value
- mod2p <- coef(summary(mod2))[2, 4]/2
+  mod2p <- drop1(mod2,test="Chisq")[2,5]/2
 
 
   ## to check equality of motivation to feed
@@ -149,8 +153,8 @@ nTermiteYes <- nrow(MY_TABLE_TermiteTest[MY_TABLE_TermiteTest$AttackNewRedYN == 
   
 }
 
-{# step 3
-
+# Male test
+{
 mod3 <- glm (CannibalizedRedYN ~ Trt+ DeltaMsize + DeltaMcondition, family = "binomial", data = MY_TABLE_MaleTest)
 
 par(mfrow=c(2,2))
@@ -159,50 +163,40 @@ plot(mod3)
 summary(mod3)
 drop1(mod3,test="Chisq")
 
+  ## for table and figure
+  nMaleYes <- nrow(MY_TABLE_MaleTest[MY_TABLE_MaleTest$CannibalizedRedYN == 1,])
+  
+  maleaverse <- invlogit(coef(summary(mod3))[1, 1]) # likelihood of eating the red male for red averse females
+   
+  malepref <- invlogit(coef(summary(mod3))[1, 1] + coef(summary(mod3))[2, 1]) # likelihood of eating the red male for red preference females
+   
+  (invlogit(coef(summary(mod3))[1, 1]+coef(summary(mod3))[1, 2])
+     -invlogit(coef(summary(mod3))[1, 1]-coef(summary(mod3))[1, 2]))/2	# 0.06621911 average SE for red averse
+  
+  maleupperseaverse <- invlogit(coef(summary(mod3))[1, 1]+coef(summary(mod3))[1, 2]*1.96)
+  malelowerseaverse <- invlogit(coef(summary(mod3))[1, 1]-coef(summary(mod3))[1, 2]*1.96)
+   
+  (invlogit(coef(summary(mod3))[1, 1]+ coef(summary(mod3))[2, 1]+coef(summary(mod3))[2, 2])
+     -invlogit(coef(summary(mod3))[1, 1]+ coef(summary(mod3))[2, 1]-coef(summary(mod3))[2, 2]))/2	# 0.09226776 average SE for red preference
+   
+  malelowersepref <- invlogit(coef(summary(mod3))[1, 1]+ coef(summary(mod3))[2, 1]-coef(summary(mod3))[2, 2]*1.96)
+  maleuppersepref <- invlogit(coef(summary(mod3))[1, 1]+ coef(summary(mod3))[2, 1]+coef(summary(mod3))[2, 2]*1.96)
+   
+  
+  invlogit(coef(summary(mod3))[3, 1]) # 0.001618516 back transformed estimate for DeltaMsize
+  (invlogit(coef(summary(mod3))[3, 1]+coef(summary(mod3))[3, 2]) 
+    - invlogit(coef(summary(mod3))[3, 1]-coef(summary(mod3))[3, 2]) ) /2# 0.1987484 back transformed estimate for DeltaMsize SE
+  
+  invlogit(coef(summary(mod3))[4, 1]) # 3.141732e-12 back transformed estimate for DeltaMcondition
+  (invlogit(coef(summary(mod3))[4, 1]+coef(summary(mod3))[4, 2]) 
+    - invlogit(coef(summary(mod3))[4, 1]-coef(summary(mod3))[4, 2]) ) /2# 0.5 back transformed estimate forDeltaMcondition SE
+  
+  
   ## to get one sided test p value
- mod3p <-  coef(summary(mod3))[2, 4]/2
-
- nMaleYes <- nrow(MY_TABLE_MaleTest[MY_TABLE_MaleTest$CannibalizedRedYN == 1,])
- 
- 
-maleaverse <- invlogit(coef(summary(mod3))[1, 1]) # likelihood of eating the red male for red averse females
- 
-malepref <- invlogit(coef(summary(mod3))[1, 1] + coef(summary(mod3))[2, 1]) # likelihood of eating the red male for red preference females
- 
-(invlogit(coef(summary(mod3))[1, 1]+coef(summary(mod3))[1, 2])
-   -invlogit(coef(summary(mod3))[1, 1]-coef(summary(mod3))[1, 2]))/2	# 0.06621911 average SE for red averse
-
-maleupperseaverse <- invlogit(coef(summary(mod3))[1, 1]+coef(summary(mod3))[1, 2]*1.96)
-malelowerseaverse <- invlogit(coef(summary(mod3))[1, 1]-coef(summary(mod3))[1, 2]*1.96)
- 
-(invlogit(coef(summary(mod3))[1, 1]+ coef(summary(mod3))[2, 1]+coef(summary(mod3))[2, 2])
-   -invlogit(coef(summary(mod3))[1, 1]+ coef(summary(mod3))[2, 1]-coef(summary(mod3))[2, 2]))/2	# 0.09226776 average SE for red preference
- 
-malelowersepref <- invlogit(coef(summary(mod3))[1, 1]+ coef(summary(mod3))[2, 1]-coef(summary(mod3))[2, 2]*1.96)
-maleuppersepref <- invlogit(coef(summary(mod3))[1, 1]+ coef(summary(mod3))[2, 1]+coef(summary(mod3))[2, 2]*1.96)
- 
+  mod3p <-  drop1(mod3,test="Chisq")[2,5]/2
 
 
-
-invlogit(coef(summary(mod3))[3, 1]) # 0.001618516 back transformed estimate for DeltaMsize
-(invlogit(coef(summary(mod3))[3, 1]+coef(summary(mod3))[3, 2]) 
-  - invlogit(coef(summary(mod3))[3, 1]-coef(summary(mod3))[3, 2]) ) /2# 0.1987484 back transformed estimate for DeltaMsize SE
-
-
-invlogit(coef(summary(mod3))[4, 1]) # 3.141732e-12 back transformed estimate for DeltaMcondition
-(invlogit(coef(summary(mod3))[4, 1]+coef(summary(mod3))[4, 2]) 
-  - invlogit(coef(summary(mod3))[4, 1]-coef(summary(mod3))[4, 2]) ) /2# 0.5 back transformed estimate forDeltaMcondition SE
-
-
-
-
-  ## to check equality of male motivation to court
-  # shapiro.test(MY_TABLE_MID$Latency_to_court)
-  # t.test (MY_TABLE_MID$Latency_to_court[MY_TABLE_MID$Mcolor == "Red"], 
-  #         MY_TABLE_MID$Latency_to_court[MY_TABLE_MID$Mcolor == "Black"])
-
-
- # exploration: male test for test where male consumption happened within the first day
+ ## exploration: male test for test where male consumption happened within the first day
  MY_TABLE_MaleTest$TrialDate <-  as.POSIXct(MY_TABLE_MaleTest$TrialDate)
  MY_TABLE_MaleTest$TrialDateEnd <-  as.POSIXct(MY_TABLE_MaleTest$TrialDateEnd)
  
@@ -219,6 +213,7 @@ invlogit(coef(summary(mod3))[4, 1]) # 3.141732e-12 back transformed estimate for
  plot(mod3_firstDay)
  
  summary(mod3_firstDay)
+ drop1(mod3_firstDay,test="Chisq")
  
  
  invlogit(coef(summary(mod3_firstDay))[1, 1]) # likelihood of eating the red male for red averse females
@@ -233,9 +228,9 @@ invlogit(coef(summary(mod3))[4, 1]) # 3.141732e-12 back transformed estimate for
  
  
  
- # exploration: male tests where no male male competition to exclude it entirely as a possible confounding factor
+ ## exploration: male tests where no male male competition to exclude it entirely as a possible confounding factor
  ## subset of valid trials (no spider died from other reason than cannibalism) and where no male male competition
-  MY_TABLE_MaleTest_NoMaleMaleFight <- MY_TABLE_MaleTest[MY_TABLE_MaleTest$FID %in% FID_NoMaleMaleFight,]
+ MY_TABLE_MaleTest_NoMaleMaleFight <- MY_TABLE_MaleTest[MY_TABLE_MaleTest$FID %in% FID_NoMaleMaleFight,]
  nrow(MY_TABLE_MaleTest_NoMaleMaleFight)
  table(MY_TABLE_MaleTest_NoMaleMaleFight$Trt)
  
@@ -247,7 +242,7 @@ invlogit(coef(summary(mod3))[4, 1]) # 3.141732e-12 back transformed estimate for
  plot(mod3_NoMaleMaleFight)
  
  summary(mod3_NoMaleMaleFight)
- 
+ drop1(mod3_NoMaleMaleFight,test="Chisq")
  
  invlogit(coef(summary(mod3_NoMaleMaleFight))[1, 1]) # likelihood of eating the red male for red averse females
  
@@ -261,7 +256,7 @@ invlogit(coef(summary(mod3))[4, 1]) # 3.141732e-12 back transformed estimate for
  
 
  
- # is M size correlated to M condition
+ ## are the covariates M size and M condition uncorrelated?
  head(MY_TABLE_MID) 
  size <- c(MY_TABLE_MID$CarapaceWidth.x,MY_TABLE_MID$CarapaceWidth.y)
  condition <- c(MY_TABLE_MID$Mcondition.x,MY_TABLE_MID$Mcondition.y)
@@ -271,8 +266,9 @@ invlogit(coef(summary(mod3))[4, 1]) # 3.141732e-12 back transformed estimate for
 }  
  
   
-{# exploratory analyses: repeatability of female bias
 
+# Repeatability of female bias
+{
 mod4 <- glmer (AttackRedYN ~ Trt + (1|FID), family = "binomial", data=MY_TABLE_Step)
  
 par(mfrow=c(2,2))
@@ -290,13 +286,13 @@ anova(mod4,mod4withrowID)
 
 summary(mod4)
 
-print(rpt(formula = AttackRedYN ~ Trt + (1|FID),
-          grname = c("Fixed","FID"),
-          data= MY_TABLE_Step,
-          datatype = "Binary",
-          nboot = 1000,
-          npermut = 0,
-          adjusted = FALSE))
+# print(rpt(formula = AttackRedYN ~ Trt + (1|FID),
+#           grname = c("Fixed","FID"),
+#           data= MY_TABLE_Step,
+#           datatype = "Binary",
+#           nboot = 1000,
+#           npermut = 0,
+#           adjusted = FALSE))
 
 # female response with termite predict response with male ?
 MY_TABLE_TermiteMale <- merge(MY_TABLE_TermiteTest[,c('FID','AttackNewRedYN')],MY_TABLE_MaleTest[,c('FID','CannibalizedRedYN')],by='FID' )
@@ -315,17 +311,18 @@ summary(mod5)
 }
 
 
-{# to calculate odds ratios of eating the red prey for the Red Preference group relative to the red averse group
 
-## step 1 
+# Calculate odds ratios of eating the red prey for the Red Preference group relative to the red averse group
+{
+## Bug Test
 table(MY_TABLE_BugTest$Trt, MY_TABLE_BugTest$AttackBugYN)
 oddsBug <- exp(cbind(OR=coef(mod1), confint(mod1)))[2,] 
 
-## step 2
+## Termite test
 table(MY_TABLE_TermiteTest$Trt, MY_TABLE_TermiteTest$AttackNewRedYN)
 oddsTermite <- exp(cbind(OR=coef(mod2), confint(mod2)))[2,]
 
-## step 3: odds ratio ?
+## Male test: odds ratio ?
 table(MY_TABLE_MaleTestValid$Trt, MY_TABLE_MaleTestValid$CannibalizedRedYN)
 oddsMales <- exp(cbind(OR=coef(mod3_firstDay), confint(mod3_firstDay)))[2,]  
 oddsMales1stDay <- exp(cbind(OR=coef(mod3_firstDay_firstDay), confint(mod3_firstDay_firstDay)))[2,]
@@ -347,9 +344,9 @@ ggplot(odds, aes(y= OR, x = testname)) +
 
 }
 
-{# Comparing each group to 50/50
-
-## step 1
+# Comparing each group to 50/50
+{
+## Bug Test
 chisq.test(table(MY_TABLE_BugTest$AttackBugYN[MY_TABLE_BugTest$Trt == 'RedPreference']), p=c(0.5,0.5))
 chisq.test(table(MY_TABLE_BugTest$AttackBugYN[MY_TABLE_BugTest$Trt == 'RedAverse']), p=c(0.5,0.5))
 
@@ -362,7 +359,7 @@ ggplot(MY_TABLE_BugTest,aes(x=AttackBugYN,group=Trt,fill=Trt))+
   theme(text = element_text(size=20))
 
 
-##step 2
+## Termite test
 chisq.test(table(MY_TABLE_TermiteTest$AttackNewRedYN[MY_TABLE_TermiteTest$Trt == 'RedPreference']), p=c(0.5,0.5))
 chisq.test(table(MY_TABLE_TermiteTest$AttackNewRedYN[MY_TABLE_TermiteTest$Trt == 'RedAverse']), p=c(0.5,0.5))
 
@@ -373,7 +370,7 @@ ggplot(MY_TABLE_TermiteTest,aes(x=AttackNewRedYN,group=Trt,fill=Trt))+
   scale_fill_discrete(name = "Treatment")+
   theme(text = element_text(size=20))
 
-##step 3
+## Male test
 chisq.test(table(MY_TABLE_MaleTest$CannibalizedRedYN[MY_TABLE_MaleTest$Trt == 'RedPreference']), p=c(0.5,0.5))
 chisq.test(table(MY_TABLE_MaleTest$CannibalizedRedYN[MY_TABLE_MaleTest$Trt == 'RedAverse']), p=c(0.5,0.5))
 
@@ -407,43 +404,37 @@ chisq.test(contingencyTable)
 
 }
 
-{# Comparing all to 50/50
-  
-#step 1
+# Comparing pooled groups to 50/50
+{  
+## Bug Test
 chisq.test(table(MY_TABLE_BugTest$AttackBugYN), p=c(0.5,0.5))
 
 
-#step 2
+## Termite test
 chisq.test(table(MY_TABLE_TermiteTest$AttackNewRedYN), p=c(0.5,0.5))
 
 
-#step 3    
+## Male test  
 chisq.test(table(MY_TABLE_MaleTest$CannibalizedRedYN), p=c(0.5,0.5))
 summary(glm ( MY_TABLE_MaleTest$CannibalizedRedYN~1, family = "binomial", data=MY_TABLE_Step))
 
 
-  # excluding test with male male competition
+### excluding test with male male competition
 chisq.test(table(MY_TABLE_MaleTest$CannibalizedRedYN[MY_TABLE_MaleTest$FID %in% FID_NoMaleMaleFight]), p=c(0.5,0.5))  
 
-# all 
+### all tests
 mod4 <- glmer (AttackRedYN ~ Trt + (1|FID), family = "binomial", data=MY_TABLE_Step)
 summary(mod4) 
 
-# all 
+### all test females pooled
 mod4bis <- glmer (AttackRedYN ~ (1|FID), family = "binomial", data=MY_TABLE_Step)
 summary(mod4bis)
 
 }
 
 
-
-
-
-
-
-
-# graphs 
-
+# Figures 
+{
 {figdata <- data.frame(rbind(c('Bug', bugaverse,buglowerCIaverse, bugupperCIaverse, 'Red averse'), 
                             c('Bug',bugpref, buglowerCIpref, bugupperCIpref,'Red accustomed'),
                             c('Termite', termiteaverse, termitelowerseaverse, termiteupperseaverse, 'Red averse'),
@@ -534,10 +525,10 @@ g1 <- ggplotGrob(Fig1)
 g2 <- ggplotGrob(Fig2)
 g3 <- ggplotGrob(Fig3)
 
-setEPS() 
-pdf("5_FiguresReport/Fig1.pdf", height=7, width=15)
+#setEPS() 
+#pdf("5_FiguresReport/Fig1.pdf", height=7, width=15)
 grid.arrange(cbind(g1, g2, g3, size = "last"))
-dev.off()
+#dev.off()
 
-
+}
 
