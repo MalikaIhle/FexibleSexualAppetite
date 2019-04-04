@@ -73,7 +73,7 @@ drop1(mod1,test="Chisq")
 
  
   ## to get one sided test p value
-  mod1p <- drop1(mod1,test="Chisq")[3,5]/2
+  mod1p <- drop1(mod1,test="Chisq")[2,5]/2
 
   ## testing for confounding factor Fcondition
   shapiro.test(MY_TABLE_BugTest$Fcondition)

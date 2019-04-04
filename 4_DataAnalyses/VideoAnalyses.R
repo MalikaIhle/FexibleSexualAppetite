@@ -464,7 +464,6 @@ drop1(modTotalCourtDur, test="Chisq")
 
       ###### before being attacked
 modNaiveTotalCourtDur <- lmer(NaiveTotalCourtDur~ Mcol
-                              #*Author 
                               + scale(TotalWatchNaiveCourt)
                               + (1|FID)
                               ,data = MY_TABLE_Videos_perMale, REML =FALSE)
