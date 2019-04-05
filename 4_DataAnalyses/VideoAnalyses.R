@@ -395,6 +395,17 @@ head(MY_TABLE_Videos)
 # nrow(MY_TABLE_Videos[MY_TABLE_Videos$ExcludeYN==0,]) # 77 (out of 79 valid tests (2 videos missing, see remarks))
 
 
+# making Nb of F or M attacks binomial YN
+{
+MY_TABLE_Videos_perMale$FAttackYN[MY_TABLE_Videos_perMale$NbFAttacks == 0] <- 0
+MY_TABLE_Videos_perMale$FAttackYN[MY_TABLE_Videos_perMale$NbFAttacks != 0] <- 1
+MY_TABLE_Videos_perMale$NbMphysicalInterYN[MY_TABLE_Videos_perMale$NbMphysicalInter == 0] <- 0
+MY_TABLE_Videos_perMale$NbMphysicalInterYN[MY_TABLE_Videos_perMale$NbMphysicalInter != 0] <- 1
+MY_TABLE_Videos_perMale$FMAttackYN[MY_TABLE_Videos_perMale$NbFAttacks == 0 & MY_TABLE_Videos_perMale$NbMphysicalInter == 0] <- 0
+MY_TABLE_Videos_perMale$FMAttackYN[MY_TABLE_Videos_perMale$NbFAttacks != 0 | MY_TABLE_Videos_perMale$NbMphysicalInter != 0] <- 1
+}
+
+
 # subset to male test without male male fight
 {
 FID_NoMaleMaleFight <- MY_TABLE_Videos$FID[MY_TABLE_Videos$NbMphysicalInter == 0]
@@ -417,58 +428,92 @@ head(MY_TABLE_Videos_perMale_NoMaleMaleFight)
 ## Preregistered
 {### comparison delay to court for both type of male in the valid tests (i.e. not excluded because one of the three spiders died for other reason than cannibalism)
 
-modDelayCourtAllVideo <- lmer(DelayFirstCourt ~ Mcol + (1|FID)
+modDelayCourtAllVideo <- lmer(log(DelayFirstCourt) ~ Mcol + (1|FID)
                               ,data = MY_TABLE_Videos_perMale, REML =FALSE)
 summary(modDelayCourtAllVideo)# n=179 (delay not NA our of 204 total male-video (25 NA)), NS
 drop1(modDelayCourtAllVideo, test="Chisq")
+plot(modDelayCourtAllVideo)
 
+hist(MY_TABLE_Videos_perMale$DelayFirstCourt)
+hist(log(MY_TABLE_Videos_perMale$DelayFirstCourt))
+shapiro.test(log(MY_TABLE_Videos_perMale$DelayFirstCourt))
 }
 
 ## Exploratory
 { 
 ### are black males behaving differently than red males 
-{ ##### Delay to court
-      ###### all courts, even if had been attacked prior to starting to court
-modDelayCourtAllVideo <- lmer(DelayFirstCourt ~ Mcol
-                              + (1|FID)
-                               ,data = MY_TABLE_Videos_perMale, REML =FALSE)
-summary(modDelayCourtAllVideo)# n=179 (delay not NA out of 204 total male-video (25 NA)), NS
-drop1(modDelayCourtAllVideo, test="Chisq")
-
-
-      ###### delay to court before any attack happened on any males within test
-modDelayNaiveCourtAllVideo <- lmer(DelayNaiveFirstCourt ~ Mcol*Author + (1|FID)
+{ ##### delay to court before any attack happened on any males within test
+modDelayNaiveCourtAllVideo <- lmer(log(DelayNaiveFirstCourt) ~ Mcol + (1|FID)
                               ,data = MY_TABLE_Videos_perMale, REML =FALSE)
 summary(modDelayNaiveCourtAllVideo)# n=121 NS
 drop1(modDelayNaiveCourtAllVideo, test="Chisq")
 
+hist(MY_TABLE_Videos_perMale$DelayNaiveFirstCourt)
+hist(log(MY_TABLE_Videos_perMale$DelayNaiveFirstCourt))
+plot(modDelayNaiveCourtAllVideo)
+
+# wilcox.test(MY_TABLE_Videos_perMale$DelayNaiveFirstCourt[MY_TABLE_Videos_perMale$Mcol == "ARed"],
+#             MY_TABLE_Videos_perMale$DelayNaiveFirstCourt[MY_TABLE_Videos_perMale$Mcol == "ZBlack"],
+#             paired = TRUE)
 
     ##### delay to leave dish
-modDelayLeaveDishAllVideos <- lmer(DelayLeaveDish~ Mcol
-                                   + (1|FID)
-                          ,data = MY_TABLE_Videos_perMale, REML =FALSE)
-summary(modDelayLeaveDishAllVideos)# n=202 NS (2 were eaten in the vial)
-drop1(modDelayLeaveDishAllVideos, test="Chisq")
+# would need to do zero inflacted model or hurdle model?
+# modDelayLeaveDishAllVideos <- lmer(DelayLeaveDish ~ Mcol
+#                                    + (1|FID)
+#                           ,data = MY_TABLE_Videos_perMale, REML =FALSE)
+# summary(modDelayLeaveDishAllVideos)# n=202 NS (2 were eaten in the vial)
+# drop1(modDelayLeaveDishAllVideos, test="Chisq")
+# plot(modDelayLeaveDishAllVideos)
+
+hist(MY_TABLE_Videos_perMale$DelayLeaveDish)
+hist(log(MY_TABLE_Videos_perMale$DelayLeaveDish + 1))
+shapiro.test(log(MY_TABLE_Videos_perMale$DelayLeaveDish))
+
+wilcox.test(MY_TABLE_Videos_perMale$DelayLeaveDish[MY_TABLE_Videos_perMale$Mcol == "ARed"],
+            MY_TABLE_Videos_perMale$DelayLeaveDish[MY_TABLE_Videos_perMale$Mcol == "ZBlack"],
+            paired = TRUE)
+
+mean(MY_TABLE_Videos_perMale$DelayLeaveDish[MY_TABLE_Videos_perMale$Mcol == "ARed"], na.rm=TRUE)
+sd(MY_TABLE_Videos_perMale$DelayLeaveDish[MY_TABLE_Videos_perMale$Mcol == "ARed"], na.rm=TRUE)/sqrt(!is.na(length(MY_TABLE_Videos_perMale$DelayLeaveDish[MY_TABLE_Videos_perMale$Mcol == "ARed"])))
+mean(MY_TABLE_Videos_perMale$DelayLeaveDish[MY_TABLE_Videos_perMale$Mcol == "ZBlack"], na.rm=TRUE)
+sd(MY_TABLE_Videos_perMale$DelayLeaveDish[MY_TABLE_Videos_perMale$Mcol == "ZBlack"], na.rm=TRUE)/sqrt(!is.na(length(MY_TABLE_Videos_perMale$DelayLeaveDish[MY_TABLE_Videos_perMale$Mcol == "ZBlack"])))
+
 
 
   ##### Courtship effort 
       ###### even if had been attacked prior to starting to court
-modTotalCourtDur <- lmer(TotalCourtDur~  Mcol
-                         + scale(TotalWatch)
-                         + (1|FID)
-                         ,data = MY_TABLE_Videos_perMale, REML =FALSE)
-summary(modTotalCourtDur)# n=204 NS
-drop1(modTotalCourtDur, test="Chisq")
 
+# modTotalCourtDur <- lmer(TotalCourtDur~  Mcol
+#                          + scale(TotalWatch)
+#                          + (1|FID)
+#                          ,data = MY_TABLE_Videos_perMale, REML =FALSE)
+# summary(modTotalCourtDur)# n=204 NS
+# drop1(modTotalCourtDur, test="Chisq")
+# plot(modTotalCourtDur)
+
+hist(MY_TABLE_Videos_perMale$TotalCourtDur)
+hist(log(MY_TABLE_Videos_perMale$TotalCourtDur+1))
+
+
+wilcox.test(MY_TABLE_Videos_perMale$TotalCourtDur[MY_TABLE_Videos_perMale$Mcol == "ARed"],
+            MY_TABLE_Videos_perMale$TotalCourtDur[MY_TABLE_Videos_perMale$Mcol == "ZBlack"],
+            paired = TRUE)
 
 
       ###### before being attacked
-modNaiveTotalCourtDur <- lmer(NaiveTotalCourtDur~ Mcol
-                              + scale(TotalWatchNaiveCourt)
-                              + (1|FID)
-                              ,data = MY_TABLE_Videos_perMale, REML =FALSE)
-summary(modNaiveTotalCourtDur)# n=204 NS (no NAs but more zeros for duration, hence same sample size as above)
-drop1(modNaiveTotalCourtDur, test="Chisq")
+# modNaiveTotalCourtDur <- lmer(NaiveTotalCourtDur~ Mcol
+#                               + scale(TotalWatchNaiveCourt)
+#                               + (1|FID)
+#                               ,data = MY_TABLE_Videos_perMale, REML =FALSE)
+# summary(modNaiveTotalCourtDur)# n=204 NS (no NAs but more zeros for duration, hence same sample size as above)
+# drop1(modNaiveTotalCourtDur, test="Chisq")
+# plot(modNaiveTotalCourtDur)
+
+
+wilcox.test(MY_TABLE_Videos_perMale$NaiveTotalCourtDur[MY_TABLE_Videos_perMale$Mcol == "ARed"],
+            MY_TABLE_Videos_perMale$NaiveTotalCourtDur[MY_TABLE_Videos_perMale$Mcol == "ZBlack"],
+            paired = TRUE)
+
 
 }
 
@@ -486,6 +531,9 @@ drop1(modNaiveTotalCourtDur, test="Chisq")
                       , family = 'poisson')
 summary(modNbFAttacks)# n=204
 drop1(modNbFAttacks, test= "Chisq")
+plot(modNbFAttacks) ## very ugly
+hist(MY_TABLE_Videos_perMale$NbFAttacks)
+
 
 # using attack rate gives similar results
 # modFAttacksRate <- lmer(I(NbFAttacks/TotalWatch) ~  Mcol*GroupName 
@@ -512,10 +560,37 @@ modNbFAttacksinter0 <- glmer(NbFAttacks~ Mcol
                              , family = 'poisson')
 summary(modNbFAttacksinter0)
 drop1(modNbFAttacksinter0, test= "Chisq" )
+plot(modNbFAttacksinter0) # very ugly
+
+wilcox.test(MY_TABLE_Videos_perMale$NbFAttacks[MY_TABLE_Videos_perMale$Mcol == "ARed"],
+            MY_TABLE_Videos_perMale$NbFAttacks[MY_TABLE_Videos_perMale$Mcol == "ZBlack"],
+            paired = TRUE)
+
+
+
+modNbFAttacks_bin <- glmer(FAttackYN ~  Mcol*GroupName 
+                       + (1|FID) 
+                       , data = MY_TABLE_Videos_perMale
+                       , family = 'binomial')
+summary(modNbFAttacks_bin)#
+plot(modNbFAttacks_bin)
+
+modNbFAttacks_bin_inter0 <- glmer(FAttackYN ~  Mcol+GroupName 
+                           + (1|FID) 
+                           , data = MY_TABLE_Videos_perMale
+                           , family = 'binomial')
+summary(modNbFAttacks_bin_inter0)#
+plot(modNbFAttacks_bin_inter0)
+
+
+fisher.test(table(MY_TABLE_Videos_perMale$FAttackYN[MY_TABLE_Videos_perMale$Mcol == "ARed"],
+            MY_TABLE_Videos_perMale$FAttackYN[MY_TABLE_Videos_perMale$Mcol == "ZBlack"]))
+
 }
 
 #### Same as above, in subset of trials without male male competition
 {
+  # not enough data - model can't converge
 modNbFAttacks_NoMaleMaleFight <- glmer(NbFAttacks~ Mcol* GroupName 
                                                   + (1|FID)
                                                   + (1|VideoIDMcol) # overdispersion parameter
@@ -524,6 +599,7 @@ modNbFAttacks_NoMaleMaleFight <- glmer(NbFAttacks~ Mcol* GroupName
                                                   , family = 'poisson')
 summary(modNbFAttacks_NoMaleMaleFight)#106 
 drop1(modNbFAttacks_NoMaleMaleFight, test="Chisq")
+plot(modNbFAttacks_NoMaleMaleFight)
 
 modNbFAttacks_MoMaleMaleFight_effects <- data.frame(est = exp(summary(modNbFAttacks_NoMaleMaleFight)$coeff[,1]),
                                     SEhigh = exp(summary(modNbFAttacks_NoMaleMaleFight)$coeff[,1] + summary(modNbFAttacks_NoMaleMaleFight)$coeff[,2]),
@@ -541,6 +617,34 @@ modNbFAttacks_NoMaleMaleFight_Inter0 <- glmer(NbFAttacks~ Mcol+ GroupName
                                                               , family = "poisson")
 summary(modNbFAttacks_NoMaleMaleFight_Inter0)
 drop1(modNbFAttacks_NoMaleMaleFight_Inter0, test="Chisq")
+
+wilcox.test(MY_TABLE_Videos_perMale_NoMaleMaleFight$NbFAttacks[MY_TABLE_Videos_perMale_NoMaleMaleFight$Mcol == "ARed"],
+            MY_TABLE_Videos_perMale_NoMaleMaleFight$NbFAttacks[MY_TABLE_Videos_perMale_NoMaleMaleFight$Mcol == "ZBlack"],
+            paired = TRUE)
+
+
+
+modNbFAttacks_bin_NoMaleMaleFight <- glmer(FAttackYN ~  Mcol*GroupName 
+                           + (1|FID) 
+                           , data = MY_TABLE_Videos_perMale_NoMaleMaleFight
+                           , family = 'binomial')
+summary(modNbFAttacks_bin_NoMaleMaleFight)#
+plot(modNbFAttacks_bin_NoMaleMaleFight)
+drop1(modNbFAttacks_bin_NoMaleMaleFight, test="Chisq")
+
+
+modNbFAttacks_bin_inter0_NoMaleMaleFight <- glmer(FAttackYN ~  Mcol+GroupName 
+                                  + (1|FID) 
+                                  , data = MY_TABLE_Videos_perMale_NoMaleMaleFight
+                                  , family = 'binomial')
+summary(modNbFAttacks_bin_inter0_NoMaleMaleFight)#
+plot(modNbFAttacks_bin_inter0_NoMaleMaleFight)
+drop1(modNbFAttacks_bin_inter0_NoMaleMaleFight, test="Chisq")
+
+
+fisher.test(table(MY_TABLE_Videos_perMale_NoMaleMaleFight$FAttackYN[MY_TABLE_Videos_perMale_NoMaleMaleFight$Mcol == "ARed"],
+                  MY_TABLE_Videos_perMale_NoMaleMaleFight$FAttackYN[MY_TABLE_Videos_perMale_NoMaleMaleFight$Mcol == "ZBlack"]))
+
 
 
 }      
@@ -663,6 +767,36 @@ grid.arrange (grobs = list(cbind(ggplotGrob(FAttack),
 
   summary(MY_TABLE_Videos_perMale$NbMphysicalInter)
   
+  wilcox.test(MY_TABLE_Videos_perMale$NbMphysicalInter[MY_TABLE_Videos_perMale$Mcol == "ARed"],
+              MY_TABLE_Videos_perMale$NbMphysicalInter[MY_TABLE_Videos_perMale$Mcol == "ZBlack"],
+              paired = TRUE) 
+  
+  
+  modNbMAttacks_bin <- glmer(NbMphysicalInterYN ~  Mcol*GroupName 
+                                             + (1|FID) 
+                                             , data = MY_TABLE_Videos_perMale
+                                             , family = 'binomial')
+  summary(modNbMAttacks_bin)#
+  plot(modNbMAttacks_bin)
+  drop1(modNbMAttacks_bin, test="Chisq")
+  
+  
+  modNbMAttacks_bin_inter0 <- glmer(NbMphysicalInterYN ~  Mcol+GroupName 
+                                                    + (1|FID) 
+                                                    , data = MY_TABLE_Videos_perMale
+                                                    , family = 'binomial')
+  summary(modNbMAttacks_bin_inter0)#
+  plot(modNbMAttacks_bin_inter0)
+  drop1(modNbMAttacks_bin_inter0, test="Chisq")
+  
+  
+  fisher.test(table(MY_TABLE_Videos_perMale$NbMphysicalInterYN[MY_TABLE_Videos_perMale$Mcol == "ARed"],
+                    MY_TABLE_Videos_perMale$NbMphysicalInterYN[MY_TABLE_Videos_perMale$Mcol == "ZBlack"]))
+  
+  
+  
+  
+  
 modNbMAttacks <- glmer(NbMphysicalInter~ Mcol
                       + (1|FID)
                       + (1|VideoIDMcol) # overdispersion parameter
@@ -671,6 +805,7 @@ modNbMAttacks <- glmer(NbMphysicalInter~ Mcol
                       , family = "poisson")
 summary(modNbMAttacks)# n=204 signi more attacks toward black males
 drop1(modNbMAttacks, test="Chisq")
+plot(modNbMAttacks) # soo ugly
 
 modNbMAttacks_noIntercept <- glmer(NbMphysicalInter~ -1+ Mcol
                        + (1|FID)
@@ -728,6 +863,12 @@ paired = TRUE)
 mean(MY_TABLE_Videos_perMale$NbFAttacks[MY_TABLE_Videos_perMale$ConsumYN == 1 & MY_TABLE_Videos_perMale$ExcludeYN == 0])
 mean(MY_TABLE_Videos_perMale$NbFAttacks[MY_TABLE_Videos_perMale$ConsumYN == 0 & MY_TABLE_Videos_perMale$ExcludeYN == 0])
 
+
+fisher.test(table(
+  MY_TABLE_Videos_perMale$FAttackYN[MY_TABLE_Videos_perMale$ConsumYN == 1 & MY_TABLE_Videos_perMale$ExcludeYN == 0],
+  MY_TABLE_Videos_perMale$FAttackYN[MY_TABLE_Videos_perMale$ConsumYN == 0 & MY_TABLE_Videos_perMale$ExcludeYN == 0]))
+
+
 }
 
 ### Do F and M attacks predict futur death of male for reason other than consumption ?
@@ -748,6 +889,9 @@ wilcox.test(subsetTrialwhereMaleDied$NbFMAttacks[subsetTrialwhereMaleDied$Died =
             subsetTrialwhereMaleDied$NbFMAttacks[subsetTrialwhereMaleDied$Died == 0],
             paired = TRUE)
 
+fisher.test(table(
+  subsetTrialwhereMaleDied$FMAttackYN[subsetTrialwhereMaleDied$Died == 1],
+  subsetTrialwhereMaleDied$FMAttackYN[subsetTrialwhereMaleDied$Died == 0]))
 
 
 }
