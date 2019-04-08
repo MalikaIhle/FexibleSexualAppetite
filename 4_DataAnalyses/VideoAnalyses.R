@@ -523,48 +523,48 @@ wilcox.test(MY_TABLE_Videos_perMale$NaiveTotalCourtDur[MY_TABLE_Videos_perMale$M
   
 #### Female attacks toward male of specific colors, in function of their training
 {
-  modNbFAttacks <- glmer(NbFAttacks ~  Mcol*GroupName 
-                      + (1|FID) 
-                      + (1|VideoIDMcol) # overdispersion parameter
-                      , offset = log(TotalWatch)
-                      , data = MY_TABLE_Videos_perMale
-                      , family = 'poisson')
-summary(modNbFAttacks)# n=204
-drop1(modNbFAttacks, test= "Chisq")
-plot(modNbFAttacks) ## very ugly
-hist(MY_TABLE_Videos_perMale$NbFAttacks)
-
-
-# using attack rate gives similar results
-# modFAttacksRate <- lmer(I(NbFAttacks/TotalWatch) ~  Mcol*GroupName 
-#                        + (1|FID) 
-#                        , data = MY_TABLE_Videos_perMale
-#                        )
-# summary(modFAttacksRate)# n=204
-# drop1(modFAttacksRate, test= "Chisq")
-
-
-modNbFAttacks_effects <- data.frame(est = exp(summary(modNbFAttacks)$coeff[,1]),
-SEhigh = exp(summary(modNbFAttacks)$coeff[,1] + summary(modNbFAttacks)$coeff[,2]),
-SElow = exp(summary(modNbFAttacks)$coeff[,1] - summary(modNbFAttacks)$coeff[,2])
-)
-modNbFAttacks_effects$avSE <- (modNbFAttacks_effects$SEhigh-modNbFAttacks_effects$SElow)/2
-
-
-modNbFAttacksinter0 <- glmer(NbFAttacks~ Mcol
-                             + GroupName   
-                             + (1|FID)
-                             + (1|VideoIDMcol) # overdispersion parameter
-                             , offset = log(TotalWatch)
-                             , data = MY_TABLE_Videos_perMale 
-                             , family = 'poisson')
-summary(modNbFAttacksinter0)
-drop1(modNbFAttacksinter0, test= "Chisq" )
-plot(modNbFAttacksinter0) # very ugly
-
-wilcox.test(MY_TABLE_Videos_perMale$NbFAttacks[MY_TABLE_Videos_perMale$Mcol == "ARed"],
-            MY_TABLE_Videos_perMale$NbFAttacks[MY_TABLE_Videos_perMale$Mcol == "ZBlack"],
-            paired = TRUE)
+#   modNbFAttacks <- glmer(NbFAttacks ~  Mcol*GroupName 
+#                       + (1|FID) 
+#                       + (1|VideoIDMcol) # overdispersion parameter
+#                       , offset = log(TotalWatch)
+#                       , data = MY_TABLE_Videos_perMale
+#                       , family = 'poisson')
+# summary(modNbFAttacks)# n=204
+# drop1(modNbFAttacks, test= "Chisq")
+# plot(modNbFAttacks) ## very ugly
+# hist(MY_TABLE_Videos_perMale$NbFAttacks)
+# 
+# 
+# # using attack rate gives similar results
+# # modFAttacksRate <- lmer(I(NbFAttacks/TotalWatch) ~  Mcol*GroupName 
+# #                        + (1|FID) 
+# #                        , data = MY_TABLE_Videos_perMale
+# #                        )
+# # summary(modFAttacksRate)# n=204
+# # drop1(modFAttacksRate, test= "Chisq")
+# 
+# 
+# modNbFAttacks_effects <- data.frame(est = exp(summary(modNbFAttacks)$coeff[,1]),
+# SEhigh = exp(summary(modNbFAttacks)$coeff[,1] + summary(modNbFAttacks)$coeff[,2]),
+# SElow = exp(summary(modNbFAttacks)$coeff[,1] - summary(modNbFAttacks)$coeff[,2])
+# )
+# modNbFAttacks_effects$avSE <- (modNbFAttacks_effects$SEhigh-modNbFAttacks_effects$SElow)/2
+# 
+# 
+# modNbFAttacksinter0 <- glmer(NbFAttacks~ Mcol
+#                              + GroupName   
+#                              + (1|FID)
+#                              + (1|VideoIDMcol) # overdispersion parameter
+#                              , offset = log(TotalWatch)
+#                              , data = MY_TABLE_Videos_perMale 
+#                              , family = 'poisson')
+# summary(modNbFAttacksinter0)
+# drop1(modNbFAttacksinter0, test= "Chisq" )
+# plot(modNbFAttacksinter0) # very ugly
+# 
+# wilcox.test(MY_TABLE_Videos_perMale$NbFAttacks[MY_TABLE_Videos_perMale$Mcol == "ARed"],
+#             MY_TABLE_Videos_perMale$NbFAttacks[MY_TABLE_Videos_perMale$Mcol == "ZBlack"],
+#             paired = TRUE)
 
 
 
@@ -574,6 +574,7 @@ modNbFAttacks_bin <- glmer(FAttackYN ~  Mcol*GroupName
                        , family = 'binomial')
 summary(modNbFAttacks_bin)#
 plot(modNbFAttacks_bin)
+drop1(modNbFAttacks_bin, test="Chisq")
 
 modNbFAttacks_bin_inter0 <- glmer(FAttackYN ~  Mcol+GroupName 
                            + (1|FID) 
@@ -581,46 +582,55 @@ modNbFAttacks_bin_inter0 <- glmer(FAttackYN ~  Mcol+GroupName
                            , family = 'binomial')
 summary(modNbFAttacks_bin_inter0)#
 plot(modNbFAttacks_bin_inter0)
+drop1(modNbFAttacks_bin_inter0, test="Chisq")
 
 
-fisher.test(table(MY_TABLE_Videos_perMale$FAttackYN[MY_TABLE_Videos_perMale$Mcol == "ARed"],
-            MY_TABLE_Videos_perMale$FAttackYN[MY_TABLE_Videos_perMale$Mcol == "ZBlack"]))
+modNbFAttacks_bin_justMcol <- glmer(FAttackYN ~  Mcol
+                                    + (1|FID) 
+                                    , data = MY_TABLE_Videos_perMale
+                                    , family = 'binomial')
+summary(modNbFAttacks_bin_justMcol)
+drop1(modNbFAttacks_bin_justMcol, test="Chisq")
+
+
+mcnemar.test(table(MY_TABLE_Videos_perMale$FAttackYN[MY_TABLE_Videos_perMale$Mcol == "ARed"],
+                   MY_TABLE_Videos_perMale$FAttackYN[MY_TABLE_Videos_perMale$Mcol == "ZBlack"]))
 
 }
 
 #### Same as above, in subset of trials without male male competition
 {
   # not enough data - model can't converge
-modNbFAttacks_NoMaleMaleFight <- glmer(NbFAttacks~ Mcol* GroupName 
-                                                  + (1|FID)
-                                                  + (1|VideoIDMcol) # overdispersion parameter
-                                                  , offset = log(TotalWatch)
-                                                  , data = MY_TABLE_Videos_perMale_NoMaleMaleFight
-                                                  , family = 'poisson')
-summary(modNbFAttacks_NoMaleMaleFight)#106 
-drop1(modNbFAttacks_NoMaleMaleFight, test="Chisq")
-plot(modNbFAttacks_NoMaleMaleFight)
-
-modNbFAttacks_MoMaleMaleFight_effects <- data.frame(est = exp(summary(modNbFAttacks_NoMaleMaleFight)$coeff[,1]),
-                                    SEhigh = exp(summary(modNbFAttacks_NoMaleMaleFight)$coeff[,1] + summary(modNbFAttacks_NoMaleMaleFight)$coeff[,2]),
-                                    SElow = exp(summary(modNbFAttacks_NoMaleMaleFight)$coeff[,1] - summary(modNbFAttacks_NoMaleMaleFight)$coeff[,2])
-)
-modNbFAttacks_MoMaleMaleFight_effects$avSE <- (modNbFAttacks_MoMaleMaleFight_effects$SEhigh-modNbFAttacks_MoMaleMaleFight_effects$SElow)/2
-
-
-
-modNbFAttacks_NoMaleMaleFight_Inter0 <- glmer(NbFAttacks~ Mcol+ GroupName  
-                                                              + (1|FID)
-                                                              + (1|VideoIDMcol) # overdispersion parameter
-                                                              , offset = log(TotalWatch)
-                                                              , data = MY_TABLE_Videos_perMale_NoMaleMaleFight
-                                                              , family = "poisson")
-summary(modNbFAttacks_NoMaleMaleFight_Inter0)
-drop1(modNbFAttacks_NoMaleMaleFight_Inter0, test="Chisq")
-
-wilcox.test(MY_TABLE_Videos_perMale_NoMaleMaleFight$NbFAttacks[MY_TABLE_Videos_perMale_NoMaleMaleFight$Mcol == "ARed"],
-            MY_TABLE_Videos_perMale_NoMaleMaleFight$NbFAttacks[MY_TABLE_Videos_perMale_NoMaleMaleFight$Mcol == "ZBlack"],
-            paired = TRUE)
+# modNbFAttacks_NoMaleMaleFight <- glmer(NbFAttacks~ Mcol* GroupName 
+#                                                   + (1|FID)
+#                                                   + (1|VideoIDMcol) # overdispersion parameter
+#                                                   , offset = log(TotalWatch)
+#                                                   , data = MY_TABLE_Videos_perMale_NoMaleMaleFight
+#                                                   , family = 'poisson')
+# summary(modNbFAttacks_NoMaleMaleFight)#106 
+# drop1(modNbFAttacks_NoMaleMaleFight, test="Chisq")
+# plot(modNbFAttacks_NoMaleMaleFight)
+# 
+# modNbFAttacks_MoMaleMaleFight_effects <- data.frame(est = exp(summary(modNbFAttacks_NoMaleMaleFight)$coeff[,1]),
+#                                     SEhigh = exp(summary(modNbFAttacks_NoMaleMaleFight)$coeff[,1] + summary(modNbFAttacks_NoMaleMaleFight)$coeff[,2]),
+#                                     SElow = exp(summary(modNbFAttacks_NoMaleMaleFight)$coeff[,1] - summary(modNbFAttacks_NoMaleMaleFight)$coeff[,2])
+# )
+# modNbFAttacks_MoMaleMaleFight_effects$avSE <- (modNbFAttacks_MoMaleMaleFight_effects$SEhigh-modNbFAttacks_MoMaleMaleFight_effects$SElow)/2
+# 
+# 
+# 
+# modNbFAttacks_NoMaleMaleFight_Inter0 <- glmer(NbFAttacks~ Mcol+ GroupName  
+#                                                               + (1|FID)
+#                                                               + (1|VideoIDMcol) # overdispersion parameter
+#                                                               , offset = log(TotalWatch)
+#                                                               , data = MY_TABLE_Videos_perMale_NoMaleMaleFight
+#                                                               , family = "poisson")
+# summary(modNbFAttacks_NoMaleMaleFight_Inter0)
+# drop1(modNbFAttacks_NoMaleMaleFight_Inter0, test="Chisq")
+# 
+# wilcox.test(MY_TABLE_Videos_perMale_NoMaleMaleFight$NbFAttacks[MY_TABLE_Videos_perMale_NoMaleMaleFight$Mcol == "ARed"],
+#             MY_TABLE_Videos_perMale_NoMaleMaleFight$NbFAttacks[MY_TABLE_Videos_perMale_NoMaleMaleFight$Mcol == "ZBlack"],
+#             paired = TRUE)
 
 
 
@@ -642,10 +652,15 @@ plot(modNbFAttacks_bin_inter0_NoMaleMaleFight)
 drop1(modNbFAttacks_bin_inter0_NoMaleMaleFight, test="Chisq")
 
 
-fisher.test(table(MY_TABLE_Videos_perMale_NoMaleMaleFight$FAttackYN[MY_TABLE_Videos_perMale_NoMaleMaleFight$Mcol == "ARed"],
-                  MY_TABLE_Videos_perMale_NoMaleMaleFight$FAttackYN[MY_TABLE_Videos_perMale_NoMaleMaleFight$Mcol == "ZBlack"]))
+odNbFAttacks_bin_justMcol_NoMaleMaleFight <- glmer(FAttackYN ~  Mcol
+                                                 + (1|FID) 
+                                                 , data = MY_TABLE_Videos_perMale_NoMaleMaleFight
+                                                 , family = 'binomial')
+summary(odNbFAttacks_bin_justMcol_NoMaleMaleFight)#
+drop1(odNbFAttacks_bin_justMcol_NoMaleMaleFight, test="Chisq")
 
-
+mcnemar.test(table(MY_TABLE_Videos_perMale_NoMaleMaleFight$FAttackYN[MY_TABLE_Videos_perMale_NoMaleMaleFight$Mcol == "ARed"],
+                   MY_TABLE_Videos_perMale_NoMaleMaleFight$FAttackYN[MY_TABLE_Videos_perMale_NoMaleMaleFight$Mcol == "ZBlack"]))
 
 }      
       
@@ -767,10 +782,10 @@ grid.arrange (grobs = list(cbind(ggplotGrob(FAttack),
 
   summary(MY_TABLE_Videos_perMale$NbMphysicalInter)
   
-  wilcox.test(MY_TABLE_Videos_perMale$NbMphysicalInter[MY_TABLE_Videos_perMale$Mcol == "ARed"],
-              MY_TABLE_Videos_perMale$NbMphysicalInter[MY_TABLE_Videos_perMale$Mcol == "ZBlack"],
-              paired = TRUE) 
-  
+  # wilcox.test(MY_TABLE_Videos_perMale$NbMphysicalInter[MY_TABLE_Videos_perMale$Mcol == "ARed"],
+  #             MY_TABLE_Videos_perMale$NbMphysicalInter[MY_TABLE_Videos_perMale$Mcol == "ZBlack"],
+  #             paired = TRUE) 
+  # 
   
   modNbMAttacks_bin <- glmer(NbMphysicalInterYN ~  Mcol*GroupName 
                                              + (1|FID) 
@@ -790,61 +805,61 @@ grid.arrange (grobs = list(cbind(ggplotGrob(FAttack),
   drop1(modNbMAttacks_bin_inter0, test="Chisq")
   
   
-  fisher.test(table(MY_TABLE_Videos_perMale$NbMphysicalInterYN[MY_TABLE_Videos_perMale$Mcol == "ARed"],
+  mcnemar.test(table(MY_TABLE_Videos_perMale$NbMphysicalInterYN[MY_TABLE_Videos_perMale$Mcol == "ARed"],
                     MY_TABLE_Videos_perMale$NbMphysicalInterYN[MY_TABLE_Videos_perMale$Mcol == "ZBlack"]))
   
   
   
-  
-  
-modNbMAttacks <- glmer(NbMphysicalInter~ Mcol
-                      + (1|FID)
-                      + (1|VideoIDMcol) # overdispersion parameter
-                      , offset = log(TotalWatch)
-                      , data = MY_TABLE_Videos_perMale
-                      , family = "poisson")
-summary(modNbMAttacks)# n=204 signi more attacks toward black males
-drop1(modNbMAttacks, test="Chisq")
-plot(modNbMAttacks) # soo ugly
-
-modNbMAttacks_noIntercept <- glmer(NbMphysicalInter~ -1+ Mcol
-                       + (1|FID)
-                       + (1|VideoIDMcol) # overdispersion parameter
-                       , offset = log(TotalWatch)
-                       , data = MY_TABLE_Videos_perMale
-                       , family = "poisson")
-summary(modNbMAttacks_noIntercept)
-
-
-table_effect_MAttack <- as.data.frame(cbind(est=exp(summary(modNbMAttacks)$coeff[,1]),
-                                            CIhigh=exp(summary(modNbMAttacks)$coeff[,1]+summary(modNbMAttacks)$coeff[,2]*1.96),
-                                            CIlow=exp(summary(modNbMAttacks)$coeff[,1]-summary(modNbMAttacks)$coeff[,2]*1.96),
-                                            SEhigh = exp(summary(modNbMAttacks)$coeff[,1]+summary(modNbMAttacks)$coeff[,2]),
-                                            SElow = exp(summary(modNbMAttacks)$coeff[,1]-summary(modNbMAttacks)$coeff[,2])
-                                             ))
-
-table_effect_MAttack$avSE <- (table_effect_MAttack$SEhigh-table_effect_MAttack$SElow)/2
-table_effect_MAttack$Mcol <- c("Red",'Black')
-rownames(table_effect_MAttack) <- NULL
-table_effect_MAttack
-
-
-MAttack_received_Fig <-   ggplot(data=table_effect_MAttack, aes(x=Mcol, y=est)) + 
-  scale_y_continuous(name="Number of male attacks received")+
-  scale_x_discrete(name = "Male facial color",limits = c("Red","Black") ) +
-  theme_classic() + # white backgroun, x and y axis (no box)
-  geom_errorbar(aes(ymin=CIlow, ymax=CIhigh), width =0.4,na.rm=TRUE, position = position_dodge(width=0.5))+ # don't plot bor bars on x axis tick, but separate them (dodge)
-  geom_point(size =4, stroke = 1, position = position_dodge(width=0.5)) +
-   theme(panel.border = element_rect(colour = "black", fill=NA), # ad square box around graph 
-        legend.position='none',
-        axis.title.x=element_text(size=10),
-        axis.title.y=element_text(size=10),
-        plot.title = element_text(hjust = 0.5, size = 10))
- 
-#setEPS()
-#pdf(paste(here(), "5_FiguresReport/SuppFig1.pdf", sep="/"), height=5, width=3.3)
-MAttack_received_Fig
-#dev.off()
+#   
+#   
+# modNbMAttacks <- glmer(NbMphysicalInter~ Mcol
+#                       + (1|FID)
+#                       + (1|VideoIDMcol) # overdispersion parameter
+#                       , offset = log(TotalWatch)
+#                       , data = MY_TABLE_Videos_perMale
+#                       , family = "poisson")
+# summary(modNbMAttacks)# n=204 signi more attacks toward black males
+# drop1(modNbMAttacks, test="Chisq")
+# plot(modNbMAttacks) # soo ugly
+# 
+# modNbMAttacks_noIntercept <- glmer(NbMphysicalInter~ -1+ Mcol
+#                        + (1|FID)
+#                        + (1|VideoIDMcol) # overdispersion parameter
+#                        , offset = log(TotalWatch)
+#                        , data = MY_TABLE_Videos_perMale
+#                        , family = "poisson")
+# summary(modNbMAttacks_noIntercept)
+# 
+# 
+# table_effect_MAttack <- as.data.frame(cbind(est=exp(summary(modNbMAttacks)$coeff[,1]),
+#                                             CIhigh=exp(summary(modNbMAttacks)$coeff[,1]+summary(modNbMAttacks)$coeff[,2]*1.96),
+#                                             CIlow=exp(summary(modNbMAttacks)$coeff[,1]-summary(modNbMAttacks)$coeff[,2]*1.96),
+#                                             SEhigh = exp(summary(modNbMAttacks)$coeff[,1]+summary(modNbMAttacks)$coeff[,2]),
+#                                             SElow = exp(summary(modNbMAttacks)$coeff[,1]-summary(modNbMAttacks)$coeff[,2])
+#                                              ))
+# 
+# table_effect_MAttack$avSE <- (table_effect_MAttack$SEhigh-table_effect_MAttack$SElow)/2
+# table_effect_MAttack$Mcol <- c("Red",'Black')
+# rownames(table_effect_MAttack) <- NULL
+# table_effect_MAttack
+# 
+# 
+# MAttack_received_Fig <-   ggplot(data=table_effect_MAttack, aes(x=Mcol, y=est)) + 
+#   scale_y_continuous(name="Number of male attacks received")+
+#   scale_x_discrete(name = "Male facial color",limits = c("Red","Black") ) +
+#   theme_classic() + # white backgroun, x and y axis (no box)
+#   geom_errorbar(aes(ymin=CIlow, ymax=CIhigh), width =0.4,na.rm=TRUE, position = position_dodge(width=0.5))+ # don't plot bor bars on x axis tick, but separate them (dodge)
+#   geom_point(size =4, stroke = 1, position = position_dodge(width=0.5)) +
+#    theme(panel.border = element_rect(colour = "black", fill=NA), # ad square box around graph 
+#         legend.position='none',
+#         axis.title.x=element_text(size=10),
+#         axis.title.y=element_text(size=10),
+#         plot.title = element_text(hjust = 0.5, size = 10))
+#  
+# #setEPS()
+# #pdf(paste(here(), "5_FiguresReport/SuppFig1.pdf", sep="/"), height=5, width=3.3)
+# MAttack_received_Fig
+# #dev.off()
 
 
 }
