@@ -521,10 +521,35 @@ wilcox.test(MY_TABLE_Videos_perMale$NaiveTotalCourtDur[MY_TABLE_Videos_perMale$M
 { 
   summary(MY_TABLE_Videos_perMale$NbFAttacks)
   
+  #MY_TABLE_Videos_perMale$rankedFAttackRate <- rank(MY_TABLE_Videos_perMale$NbFAttacks/MY_TABLE_Videos_perMale$TotalWatch)
+  
+  MY_TABLE_Videos_perMale <- data.frame(MY_TABLE_Videos_perMale %>% group_by(FID) %>% mutate(rankedFAttackRate = rank(NbFAttacks/TotalWatch)))
+ head(MY_TABLE_Videos_perMale) 
+ 
 #### Female attacks toward male of specific colors, in function of their training
 {
-#   modNbFAttacks <- glmer(NbFAttacks ~  Mcol*GroupName 
-#                       + (1|FID) 
+  
+  # mod_Ranked_NbFAttacks <- lmer(rankedFAttackRate ~  Mcol*GroupName
+  #                        + (1|FID)
+  #                        , data = MY_TABLE_Videos_perMale)
+  # summary(mod_Ranked_NbFAttacks)# n=204
+  # drop1(mod_Ranked_NbFAttacks, test= "Chisq")
+  # plot(mod_Ranked_NbFAttacks) ## very ugly
+  # hist(MY_TABLE_Videos_perMale$rankedFAttackRate, xlab = "rankedFAttackRate", main = NULL)
+  # 
+  
+  mod_Ranked_NbFAttacks_withinFID <- lm(rankedFAttackRate ~  Mcol*GroupName, data = MY_TABLE_Videos_perMale)
+  summary(mod_Ranked_NbFAttacks_withinFID)# n=204
+  drop1(mod_Ranked_NbFAttacks_withinFID, test= "Chisq")
+  plot(mod_Ranked_NbFAttacks_withinFID) ## very ugly
+  hist(MY_TABLE_Videos_perMale$rankedFAttackRate, xlab = "rankedFAttackRate_withinFID", main = NULL)
+  
+  mod_Ranked_NbFAttacks_withinFID_inter0 <- lm(rankedFAttackRate ~  Mcol, data = MY_TABLE_Videos_perMale)
+  drop1(mod_Ranked_NbFAttacks_withinFID_inter0, test= "Chisq")
+  
+  
+#   modNbFAttacks <- glmer(NbFAttacks ~  Mcol*GroupName
+#                       + (1|FID)
 #                       + (1|VideoIDMcol) # overdispersion parameter
 #                       , offset = log(TotalWatch)
 #                       , data = MY_TABLE_Videos_perMale
@@ -782,6 +807,15 @@ mcnemar.test(table(MY_TABLE_Videos_perMale_NoMaleMaleFight$FAttackYN[MY_TABLE_Vi
 {#####Male attack toward other male >>> NbAttacks is attacks received
 
   summary(MY_TABLE_Videos_perMale$NbMphysicalInter)
+  MY_TABLE_Videos_perMale <- data.frame(MY_TABLE_Videos_perMale %>% group_by(FID) %>% mutate(rankedMAttackRate = rank(NbMphysicalInter/TotalWatch)))
+  head(MY_TABLE_Videos_perMale) 
+  
+  
+  modNbMAttacks_Ranked <- lm(rankedMAttackRate ~  Mcol, data = MY_TABLE_Videos_perMale)
+  summary(modNbMAttacks_Ranked)#
+  plot(modNbMAttacks_Ranked)
+  drop1(modNbMAttacks_Ranked, test="Chisq")
+  hist(MY_TABLE_Videos_perMale$rankedMAttackRate, main=NULL, xlab="rankedMAttackRate")
   
   # wilcox.test(MY_TABLE_Videos_perMale$NbMphysicalInter[MY_TABLE_Videos_perMale$Mcol == "ARed"],
   #             MY_TABLE_Videos_perMale$NbMphysicalInter[MY_TABLE_Videos_perMale$Mcol == "ZBlack"],
