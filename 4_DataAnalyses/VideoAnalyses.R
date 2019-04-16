@@ -437,24 +437,45 @@ plot(modDelayCourtAllVideo)
 hist(MY_TABLE_Videos_perMale$DelayFirstCourt)
 hist(log(MY_TABLE_Videos_perMale$DelayFirstCourt))
 shapiro.test(log(MY_TABLE_Videos_perMale$DelayFirstCourt))
+
+wilcox.test(MY_TABLE_Videos_perMale$DelayFirstCourt[MY_TABLE_Videos_perMale$Mcol == "ARed"],
+            MY_TABLE_Videos_perMale$DelayFirstCourt[MY_TABLE_Videos_perMale$Mcol == "ZBlack"],
+            paired = TRUE)
+
+
+mean(MY_TABLE_Videos_perMale$DelayFirstCourt[MY_TABLE_Videos_perMale$Mcol == "ARed"], na.rm=TRUE)
+sd(MY_TABLE_Videos_perMale$DelayFirstCourt[MY_TABLE_Videos_perMale$Mcol == "ARed"], na.rm=TRUE)#/sqrt(!is.na(length(MY_TABLE_Videos_perMale$DelayFirstCourt[MY_TABLE_Videos_perMale$Mcol == "ARed"])))
+mean(MY_TABLE_Videos_perMale$DelayFirstCourt[MY_TABLE_Videos_perMale$Mcol == "ZBlack"], na.rm=TRUE)
+sd(MY_TABLE_Videos_perMale$DelayFirstCourt[MY_TABLE_Videos_perMale$Mcol == "ZBlack"], na.rm=TRUE)#/sqrt(!is.na(length(MY_TABLE_Videos_perMale$DelayFirstCourt[MY_TABLE_Videos_perMale$Mcol == "ZBlack"])))
+
+
+
+
 }
 
 ## Exploratory
 { 
 ### are black males behaving differently than red males 
 { ##### delay to court before any attack happened on any males within test
-modDelayNaiveCourtAllVideo <- lmer(log(DelayNaiveFirstCourt) ~ Mcol + (1|FID)
-                              ,data = MY_TABLE_Videos_perMale, REML =FALSE)
-summary(modDelayNaiveCourtAllVideo)# n=121 NS
-drop1(modDelayNaiveCourtAllVideo, test="Chisq")
-
-hist(MY_TABLE_Videos_perMale$DelayNaiveFirstCourt)
-hist(log(MY_TABLE_Videos_perMale$DelayNaiveFirstCourt))
-plot(modDelayNaiveCourtAllVideo)
-
+# modDelayNaiveCourtAllVideo <- lmer(log(DelayNaiveFirstCourt) ~ Mcol + (1|FID)
+#                               ,data = MY_TABLE_Videos_perMale, REML =FALSE)
+# summary(modDelayNaiveCourtAllVideo)# n=121 NS
+# drop1(modDelayNaiveCourtAllVideo, test="Chisq")
+# 
+# hist(MY_TABLE_Videos_perMale$DelayNaiveFirstCourt)
+# hist(log(MY_TABLE_Videos_perMale$DelayNaiveFirstCourt))
+# plot(modDelayNaiveCourtAllVideo)
+# 
 # wilcox.test(MY_TABLE_Videos_perMale$DelayNaiveFirstCourt[MY_TABLE_Videos_perMale$Mcol == "ARed"],
 #             MY_TABLE_Videos_perMale$DelayNaiveFirstCourt[MY_TABLE_Videos_perMale$Mcol == "ZBlack"],
 #             paired = TRUE)
+# 
+# 
+# mean(MY_TABLE_Videos_perMale$DelayNaiveFirstCourt[MY_TABLE_Videos_perMale$Mcol == "ARed"], na.rm=TRUE)
+# sd(MY_TABLE_Videos_perMale$DelayNaiveFirstCourt[MY_TABLE_Videos_perMale$Mcol == "ARed"], na.rm=TRUE)#/sqrt(!is.na(length(MY_TABLE_Videos_perMale$DelayNaiveFirstCourt[MY_TABLE_Videos_perMale$Mcol == "ARed"])))
+# mean(MY_TABLE_Videos_perMale$DelayNaiveFirstCourt[MY_TABLE_Videos_perMale$Mcol == "ZBlack"], na.rm=TRUE)
+# sd(MY_TABLE_Videos_perMale$DelayNaiveFirstCourt[MY_TABLE_Videos_perMale$Mcol == "ZBlack"], na.rm=TRUE)#/sqrt(!is.na(length(MY_TABLE_Videos_perMale$DelayNaiveFirstCourt[MY_TABLE_Videos_perMale$Mcol == "ZBlack"])))
+
 
     ##### delay to leave dish
 # would need to do zero inflacted model or hurdle model?
@@ -474,9 +495,9 @@ wilcox.test(MY_TABLE_Videos_perMale$DelayLeaveDish[MY_TABLE_Videos_perMale$Mcol 
             paired = TRUE)
 
 mean(MY_TABLE_Videos_perMale$DelayLeaveDish[MY_TABLE_Videos_perMale$Mcol == "ARed"], na.rm=TRUE)
-sd(MY_TABLE_Videos_perMale$DelayLeaveDish[MY_TABLE_Videos_perMale$Mcol == "ARed"], na.rm=TRUE)/sqrt(!is.na(length(MY_TABLE_Videos_perMale$DelayLeaveDish[MY_TABLE_Videos_perMale$Mcol == "ARed"])))
+sd(MY_TABLE_Videos_perMale$DelayLeaveDish[MY_TABLE_Videos_perMale$Mcol == "ARed"], na.rm=TRUE)#/sqrt(!is.na(length(MY_TABLE_Videos_perMale$DelayLeaveDish[MY_TABLE_Videos_perMale$Mcol == "ARed"])))
 mean(MY_TABLE_Videos_perMale$DelayLeaveDish[MY_TABLE_Videos_perMale$Mcol == "ZBlack"], na.rm=TRUE)
-sd(MY_TABLE_Videos_perMale$DelayLeaveDish[MY_TABLE_Videos_perMale$Mcol == "ZBlack"], na.rm=TRUE)/sqrt(!is.na(length(MY_TABLE_Videos_perMale$DelayLeaveDish[MY_TABLE_Videos_perMale$Mcol == "ZBlack"])))
+sd(MY_TABLE_Videos_perMale$DelayLeaveDish[MY_TABLE_Videos_perMale$Mcol == "ZBlack"], na.rm=TRUE)#/sqrt(!is.na(length(MY_TABLE_Videos_perMale$DelayLeaveDish[MY_TABLE_Videos_perMale$Mcol == "ZBlack"])))
 
 
 
@@ -500,6 +521,13 @@ wilcox.test(MY_TABLE_Videos_perMale$TotalCourtDur[MY_TABLE_Videos_perMale$Mcol =
             paired = TRUE)
 
 
+mean(MY_TABLE_Videos_perMale$TotalCourtDur[MY_TABLE_Videos_perMale$Mcol == "ARed"], na.rm=TRUE)
+sd(MY_TABLE_Videos_perMale$TotalCourtDur[MY_TABLE_Videos_perMale$Mcol == "ARed"], na.rm=TRUE)#/sqrt(!is.na(length(MY_TABLE_Videos_perMale$TotalCourtDur[MY_TABLE_Videos_perMale$Mcol == "ARed"])))
+mean(MY_TABLE_Videos_perMale$TotalCourtDur[MY_TABLE_Videos_perMale$Mcol == "ZBlack"], na.rm=TRUE)
+sd(MY_TABLE_Videos_perMale$TotalCourtDur[MY_TABLE_Videos_perMale$Mcol == "ZBlack"], na.rm=TRUE)#/sqrt(!is.na(length(MY_TABLE_Videos_perMale$TotalCourtDur[MY_TABLE_Videos_perMale$Mcol == "ZBlack"])))
+
+
+
       ###### before being attacked
 # modNaiveTotalCourtDur <- lmer(NaiveTotalCourtDur~ Mcol
 #                               + scale(TotalWatchNaiveCourt)
@@ -514,17 +542,29 @@ wilcox.test(MY_TABLE_Videos_perMale$NaiveTotalCourtDur[MY_TABLE_Videos_perMale$M
             MY_TABLE_Videos_perMale$NaiveTotalCourtDur[MY_TABLE_Videos_perMale$Mcol == "ZBlack"],
             paired = TRUE)
 
+mean(MY_TABLE_Videos_perMale$NaiveTotalCourtDur[MY_TABLE_Videos_perMale$Mcol == "ARed"], na.rm=TRUE)
+sd(MY_TABLE_Videos_perMale$NaiveTotalCourtDur[MY_TABLE_Videos_perMale$Mcol == "ARed"], na.rm=TRUE)#/sqrt(!is.na(length(MY_TABLE_Videos_perMale$NaiveTotalCourtDur[MY_TABLE_Videos_perMale$Mcol == "ARed"])))
+mean(MY_TABLE_Videos_perMale$NaiveTotalCourtDur[MY_TABLE_Videos_perMale$Mcol == "ZBlack"], na.rm=TRUE)
+sd(MY_TABLE_Videos_perMale$NaiveTotalCourtDur[MY_TABLE_Videos_perMale$Mcol == "ZBlack"], na.rm=TRUE)#/sqrt(!is.na(length(MY_TABLE_Videos_perMale$NaiveTotalCourtDur[MY_TABLE_Videos_perMale$Mcol == "ZBlack"])))
+
 
 }
 
 ### are black males receiving more attacks from the female ?
 { 
   summary(MY_TABLE_Videos_perMale$NbFAttacks)
+  table(MY_TABLE_Videos_perMale$NbFAttacks,MY_TABLE_Videos_perMale$Mcol)
+  table(MY_TABLE_Videos_perMale$FAttackYN,MY_TABLE_Videos_perMale$Mcol)
+  table(MY_TABLE_Videos_perMale$FAttackYN, MY_TABLE_Videos_perMale$Mcol, MY_TABLE_Videos_perMale$GroupName)
+  table(MY_TABLE_Videos_perMale$NbFAttacks, MY_TABLE_Videos_perMale$Mcol, MY_TABLE_Videos_perMale$GroupName)
+  
+  
   
   #MY_TABLE_Videos_perMale$rankedFAttackRate <- rank(MY_TABLE_Videos_perMale$NbFAttacks/MY_TABLE_Videos_perMale$TotalWatch)
   
-  MY_TABLE_Videos_perMale <- data.frame(MY_TABLE_Videos_perMale %>% group_by(FID) %>% mutate(rankedFAttackRate = rank(NbFAttacks/TotalWatch)))
- head(MY_TABLE_Videos_perMale) 
+  MY_TABLE_Videos_perMale <- data.frame(MY_TABLE_Videos_perMale %>% group_by(FID) %>% mutate(rankedFAttack = rank(NbFAttacks)))
+  
+  head(MY_TABLE_Videos_perMale) 
  
 #### Female attacks toward male of specific colors, in function of their training
 {
@@ -538,13 +578,14 @@ wilcox.test(MY_TABLE_Videos_perMale$NaiveTotalCourtDur[MY_TABLE_Videos_perMale$M
   # hist(MY_TABLE_Videos_perMale$rankedFAttackRate, xlab = "rankedFAttackRate", main = NULL)
   # 
   
-  mod_Ranked_NbFAttacks_withinFID <- lm(rankedFAttackRate ~  Mcol*GroupName, data = MY_TABLE_Videos_perMale)
+  mod_Ranked_NbFAttacks_withinFID <- lm(rankedFAttack ~  Mcol*GroupName, data = MY_TABLE_Videos_perMale)
   summary(mod_Ranked_NbFAttacks_withinFID)# n=204
   drop1(mod_Ranked_NbFAttacks_withinFID, test= "Chisq")
-  plot(mod_Ranked_NbFAttacks_withinFID) ## very ugly
-  hist(MY_TABLE_Videos_perMale$rankedFAttackRate, xlab = "rankedFAttackRate_withinFID", main = NULL)
+  plot(mod_Ranked_NbFAttacks_withinFID)
+  hist(MY_TABLE_Videos_perMale$rankedFAttack, xlab = "rankedFAttackRate_withinFID", main = NULL)
   
-  mod_Ranked_NbFAttacks_withinFID_inter0 <- lm(rankedFAttackRate ~  Mcol, data = MY_TABLE_Videos_perMale)
+  mod_Ranked_NbFAttacks_withinFID_inter0 <- lm(rankedFAttack ~  Mcol, data = MY_TABLE_Videos_perMale)
+  summary(mod_Ranked_NbFAttacks_withinFID_inter0)
   drop1(mod_Ranked_NbFAttacks_withinFID_inter0, test= "Chisq")
   
   
@@ -807,15 +848,15 @@ mcnemar.test(table(MY_TABLE_Videos_perMale_NoMaleMaleFight$FAttackYN[MY_TABLE_Vi
 {#####Male attack toward other male >>> NbAttacks is attacks received
 
   summary(MY_TABLE_Videos_perMale$NbMphysicalInter)
-  MY_TABLE_Videos_perMale <- data.frame(MY_TABLE_Videos_perMale %>% group_by(FID) %>% mutate(rankedMAttackRate = rank(NbMphysicalInter/TotalWatch)))
+  MY_TABLE_Videos_perMale <- data.frame(MY_TABLE_Videos_perMale %>% group_by(FID) %>% mutate(rankedMAttack= rank(NbMphysicalInter)))
   head(MY_TABLE_Videos_perMale) 
   
   
-  modNbMAttacks_Ranked <- lm(rankedMAttackRate ~  Mcol, data = MY_TABLE_Videos_perMale)
+  modNbMAttacks_Ranked <- lm(rankedMAttack ~  Mcol, data = MY_TABLE_Videos_perMale)
   summary(modNbMAttacks_Ranked)#
   plot(modNbMAttacks_Ranked)
   drop1(modNbMAttacks_Ranked, test="Chisq")
-  hist(MY_TABLE_Videos_perMale$rankedMAttackRate, main=NULL, xlab="rankedMAttackRate")
+  hist(MY_TABLE_Videos_perMale$rankedMAttack, main=NULL, xlab="rankedMAttack")
   
   # wilcox.test(MY_TABLE_Videos_perMale$NbMphysicalInter[MY_TABLE_Videos_perMale$Mcol == "ARed"],
   #             MY_TABLE_Videos_perMale$NbMphysicalInter[MY_TABLE_Videos_perMale$Mcol == "ZBlack"],
