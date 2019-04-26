@@ -7,7 +7,7 @@
 
 table <- read.table("1_RawData/IrradianceLamps.txt", header=TRUE)
 head(table)
-
+table <- table[table$nm <700,]
 
 library(ggplot2)
 
