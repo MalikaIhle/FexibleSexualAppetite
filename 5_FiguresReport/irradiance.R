@@ -19,11 +19,14 @@ pdf(paste(here(), "5_FiguresReport/IrradianceLamps.pdf", sep="/"), height=3, wid
 ggplot(data=table, aes(x=nm, y=intensity, colour = lamp)) +
   scale_y_continuous(name = "Intensity") +
   scale_x_continuous(name = "Wavelength (nm)") +
+  geom_line(aes(linetype=lamp, color=lamp), size = 2)+
   scale_color_manual(values = c("training"="orange","testing" ="darkorange"), 
                      labels = c("SoLux MR16 3500K 50W used during training" ,
                                 "SoLux PAR38 3500K 90W used during testing")) +
-                       
-  geom_line() +
+  scale_linetype_manual(values=c("training"="longdash","testing" = "solid"),
+                        labels = c("SoLux MR16 3500K 50W used during training" ,
+                                   "SoLux PAR38 3500K 90W used during testing"))+                   
+ 
  theme_classic() +
   theme (panel.border = element_rect(colour = "black", fill=NA), # ad square box around graph 
          axis.title.x=element_text(size=10),
@@ -32,7 +35,7 @@ ggplot(data=table, aes(x=nm, y=intensity, colour = lamp)) +
          legend.title = element_text(size=rel(0.8)),
          legend.text = element_text(size=rel(0.7)),
          legend.key.size = unit(0.8, 'lines'))+
-guides(colour = guide_legend(title = "Light bulbs")) 
+guides(colour = guide_legend(title = "Light bulbs"))+guides(linetype = guide_legend(title = "Light bulbs")) 
 
 
 dev.off()
