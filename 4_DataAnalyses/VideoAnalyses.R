@@ -34,6 +34,7 @@ rm(list = ls(all = TRUE))
   library(RODBC) # this require R AND ACCESS to run on 32 bits !
   library(stringr)
   library(dplyr)
+  library(tidyr)
   library(here)
   require(sjPlot) # for model automatic interaction plot
   library(gridExtra) # for function gridarrange
@@ -308,8 +309,8 @@ MY_TABLE_Videos_perMale$NbMphysicalInter <- MY_TABLE_Videos_perMale$NbMAttacks+M
 summary(MY_TABLE_Videos_perMale)
 DelayLeaveDish <- MY_TABLE_Videos_perMale$DelayLeaveDish
 
-MY_TABLE_Videos_perMale <- MY_TABLE_Videos_perMale %>%
-  mutate_if(is.numeric, funs(ifelse(is.na(.), 0, .))) # replace all NAs by 0
+MY_TABLE_Videos_perMale <- MY_TABLE_Videos_perMale %>% 
+  mutate_if(is.numeric, list(~ifelse(is.na(.), 0, .))) # replace all NAs by 0
 
 MY_TABLE_Videos_perMale$DelayLeaveDish <- DelayLeaveDish
 
@@ -377,7 +378,7 @@ MY_TABLE_Videos <- merge (x = MY_TABLE_Videos, y=  Behav_Female[,c('FID', 'Attac
                           by = 'FID', all.x=TRUE)  
 
 MY_TABLE_Videos <- MY_TABLE_Videos %>%
-  mutate_if(is.numeric, funs(ifelse(is.na(.), 0, .)))
+  mutate_if(is.numeric, list(~ifelse(is.na(.), 0, .))) # replace all NAs by 0
 
 ## Convert first times into delay from time start video, in seconds
 MY_TABLE_Videos$DelayFirstMInter <-  as.numeric(difftime(MY_TABLE_Videos$FirstMInter,MY_TABLE_Videos$VideoTimeStart, units = 'secs'))
